@@ -53,7 +53,7 @@ export function ClientsList() {
       />
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-white/15 bg-background px-6 py-16 text-center">
+        <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
           <p className="text-sm text-muted-foreground">
             No clients yet. Create your first client to get started.
           </p>

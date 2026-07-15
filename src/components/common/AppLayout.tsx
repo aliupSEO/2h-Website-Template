@@ -20,7 +20,7 @@ export function AppLayout() {
       <AppSidebar />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
         <AppHeader />
-        <main className="min-h-0 flex-1 overflow-auto bg-surface p-4 sm:p-6">
+        <main className="min-h-0 flex-1 overflow-auto bg-muted p-4 sm:p-6">
           <Outlet />
         </main>
       </div>

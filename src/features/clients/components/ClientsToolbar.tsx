@@ -51,7 +51,7 @@ export function ClientsToolbar({
             className={cn(
               'rounded-md p-2 transition-colors',
               viewMode === 'table'
-                ? 'bg-background text-foreground'
+                ? 'bg-card text-foreground'
                 : 'text-muted-foreground hover:text-foreground',
             )}
             onClick={() => onViewModeChange('table')}
@@ -64,7 +64,7 @@ export function ClientsToolbar({
             className={cn(
               'rounded-md p-2 transition-colors',
               viewMode === 'cards'
-                ? 'bg-background text-foreground'
+                ? 'bg-card text-foreground'
                 : 'text-muted-foreground hover:text-foreground',
             )}
             onClick={() => onViewModeChange('cards')}

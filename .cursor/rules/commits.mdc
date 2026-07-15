@@ -27,7 +27,7 @@ Examples:
 - One logical change per commit when possible.
 - Keep messages **concise and clean**: imperative mood, no filler, summary under ~72 chars.
 - Message explains **why** when the diff alone is unclear; skip noise ("WIP", "updates", "misc").
-- Never commit secrets (`.env`, credentials).
+- Never commit secrets (`.env.local`, credentials, service-account JSON) — see `secrets.mdc`.
 - Never use `--no-verify` unless the user explicitly requests it.
 - Never amend/push unless the user asks; when pushing, push the **topic branch only**.
 

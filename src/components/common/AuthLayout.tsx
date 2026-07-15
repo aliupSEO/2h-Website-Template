@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
+import authBg from '@/assets/authbg.jpg'
 import logo2h from '@/assets/logo-2h.png'
 import {
   Card,
@@ -18,10 +19,16 @@ type AuthLayoutProps = {
 
 export function AuthLayout({ title, description, children }: AuthLayoutProps) {
   return (
-    <div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-surface px-4 py-10">
+    <div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-4 py-10">
+      <img
+        src={authBg}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute inset-0 size-full object-cover object-center"
+      />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,color-mix(in_srgb,var(--brand-green)_12%,transparent),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-black/35"
       />
 
       <div className="relative z-10 mb-8 flex flex-col items-center gap-1">
@@ -29,18 +36,18 @@ export function AuthLayout({ title, description, children }: AuthLayoutProps) {
           <img
             src={logo2h}
             alt="2H Web Solutions"
-            className="h-10 w-auto object-contain"
+            className="h-10 w-auto object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)]"
           />
-          <span className="text-[11px] font-medium tracking-wide text-muted-foreground">
+          <span className="text-[11px] font-medium tracking-wide text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
             Central Hub
           </span>
         </Link>
       </div>
 
-      <Card className="relative z-10 w-full max-w-md gap-0 border border-white/15 bg-background py-0 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+      <Card className="relative z-10 w-full max-w-md gap-0 border-0 bg-surface py-0 shadow-[0_28px_90px_rgba(0,0,0,0.75)] ring-0">
         <CardHeader className="justify-items-center space-y-0 px-8 pt-8 pb-2 text-center">
-          <CardTitle className="text-xl">{title}</CardTitle>
-          <CardDescription className="text-center">
+          <CardTitle className="text-xl text-foreground">{title}</CardTitle>
+          <CardDescription className="text-center text-muted-foreground">
             {description}
           </CardDescription>
         </CardHeader>

@@ -26,7 +26,7 @@ export function ClientsCardGrid({ clients, onDelete }: ClientsCardGridProps) {
           client.logos.length + client.assets.length + client.documents.length
 
         return (
-          <Card key={client.id} className="border-white/10 bg-background">
+          <Card key={client.id}>
             <CardHeader>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 space-y-1">

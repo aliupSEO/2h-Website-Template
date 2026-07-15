@@ -90,7 +90,7 @@ export function ClientForm({ mode, client }: ClientFormProps) {
   return (
     <FormProvider {...form}>
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Card className="relative z-20 overflow-visible border-white/10 bg-background">
+        <Card className="relative z-20 overflow-visible">
           <CardHeader>
             <CardTitle>Details</CardTitle>
             <CardDescription>
@@ -160,7 +160,7 @@ export function ClientForm({ mode, client }: ClientFormProps) {
                 <SelectTrigger id="client-status" className="w-full">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent className="bg-background">
+                <SelectContent className="border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.55)]">
                   {CLIENT_STATUSES.map((status) => (
                     <SelectItem key={status.value} value={status.value}>
                       {status.label}
@@ -172,7 +172,7 @@ export function ClientForm({ mode, client }: ClientFormProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-background">
+        <Card>
           <CardHeader>
             <CardTitle>Links</CardTitle>
             <CardDescription>
@@ -184,7 +184,7 @@ export function ClientForm({ mode, client }: ClientFormProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-background">
+        <Card>
           <CardHeader>
             <CardTitle>Files</CardTitle>
             <CardDescription>

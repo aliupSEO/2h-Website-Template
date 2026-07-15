@@ -32,6 +32,7 @@ Do **not** silently follow a bad pattern. Instead:
 | Routes in a random file | All routes in `App.tsx` |
 | Giant unstructured commit | Conventional Commits, scoped messages |
 | Push / commit on `main` or `dev` | Branch from `dev` (`feature/…`, `ui/…`, `fix/…`); PR → `dev`; promote with `git push origin dev:main` |
+| Hardcoded API key / token | Put value in `.env.local`; key name in `.env.example`; read from env (see `secrets.mdc`) |
 | New file at `src/` root | Place under the matching folder |
 
 Be concise but complete enough that the user understands the tradeoff.

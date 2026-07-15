@@ -73,9 +73,9 @@
 :root {
   --background: var(--brand-black);
   --foreground: var(--brand-white);
-  --card: var(--brand-black);
+  --card: var(--brand-surface);
   --card-foreground: var(--brand-white);
-  --popover: var(--brand-black);
+  --popover: var(--brand-surface);
   --popover-foreground: var(--brand-white);
   --primary: var(--brand-green);
   --primary-foreground: var(--brand-black);
@@ -108,9 +108,9 @@
 .dark {
   --background: var(--brand-black);
   --foreground: var(--brand-white);
-  --card: var(--brand-black);
+  --card: var(--brand-surface);
   --card-foreground: var(--brand-white);
-  --popover: var(--brand-black);
+  --popover: var(--brand-surface);
   --popover-foreground: var(--brand-white);
   --primary: var(--brand-green);
   --primary-foreground: var(--brand-black);

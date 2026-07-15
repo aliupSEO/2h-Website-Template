@@ -48,7 +48,7 @@ export function ConfirmModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="gap-5 border border-white/20 bg-background shadow-[0_24px_80px_rgba(0,0,0,0.65)]"
+        className="gap-5 border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.75)] ring-0"
       >
         <DialogHeader>
           <DialogTitle className="text-foreground">{title}</DialogTitle>

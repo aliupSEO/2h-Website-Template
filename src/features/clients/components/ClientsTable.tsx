@@ -20,10 +20,10 @@ type ClientsTableProps = {
 
 export function ClientsTable({ clients, onDelete }: ClientsTableProps) {
   return (
-    <div className="rounded-xl border border-white/10 bg-background">
+    <div className="rounded-xl border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
       <Table>
         <TableHeader>
-          <TableRow className="border-white/10 hover:bg-transparent">
+          <TableRow className="border-white/5 hover:bg-transparent">
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Phone</TableHead>
@@ -41,7 +41,7 @@ export function ClientsTable({ clients, onDelete }: ClientsTableProps) {
               client.documents.length
 
             return (
-              <TableRow key={client.id} className="border-white/10">
+              <TableRow key={client.id} className="border-white/5">
                 <TableCell className="font-medium">{client.name}</TableCell>
                 <TableCell>{client.email}</TableCell>
                 <TableCell>+{client.phone}</TableCell>
