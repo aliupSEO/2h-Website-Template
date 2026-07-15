@@ -1,0 +1,14 @@
+---
+description: shadcn/ui is the component library — add via CLI and customize in place
+globs: "**/components/ui/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# shadcn/ui
+
+- Primitives live only in `src/components/ui/`.
+- Add new primitives with: `npx shadcn@latest add <component>`.
+- **Customize the generated files** (variants, sizes, classNames) — do not fork a parallel Button/Input elsewhere.
+- Import with the `@/` alias: `import { Button } from "@/components/ui/button"`.
+- Shared layouts/composites that use several primitives go in `components/common`, not `ui/`.
+- Do not install alternate UI kits (MUI, Chakra, Ant Design) unless the user explicitly asks.

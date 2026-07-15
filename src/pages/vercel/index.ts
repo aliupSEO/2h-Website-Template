@@ -1,0 +1,1 @@
+export { VercelPage } from './VercelPage'

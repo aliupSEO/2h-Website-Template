@@ -1,0 +1,153 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "./phone-input.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Brand palette:
+  - black  → shell + cards / modals
+  - surface → gray page / inner body only
+  - white / green → text + accent
+*/
+:root {
+  --brand-black: #000000;
+  --brand-surface: #2a2a2a;
+  --brand-panel: #000000;
+  --brand-white: #ffffff;
+  --brand-green: #c6f532;
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-surface: var(--brand-surface);
+  --color-panel: var(--brand-panel);
+  --color-brand-black: var(--brand-black);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-panel: var(--brand-panel);
+  --color-brand-white: var(--brand-white);
+  --color-brand-green: var(--brand-green);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: var(--brand-black);
+  --foreground: var(--brand-white);
+  --card: var(--brand-black);
+  --card-foreground: var(--brand-white);
+  --popover: var(--brand-black);
+  --popover-foreground: var(--brand-white);
+  --primary: var(--brand-green);
+  --primary-foreground: var(--brand-black);
+  --secondary: #1a1a1a;
+  --secondary-foreground: var(--brand-white);
+  --muted: #1a1a1a;
+  --muted-foreground: #a3a3a3;
+  --accent: color-mix(in srgb, var(--brand-green) 16%, transparent);
+  --accent-foreground: var(--brand-green);
+  --destructive: #ef4444;
+  --border: color-mix(in srgb, var(--brand-white) 14%, transparent);
+  --input: color-mix(in srgb, var(--brand-white) 12%, transparent);
+  --ring: var(--brand-green);
+  --chart-1: var(--brand-green);
+  --chart-2: #a3e635;
+  --chart-3: #ffffff;
+  --chart-4: #737373;
+  --chart-5: #262626;
+  --radius: 0.625rem;
+  --sidebar: var(--brand-black);
+  --sidebar-foreground: var(--brand-white);
+  --sidebar-primary: var(--brand-green);
+  --sidebar-primary-foreground: var(--brand-black);
+  --sidebar-accent: color-mix(in srgb, var(--brand-green) 14%, transparent);
+  --sidebar-accent-foreground: var(--brand-green);
+  --sidebar-border: color-mix(in srgb, var(--brand-white) 10%, transparent);
+  --sidebar-ring: var(--brand-green);
+}
+
+.dark {
+  --background: var(--brand-black);
+  --foreground: var(--brand-white);
+  --card: var(--brand-black);
+  --card-foreground: var(--brand-white);
+  --popover: var(--brand-black);
+  --popover-foreground: var(--brand-white);
+  --primary: var(--brand-green);
+  --primary-foreground: var(--brand-black);
+  --secondary: #1a1a1a;
+  --secondary-foreground: var(--brand-white);
+  --muted: #1a1a1a;
+  --muted-foreground: #a3a3a3;
+  --accent: color-mix(in srgb, var(--brand-green) 16%, transparent);
+  --accent-foreground: var(--brand-green);
+  --destructive: #ef4444;
+  --border: color-mix(in srgb, var(--brand-white) 14%, transparent);
+  --input: color-mix(in srgb, var(--brand-white) 12%, transparent);
+  --ring: var(--brand-green);
+  --chart-1: var(--brand-green);
+  --chart-2: #a3e635;
+  --chart-3: #ffffff;
+  --chart-4: #737373;
+  --chart-5: #262626;
+  --sidebar: var(--brand-black);
+  --sidebar-foreground: var(--brand-white);
+  --sidebar-primary: var(--brand-green);
+  --sidebar-primary-foreground: var(--brand-black);
+  --sidebar-accent: color-mix(in srgb, var(--brand-green) 14%, transparent);
+  --sidebar-accent-foreground: var(--brand-green);
+  --sidebar-border: color-mix(in srgb, var(--brand-white) 10%, transparent);
+  --sidebar-ring: var(--brand-green);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+  }
+}

@@ -1,0 +1,26 @@
+---
+description: Use the shared Loading component for all loading states
+alwaysApply: true
+---
+
+# Loading UI
+
+- **Always** use the shared loading components from `components/common` for any loading / pending UI.
+- Asset: `src/assets/live-chatbot.svg` (do not swap in random spinners, CSS dots, or third-party loaders).
+
+## Components
+
+| Use case | Component |
+|----------|-----------|
+| Inline / button / small area | `<Loading size="sm" />` or `size="md"` |
+| Page / section / full viewport | `<LoadingScreen />` (optional `label`) |
+| Overlay over existing content | `<LoadingOverlay />` |
+
+## Rules
+
+- Do **not** invent one-off loaders (`animate-spin`, Lucide `Loader2`, browser `busy` text alone).
+- Buttons that wait on async work should show `<Loading size="sm" />` (or disable + nearby loader) via the shared component.
+- Feature pages awaiting data must render `LoadingScreen` (or `Loading` inside the content area), not blank screens or custom spinners.
+- Keep the chatbot SVG as the only loading visual language in the app.
+
+If the user asks for a different spinner, redirect to these components unless they explicitly override.

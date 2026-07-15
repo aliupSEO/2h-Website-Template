@@ -1,0 +1,32 @@
+---
+description: Industry-standard Conventional Commits; commit only when asked
+alwaysApply: true
+---
+
+# Git Commits
+
+- Commit **only when the user asks**.
+- Use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(optional-scope): <short imperative summary>
+```
+
+Types: `feat`, `fix`, `refactor`, `style`, `docs`, `test`, `chore`, `perf`, `ci`.
+
+Examples:
+
+- `feat(auth): add login page and auth store`
+- `fix(users): correct empty-state when list is empty`
+- `chore: set up folder structure and eslint`
+- `refactor(ui): extract Button into components/ui`
+
+## Rules
+
+- One logical change per commit when possible.
+- Message explains **why**, summary stays under ~72 chars.
+- Never commit secrets (`.env`, credentials).
+- Never use `--no-verify` unless the user explicitly requests it.
+- Never amend/push unless the user asks.
+
+If the user asks for a vague dump commit ("save everything"), suggest splitting into meaningful Conventional Commits and explain briefly.

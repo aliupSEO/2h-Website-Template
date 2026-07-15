@@ -1,0 +1,31 @@
+---
+description: Zustand store conventions — add only when shared client state is required
+globs: "**/stores/**/*.ts,**/stores/**/*.tsx"
+alwaysApply: false
+---
+
+# Zustand
+
+- Add Zustand **only when needed**: state shared across unrelated components/pages, or global UI state (auth session, theme, drawer).
+- Do **not** use Zustand for local form state, one-component UI, or server cache that belongs in a service/query layer.
+- One store per domain: `stores/authStore.ts`, `stores/uiStore.ts`.
+- Keep stores small: state + actions. No JSX. No API calls mixed with rendering — call `services/` from actions if needed.
+
+```ts
+// stores/uiStore.ts — pattern
+import { create } from 'zustand';
+
+type UiState = {
+  sidebarOpen: boolean;
+  toggleSidebar: () => void;
+};
+
+export const useUiStore = create<UiState>((set) => ({
+  sidebarOpen: true,
+  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+}));
+```
+
+Install zustand when first store is needed. Create `src/stores/` if missing.
+
+If the user wants Zustand for something that should be local `useState` / props, explain why local state is better and use that instead.

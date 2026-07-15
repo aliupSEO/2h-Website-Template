@@ -1,0 +1,37 @@
+---
+description: Form fields, Zod validation, toasts, and confirm modals
+alwaysApply: true
+---
+
+# Forms, Toasts & Confirms
+
+## Inputs & field chrome
+
+- **No borders and no focus rings** on inputs, textareas, selects, or similar controls.
+- Use muted/surface background (and spacing) for field definition — never `border-*`, `ring-*`, or `outline` on focus.
+- Invalid state is shown by the **message under the field**, not a heavy red border/ring.
+
+## Labels & required
+
+- Mark required fields with a red `*` next to the label.
+- Do **not** label optional fields as “(optional)”.
+- Place validation messages **directly under** the field, in red (`text-destructive`).
+
+## Validation
+
+- Validate every form with **Zod** (+ React Hook Form when building interactive forms).
+- Keep schemas next to the feature (`features/<name>/schemas.ts` or co-located).
+- Prefer field-level errors from Zod over browser `required` / native validation UX.
+
+## Toasts
+
+- Use the shared toast helper (`toast.success` / `toast.error` from `@/lib/toast`).
+- Success and failure toasts must stay **minimal / premium** — quiet surface, short copy, no loud colorful success/error panels.
+- Toasts are for brief outcome feedback; field errors stay under inputs.
+
+## Confirm modals
+
+- Destructive or irreversible actions use the reusable **`ConfirmModal`** in `components/common`.
+- Keep confirms minimal: title, short description, Cancel + Confirm — no extra chrome.
+
+If the user asks for bordered inputs, colored toast banners, or one-off confirm dialogs, redirect to these patterns.

@@ -1,0 +1,46 @@
+---
+description: Enforces the required React folder structure for all features large and small
+alwaysApply: true
+---
+
+# Project Folder Structure
+
+All work lives under `src/`. Never dump logic into random files.
+
+```
+src/
+  App.tsx              # Routes ONLY live here (react-router)
+  main.tsx             # App bootstrap
+  components/          # Reusable UI (no feature business logic)
+    ui/                # shadcn/ui primitives (add via CLI, then customize)
+    common/            # Shared composites: Header, EmptyState, etc.
+  pages/               # One folder per route/page (composers only)
+  features/            # Domain modules (auth, dashboard, etc.)
+    <feature>/
+      components/      # Feature-specific components
+      hooks/           # Feature-specific hooks
+      types.ts
+      index.ts         # Public exports only
+  hooks/               # Shared custom hooks
+  stores/              # Zustand stores (create only when needed)
+  services/            # API / external data layer
+  types/               # Shared TypeScript types
+  utils/               # Pure helpers (no React)
+  lib/                 # Shared libs (e.g. shadcn `cn` helper)
+  constants/           # App-wide constants
+  assets/              # Images, fonts, static media
+  styles/              # Global / shared styles (includes Tailwind + shadcn theme)
+```
+
+## Rules
+
+- Small change → still place it in the correct folder. No one-off files at `src/` root.
+- Big feature → create `features/<name>/` with its own `components/`, `hooks/`, `types.ts`.
+- Pages compose reusable components + features; they do not own low-level UI markup.
+- If a required folder is missing, create it before writing code.
+- Prefer `index.ts` barrels for clean public exports from features/components.
+---
+
+# Guidance
+
+If the user asks to put code in the wrong place (e.g. page UI inside `App.tsx`, API calls in a Button, store in a page file), **stop and explain** the correct folder and why before implementing.

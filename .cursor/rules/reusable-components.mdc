@@ -1,0 +1,48 @@
+---
+description: Always build and reuse components; never write loose inline UI or logic
+alwaysApply: true
+---
+
+# Reusable Components First
+
+Never write UI or business logic "openly" in pages, App, or one-off files.
+
+## Must
+
+- **UI primitives come from shadcn/ui** in `src/components/ui/`. Add with `npx shadcn@latest add <name>`, then customize the generated source in place (do not wrap third-party npm UI kits).
+- Shared composites (Header, EmptyState, PageLayout, **Loading**) go in `components/common`.
+- Loading states must use `Loading` / `LoadingScreen` / `LoadingOverlay` (chatbot SVG) — never ad-hoc spinners.
+- Feature-only UI goes in `features/<name>/components/`.
+- Pages and features **compose** components; they do not duplicate JSX patterns.
+- Extract repeated markup, handlers, or fetch logic into components, hooks, or services.
+- Prefer extending/modifying an existing shadcn component over inventing a parallel primitive.
+
+## Do Not
+
+```tsx
+// ❌ BAD — loose markup in App or page
+function App() {
+  return (
+    <div>
+      <button className="px-4 py-2 bg-blue-500" onClick={...}>Save</button>
+      {/* duplicated forms, cards, tables inline */}
+    </div>
+  );
+}
+```
+
+```tsx
+// ✅ GOOD — compose reusable components
+function UsersPage() {
+  return (
+    <PageLayout title="Users">
+      <UserTable users={users} onEdit={handleEdit} />
+      <Button variant="primary" onClick={handleCreate}>Add user</Button>
+    </PageLayout>
+  );
+}
+```
+
+## When user drifts
+
+If the user asks for quick inline junk that should be a component, **explain** that we extract a reusable component first, then use it — then implement that way.

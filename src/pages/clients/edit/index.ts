@@ -1,0 +1,1 @@
+export { EditClientPage } from './EditClientPage'

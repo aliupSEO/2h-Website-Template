@@ -1,0 +1,32 @@
+---
+description: All routes are declared only in App.tsx; pages live under pages/
+globs: "**/App.tsx,**/pages/**/*.tsx,**/pages/**/*.ts"
+alwaysApply: false
+---
+
+# Routing
+
+- **All routes are defined in `src/App.tsx`** using React Router.
+- Do not create separate router config files unless the user explicitly asks later.
+- Each route renders a page from `src/pages/`.
+- `App.tsx` must stay thin: providers + `<Routes>` / `<Route>` only — no page UI.
+
+```tsx
+// src/App.tsx — pattern
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HomePage } from './pages/HomePage';
+import { UsersPage } from './pages/UsersPage';
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/users" element={<UsersPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
+
+If the user proposes routes elsewhere, explain they must stay in `App.tsx` and redirect the change there.

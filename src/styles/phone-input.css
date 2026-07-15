@@ -1,0 +1,129 @@
+/* react-phone-input-2 — match borderless form fields */
+.phone-field.react-tel-input {
+  width: 100%;
+  font-family: inherit;
+  position: relative;
+  overflow: visible !important;
+}
+
+.phone-field.react-tel-input .flag-dropdown.open,
+.phone-field.react-tel-input .flag-dropdown.open .country-list {
+  z-index: 80 !important;
+}
+
+.phone-field .form-control {
+  width: 100% !important;
+  height: 2.5rem !important;
+  border: 0 !important;
+  border-radius: 0.5rem !important;
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
+  font-size: 0.875rem !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding-left: 3.25rem !important;
+}
+
+.phone-field .form-control:focus {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.phone-field .form-control::placeholder {
+  color: var(--muted-foreground) !important;
+}
+
+.phone-field .flag-dropdown {
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 0.5rem 0 0 0.5rem !important;
+}
+
+.phone-field .selected-flag {
+  width: 2.75rem !important;
+  padding: 0 0 0 0.65rem !important;
+  border-radius: 0.5rem 0 0 0.5rem !important;
+  background: transparent !important;
+  outline: none !important;
+}
+
+.phone-field .selected-flag:hover,
+.phone-field .selected-flag:focus,
+.phone-field .flag-dropdown.open .selected-flag {
+  background: color-mix(in srgb, var(--foreground) 8%, transparent) !important;
+}
+
+.phone-field .flag-dropdown.open {
+  background: transparent !important;
+  z-index: 50 !important;
+}
+
+.phone-field .country-list {
+  position: absolute !important;
+  z-index: 80 !important;
+  width: 18rem !important;
+  max-height: 16rem !important;
+  margin-top: 0.25rem !important;
+  padding: 0.35rem !important;
+  overflow-y: auto !important;
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  border: 1px solid color-mix(in srgb, var(--brand-white) 14%, transparent) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55) !important;
+  outline: none !important;
+}
+
+.phone-field .country-list .country {
+  padding: 0.55rem 0.65rem !important;
+  border-radius: 0.5rem !important;
+  margin: 0.05rem 0 !important;
+}
+
+.phone-field .country-list .country .dial-code {
+  color: var(--muted-foreground) !important;
+}
+
+.phone-field .country-list .country:hover,
+.phone-field .country-list .country.highlight {
+  background: var(--muted) !important;
+}
+
+.phone-field .country-list .search {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1 !important;
+  padding: 0.35rem 0.35rem 0.5rem !important;
+  margin: 0 0 0.25rem !important;
+  background: var(--background) !important;
+  border: 0 !important;
+}
+
+.phone-field .country-list .search-box {
+  width: 100% !important;
+  height: 2.25rem !important;
+  margin-left: 0 !important;
+  padding: 0 0.75rem !important;
+  border: 0 !important;
+  border-radius: 0.5rem !important;
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
+  font-size: 0.875rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.phone-field .country-list .search-box:focus {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.phone-field .country-list .search-emoji {
+  display: none !important;
+}
+
+.phone-field .country-list .divider {
+  display: none !important;
+}

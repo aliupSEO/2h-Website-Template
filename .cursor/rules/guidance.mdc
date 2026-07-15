@@ -1,0 +1,36 @@
+---
+description: Correct the user when direction conflicts with project standards; explain why
+alwaysApply: true
+---
+
+# Direction Guardrails
+
+Before implementing, check the request against project rules.
+
+## If the user goes the wrong way
+
+Do **not** silently follow a bad pattern. Instead:
+
+1. **Explain** clearly what is wrong and why (folder, reuse, routing, state, commits).
+2. **Propose** the industry-standard approach used in this project.
+3. **Implement** the correct approach unless the user explicitly overrides after the explanation.
+
+## Common redirects
+
+| User asks | Correct approach |
+|-----------|------------------|
+| Dump UI in `App.tsx` | Routes only in `App.tsx`; UI in pages/components |
+| Copy-paste same JSX | Extract reusable component under `components/` |
+| New Button/Input from scratch | Add/customize shadcn in `components/ui` via CLI |
+| Bordered inputs / focus rings | No borders or focus rings; muted surface + under-field errors |
+| Native form required / alerts | Zod + React Hook Form; red `*` and errors under fields |
+| Loud toast banners | Minimal `toast.success` / `toast.error` from `@/lib/toast` |
+| One-off yes/no dialog | Reusable `ConfirmModal` |
+| Custom spinner / Loader2 | Use `Loading` / `LoadingScreen` / `LoadingOverlay` |
+| Put API in a component | Use `services/` + hooks |
+| Zustand for every form | Prefer local state; Zustand only for shared global state |
+| Routes in a random file | All routes in `App.tsx` |
+| Giant unstructured commit | Conventional Commits, scoped messages |
+| New file at `src/` root | Place under the matching folder |
+
+Be concise but complete enough that the user understands the tradeoff.
