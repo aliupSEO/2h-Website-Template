@@ -1,1 +1,1 @@
-export { PluginsPage } from './PluginsPage'
+export { PluginsPage } from './PluginsPage';

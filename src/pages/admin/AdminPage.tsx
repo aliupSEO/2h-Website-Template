@@ -1,5 +1,4 @@
-import { PagePlaceholder } from '@/components/common'
-
-export function AdminPage() {
-  return <PagePlaceholder title="Admin Panel" />
-}
+import { PagePlaceholder } from '@/components/common';
+export const AdminPage = () => {
+    return <PagePlaceholder title="Admin Panel" documentTitle="Admin"/>;
+};

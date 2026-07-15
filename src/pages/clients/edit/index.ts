@@ -1,1 +1,1 @@
-export { EditClientPage } from './EditClientPage'
+export { EditClientPage } from './EditClientPage';

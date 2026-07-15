@@ -1,8 +1,8 @@
-import { ClientForm } from '@/features/clients'
-
-export function CreateClientPage() {
-  return (
-    <div className="mx-auto w-full max-w-4xl space-y-6">
+import { DocumentTitle } from '@/components/common';
+import { ClientForm } from '@/features/clients';
+export const CreateClientPage = () => {
+    return (<div className="mx-auto w-full max-w-4xl space-y-6">
+      <DocumentTitle title="Create Client"/>
       <div className="space-y-1">
         <h1 className="font-heading text-2xl font-semibold tracking-tight">
           Create client
@@ -11,7 +11,6 @@ export function CreateClientPage() {
           Add contact details, links, logos, assets, and documents.
         </p>
       </div>
-      <ClientForm mode="create" />
-    </div>
-  )
-}
+      <ClientForm mode="create"/>
+    </div>);
+};

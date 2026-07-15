@@ -1,1 +1,1 @@
-export { GitPage } from './GitPage'
+export { GitPage } from './GitPage';

@@ -1,5 +1,4 @@
-import { PagePlaceholder } from '@/components/common'
-
-export function GitPage() {
-  return <PagePlaceholder title="Git" />
-}
+import { PagePlaceholder } from '@/components/common';
+export const GitPage = () => {
+    return <PagePlaceholder title="Git"/>;
+};

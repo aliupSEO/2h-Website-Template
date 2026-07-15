@@ -1,5 +1,4 @@
-import { PagePlaceholder } from '@/components/common'
-
-export function WebsitesPage() {
-  return <PagePlaceholder title="Websites" />
-}
+import { PagePlaceholder } from '@/components/common';
+export const WebsitesPage = () => {
+    return <PagePlaceholder title="Websites"/>;
+};

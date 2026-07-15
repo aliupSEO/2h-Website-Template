@@ -1,1 +1,1 @@
-export { AppsPage } from './AppsPage'
+export { AppsPage } from './AppsPage';

@@ -34,6 +34,8 @@ Do **not** silently follow a bad pattern. Instead:
 | Push / commit on `main` or `dev` | Branch from `dev` (`feature/…`, `ui/…`, `fix/…`); PR → `dev`; promote with `git push origin dev:main` |
 | “Staging” / merge to staging | Use **`dev`** — there is no `staging` branch |
 | Hardcoded API key / token | Put value in `.env.local`; key name in `.env.example`; read from env (see `secrets.mdc`) |
+| Missing browser tab title | Set via `DocumentTitle` / `useDocumentTitle` (`Page · 2H Central Hub`) |
+| Classic `function` for components | Prefer `export const X = () => …` (see `arrow-functions.mdc`) |
 | New file at `src/` root | Place under the matching folder |
 
 Be concise but complete enough that the user understands the tradeoff.

@@ -1,1 +1,1 @@
-export { VercelPage } from './VercelPage'
+export { VercelPage } from './VercelPage';

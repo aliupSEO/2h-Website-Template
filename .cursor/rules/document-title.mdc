@@ -1,0 +1,40 @@
+---
+description: Every route updates the browser tab title — full, concise, professional
+alwaysApply: true
+---
+
+# Document / Tab Titles
+
+Every screen must set a professional browser tab title. Do not leave the Vite default (`2h-central-hub-production`) or a blank/stale title after navigation.
+
+## Format
+
+```
+{Page} · 2H Central Hub
+```
+
+- **Page** — short human label (Title Case): `Dashboard`, `Clients`, `Create Client`, `Sign In`.
+- **Suffix** — always `· 2H Central Hub` (via shared helper; do not hardcode the brand string in pages).
+- Optional detail when useful: `Edit Client · Acme Corp · 2H Central Hub` (keep under ~60 chars when possible).
+
+## How
+
+- Use `useDocumentTitle` from `@/hooks` (or `<DocumentTitle title="…" />` from `@/components/common`).
+- Set the title in the **page** (or shared layout that owns the screen), not deep inside random leaf widgets.
+- New routes: add a title when you add the page — never ship a route without one.
+
+## Tone
+
+- Full meaning at a glance; concise; no slang, no `page`, no raw path segments (`/clients/new`).
+- Prefer names that match the in-page heading.
+
+## Examples
+
+| Route | Tab title |
+|-------|-----------|
+| `/auth/sign-in` | `Sign In · 2H Central Hub` |
+| `/dashboard` | `Dashboard · 2H Central Hub` |
+| `/clients` | `Clients · 2H Central Hub` |
+| `/clients/new` | `Create Client · 2H Central Hub` |
+| `/clients/:id/edit` | `Edit Client · 2H Central Hub` |
+| `/admin` | `Admin · 2H Central Hub` |

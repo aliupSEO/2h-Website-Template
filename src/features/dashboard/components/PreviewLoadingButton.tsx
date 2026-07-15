@@ -1,38 +1,21 @@
-import { useEffect } from 'react'
-
-import { LoadingScreen } from '@/components/common'
-import { Button } from '@/components/ui'
-
+import { useEffect } from 'react';
+import { LoadingScreen } from '@/components/common';
+import { Button } from '@/components/ui';
 type PreviewLoadingButtonProps = {
-  onPreview: () => void
-}
-
-/** Temporary control to preview the shared chatbot loader. Remove later. */
-export function PreviewLoadingButton({ onPreview }: PreviewLoadingButtonProps) {
-  return (
-    <Button type="button" variant="outline" onClick={onPreview}>
+    onPreview: () => void;
+};
+export const PreviewLoadingButton = ({ onPreview }: PreviewLoadingButtonProps) => {
+    return (<Button type="button" variant="outline" onClick={onPreview}>
       Preview loading
-    </Button>
-  )
-}
-
+    </Button>);
+};
 type DashboardLoadingPreviewProps = {
-  onDone: () => void
-}
-
-export function DashboardLoadingPreview({
-  onDone,
-}: DashboardLoadingPreviewProps) {
-  useEffect(() => {
-    const timer = window.setTimeout(onDone, 2500)
-    return () => window.clearTimeout(timer)
-  }, [onDone])
-
-  return (
-    <LoadingScreen
-      label="Loading…"
-      size="lg"
-      className="min-h-[calc(100svh-8rem)]"
-    />
-  )
-}
+    onDone: () => void;
+};
+export const DashboardLoadingPreview = ({ onDone, }: DashboardLoadingPreviewProps) => {
+    useEffect(() => {
+        const timer = window.setTimeout(onDone, 2500);
+        return () => window.clearTimeout(timer);
+    }, [onDone]);
+    return (<LoadingScreen label="Loading…" size="lg" className="min-h-[calc(100svh-8rem)]"/>);
+};

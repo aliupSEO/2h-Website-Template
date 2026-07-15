@@ -1,5 +1,4 @@
-import { PagePlaceholder } from '@/components/common'
-
-export function EnvPage() {
-  return <PagePlaceholder title="Env" />
-}
+import { PagePlaceholder } from '@/components/common';
+export const EnvPage = () => {
+    return <PagePlaceholder title="Env"/>;
+};

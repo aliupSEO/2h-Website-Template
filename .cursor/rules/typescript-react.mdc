@@ -7,7 +7,8 @@ alwaysApply: false
 # TypeScript & React Standards
 
 - Functional components only; TypeScript for all new files (`.ts` / `.tsx`).
-- Named exports for components/hooks; default export allowed for pages and `App`.
+- **Arrow functions first** for components, hooks, and helpers (`export const X = () => …`). See `arrow-functions.mdc`.
+- Named exports for components/hooks; default export allowed for pages and `App` (`const App = () => …; export default App`).
 - Props: explicit types / interfaces; no `any`.
 - Hooks: shared in `hooks/`, feature-local in `features/<name>/hooks/`.
 - Side effects (fetch, storage) belong in `services/` or hooks — not in presentational UI.

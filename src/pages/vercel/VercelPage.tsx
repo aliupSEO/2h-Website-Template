@@ -1,5 +1,4 @@
-import { PagePlaceholder } from '@/components/common'
-
-export function VercelPage() {
-  return <PagePlaceholder title="Vercel" />
-}
+import { PagePlaceholder } from '@/components/common';
+export const VercelPage = () => {
+    return <PagePlaceholder title="Vercel"/>;
+};

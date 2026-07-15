@@ -35,12 +35,15 @@ npm run db:push     # push migrations to linked remote
 npm run db:types    # regenerate src/lib/supabase/database.types.ts from local DB
 ```
 
-## Next steps (schema)
+## Schema
+
+See [schema.md](./schema.md) — **profiles** (roles: admin / manager / user) and **clients** (CRM table, not a role).
+
+## Apply migrations
 
 1. Fill `.env.local` with your project URL + anon key.
 2. `supabase link --project-ref <ref>` (optional, for remote).
-3. Add SQL under `supabase/migrations/` (e.g. `YYYYMMDDHHMMSS_create_clients.sql`).
-4. `npm run db:reset` (local) or `npm run db:push` (remote).
-5. `npm run db:types`.
+3. `npm run db:reset` (local) or `npm run db:push` (remote).
+4. `npm run db:types` (regenerate `database.types.ts` from the live DB).
 
 Use `getSupabaseClient()` from `@/lib/supabase` in services — not in low-level UI.

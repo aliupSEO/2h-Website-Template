@@ -1,1 +1,1 @@
-export { WebsitesPage } from './WebsitesPage'
+export { WebsitesPage } from './WebsitesPage';

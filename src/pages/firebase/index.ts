@@ -1,1 +1,1 @@
-export { FirebasePage } from './FirebasePage'
+export { FirebasePage } from './FirebasePage';

@@ -1,1 +1,1 @@
-export { CreateClientPage } from './CreateClientPage'
+export { CreateClientPage } from './CreateClientPage';

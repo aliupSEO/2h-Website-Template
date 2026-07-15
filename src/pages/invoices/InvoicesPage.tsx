@@ -1,5 +1,4 @@
-import { PagePlaceholder } from '@/components/common'
-
-export function InvoicesPage() {
-  return <PagePlaceholder title="Invoices" />
-}
+import { PagePlaceholder } from '@/components/common';
+export const InvoicesPage = () => {
+    return <PagePlaceholder title="Invoices"/>;
+};

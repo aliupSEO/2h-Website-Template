@@ -1,5 +1,4 @@
-import { ClientsList } from '@/features/clients'
-
-export function ClientsPage() {
-  return <ClientsList />
-}
+import { ClientsList } from '@/features/clients';
+export const ClientsPage = () => {
+    return <ClientsList />;
+};

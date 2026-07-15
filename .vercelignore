@@ -1,0 +1,9 @@
+.git
+.cursor
+docs
+supabase
+node_modules
+dist
+.env*
+*.local
+README.md

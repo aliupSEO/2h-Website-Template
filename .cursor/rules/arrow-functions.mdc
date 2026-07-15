@@ -1,0 +1,40 @@
+---
+description: Prefer arrow functions everywhere; function declarations are second priority
+alwaysApply: true
+---
+
+# Arrow Functions First
+
+**First priority:** arrow functions (`const` / `export const`).  
+**Second priority:** classic `function` declarations — only when an arrow is awkward or incorrect (rare).
+
+## Must
+
+- React components: `export const Page = () => { … }`
+- Hooks: `export const useX = () => { … }`
+- Helpers / utils / service fns: `export const helper = () => { … }`
+- Handlers inside components: `const onSubmit = async () => { … }` (not `async function onSubmit`)
+- Default export (`App`): `const App = () => { … }; export default App`
+
+## Avoid (unless justified)
+
+```ts
+// ❌ Second priority — do not use as the default style
+export function ClientsPage() { … }
+function handleClick() { … }
+
+// ✅ Preferred
+export const ClientsPage = () => { … }
+const handleClick = () => { … }
+```
+
+## Rare exceptions (document why)
+
+- `function*` generators
+- Cases where a named `function` is required for a library/TS quirk (call it out in a short comment)
+
+## Agent behavior
+
+- New code: arrows by default.
+- When touching a file that still uses `function` declarations for components/helpers, convert those in the same change when practical.
+- Do not rewrite third-party generated noise unless we own the file (our `components/ui` sources **are** owned — prefer arrows there too).
