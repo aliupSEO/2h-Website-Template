@@ -39,6 +39,10 @@ npm run db:types    # regenerate src/lib/supabase/database.types.ts from local D
 
 See [schema.md](./schema.md) — **profiles** (roles: admin / manager / user) and **clients** (CRM table, not a role).
 
+## Auth
+
+See [auth.md](./auth.md) — sign-in, forgot/reset password, Google OAuth redirect URLs.
+
 ## Apply migrations
 
 1. Fill `.env.local` with your project URL + anon key.

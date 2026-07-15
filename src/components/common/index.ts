@@ -3,8 +3,8 @@ export { AuthLayout } from './AuthLayout';
 export { AppLayout } from './AppLayout';
 export { AppHeader } from './AppHeader';
 export { AppSidebar } from './AppSidebar';
-export { GuestOnly } from './GuestOnly';
 export { ConfirmModal } from './ConfirmModal';
+
 export { PagePlaceholder } from './PagePlaceholder';
 export { DocumentTitle } from './DocumentTitle';
 export { Loading } from './Loading';

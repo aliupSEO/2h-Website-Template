@@ -1,20 +1,18 @@
 import { create } from 'zustand';
-export type AuthUser = {
-    email: string;
-    name: string;
-};
+import type { AuthStatus, AuthUser } from '@/features/auth/types';
+
 type AuthState = {
+    status: AuthStatus;
     user: AuthUser | null;
-    signIn: (email: string) => void;
-    signOut: () => void;
+    setUser: (user: AuthUser | null) => void;
+    setStatus: (status: AuthStatus) => void;
+    clearSession: () => void;
 };
+
 export const useAuthStore = create<AuthState>((set) => ({
+    status: 'bootstrapping',
     user: null,
-    signIn: (email) => set({
-        user: {
-            email,
-            name: email.split('@')[0] || 'User',
-        },
-    }),
-    signOut: () => set({ user: null }),
+    setUser: (user) => set({ user }),
+    setStatus: (status) => set({ status }),
+    clearSession: () => set({ user: null }),
 }));

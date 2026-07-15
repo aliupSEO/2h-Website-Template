@@ -2,9 +2,20 @@ import { useState } from 'react';
 import { LogOut, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ConfirmModal } from '@/components/common/ConfirmModal';
-import { Avatar, AvatarFallback, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from '@/components/ui';
+import {
+    Avatar,
+    AvatarFallback,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui';
+import { getAuthErrorMessage } from '@/features/auth/utils/authErrors';
 import { toast } from '@/lib/toast';
+import { authService } from '@/services/authService';
 import { useAuthStore } from '@/stores/authStore';
+
 const getInitials = (name?: string, email?: string) => {
     const source = name?.trim() || email?.trim() || 'U';
     const parts = source.split(/\s+/).filter(Boolean);
@@ -13,15 +24,28 @@ const getInitials = (name?: string, email?: string) => {
     }
     return source.slice(0, 2).toUpperCase();
 };
+
 export const AppHeader = () => {
     const navigate = useNavigate();
     const user = useAuthStore((state) => state.user);
-    const signOut = useAuthStore((state) => state.signOut);
+    const clearSession = useAuthStore((state) => state.clearSession);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const handleSignOut = () => {
-        signOut();
-        toast.success('Signed out');
-        navigate('/auth/sign-in', { replace: true });
+
+    const handleSignOut = async () => {
+        try {
+            await authService.signOut();
+            clearSession();
+            toast.success('Signed out');
+            navigate('/auth/sign-in', { replace: true });
+        }
+        catch (error) {
+            toast.error(
+                getAuthErrorMessage(
+                    error instanceof Error ? error : null,
+                    'Could not sign out',
+                ),
+            );
+        }
     };
     return (<>
       <header className="flex h-14 shrink-0 items-center justify-end border-0 bg-surface px-4 shadow-[0_28px_90px_rgba(0,0,0,0.75)] sm:px-6">
@@ -58,6 +82,14 @@ export const AppHeader = () => {
         </DropdownMenu>
       </header>
 
-      <ConfirmModal open={confirmOpen} onOpenChange={setConfirmOpen} title="Sign out?" description="You will need to sign in again to access the hub." confirmLabel="Sign out" variant="destructive" onConfirm={handleSignOut}/>
+      <ConfirmModal
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Sign out?"
+        description="You will need to sign in again to access the hub."
+        confirmLabel="Sign out"
+        variant="destructive"
+        onConfirm={handleSignOut}
+      />
     </>);
 };
