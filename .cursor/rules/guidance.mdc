@@ -31,6 +31,7 @@ Do **not** silently follow a bad pattern. Instead:
 | Zustand for every form | Prefer local state; Zustand only for shared global state |
 | Routes in a random file | All routes in `App.tsx` |
 | Giant unstructured commit | Conventional Commits, scoped messages |
+| Push / commit on `main` or `dev` | Branch from `dev` (`feature/…`, `ui/…`, `fix/…`); PR → `dev`; promote with `git push origin dev:main` |
 | New file at `src/` root | Place under the matching folder |
 
 Be concise but complete enough that the user understands the tradeoff.

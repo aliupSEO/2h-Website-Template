@@ -1,11 +1,12 @@
 ---
-description: Industry-standard Conventional Commits; commit only when asked
+description: Conventional Commits only when asked; keep messages concise and clean
 alwaysApply: true
 ---
 
 # Git Commits
 
 - Commit **only when the user asks**.
+- Branch / PR flow lives in `git-workflow.mdc` — never push commits straight to `main` or `dev`.
 - Use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
@@ -24,9 +25,10 @@ Examples:
 ## Rules
 
 - One logical change per commit when possible.
-- Message explains **why**, summary stays under ~72 chars.
+- Keep messages **concise and clean**: imperative mood, no filler, summary under ~72 chars.
+- Message explains **why** when the diff alone is unclear; skip noise ("WIP", "updates", "misc").
 - Never commit secrets (`.env`, credentials).
 - Never use `--no-verify` unless the user explicitly requests it.
-- Never amend/push unless the user asks.
+- Never amend/push unless the user asks; when pushing, push the **topic branch only**.
 
 If the user asks for a vague dump commit ("save everything"), suggest splitting into meaningful Conventional Commits and explain briefly.

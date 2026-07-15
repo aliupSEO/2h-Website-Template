@@ -1,0 +1,66 @@
+---
+description: Branch from dev, PR into dev, fast-forward main; never push to main/dev
+alwaysApply: true
+---
+
+# Git Branch & PR Workflow
+
+## Protected branches — never push work directly
+
+- **Never** commit on `main` or `dev`, and never `git push origin main` / `git push origin HEAD` while on those branches for feature work.
+- All work lands on a short-lived branch cut **from `dev`**, then PRs into `dev`.
+- The **only** allowed update to remote `main` is promoting `dev` (see below).
+- If the user asks to push feature work onto `main` / `dev`, refuse, explain this workflow, and do the correct path instead.
+
+## Branches always start from `dev`
+
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b <type>/<short-name>
+```
+
+### Branch naming
+
+Use kebab-case after the type slash:
+
+| Type | When | Examples |
+|------|------|----------|
+| `feature/` | New capability | `feature/clients`, `feature/client-upload` |
+| `ui/` | Visual / layout only | `ui/settings`, `ui/sidebar` |
+| `fix/` | Bug fix | `fix/login-issue`, `fix/phone-dropdown` |
+| `chore/` | Tooling / deps / config | `chore/eslint-setup` |
+| `refactor/` | No behavior change | `refactor/auth-store` |
+
+## Commits on the branch
+
+- Small, focused Conventional Commits (see `commits.mdc`).
+- Prefer several clean commits over one dump commit.
+- Push only the **feature branch**, never `main` / `dev`.
+
+## PR path: branch → `dev`
+
+- Open a PR **into `dev`** (not into `main`).
+- After review/merge into `dev`, delete the topic branch when done.
+
+## Promote: `dev` → `main` (fast-forward only)
+
+- Production promote is **`dev` → `main` only** — never merge a feature branch into `main`.
+- Use a refspec push so remote `main` matches up-to-date `dev` (fast-forward; no merge commit):
+
+```bash
+git checkout dev
+git pull origin dev
+git push origin dev:main
+```
+
+- `git push origin dev:main` = push local `dev` to remote `main`. Git rejects it if `main` cannot fast-forward — **do not** add `--force`.
+- If the push is rejected, stop and fix history on `dev` / `main` — do not force-push `main`.
+
+## Agent checklist
+
+1. Ensure current base is up-to-date `dev`.
+2. Create `feature/*` | `ui/*` | `fix/*` (etc.) from `dev`.
+3. Commit cleanly; push the topic branch.
+4. PR → `dev`.
+5. Only when asked to release: `git push origin dev:main` (after `git pull origin dev`).
