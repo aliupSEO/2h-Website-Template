@@ -32,6 +32,9 @@ export function Toaster() {
   return (
     <SonnerToaster
       position="top-right"
+      // Clear app header (h-14) so toasts sit in the main body, not over chrome
+      offset={{ top: '4.5rem', right: '1rem' }}
+      mobileOffset={{ top: '4.5rem', right: '0.75rem' }}
       theme="dark"
       closeButton
       style={toasterStyle}
