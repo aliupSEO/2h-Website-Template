@@ -9,6 +9,7 @@ import {
   LayoutTemplate,
   Puzzle,
   Settings,
+  Shield,
   Triangle,
   Users,
   type LucideIcon,
@@ -76,6 +77,11 @@ export const APP_NAV_ITEMS: NavItem[] = [
     label: 'Invoices',
     to: '/invoices',
     icon: FileText,
+  },
+  {
+    label: 'Admin Panel',
+    to: '/admin',
+    icon: Shield,
   },
   {
     label: 'Settings',

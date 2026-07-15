@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { AppLayout, GuestOnly } from '@/components/common'
 import { Toaster } from '@/lib/toast'
+import { AdminPage } from '@/pages/admin'
 import { AppsPage } from '@/pages/apps'
 import { ForgotPasswordPage } from '@/pages/auth/forgot-password'
 import { SignInPage } from '@/pages/auth/sign-in'
@@ -45,8 +46,10 @@ export default function App() {
           <Route path="/vercel" element={<VercelPage />} />
           <Route path="/env" element={<EnvPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
