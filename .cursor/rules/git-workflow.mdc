@@ -1,16 +1,27 @@
 ---
-description: Branch from dev, PR into dev, fast-forward main; never push to main/dev
+description: Branch from dev (staging), PR into dev, promote dev to main; no staging branch
 alwaysApply: true
 ---
 
 # Git Branch & PR Workflow
 
-## Protected branches — never push work directly
+## Branch roles (no separate `staging`)
 
-- **Never** commit on `main` or `dev`, and never `git push origin main` / `git push origin HEAD` while on those branches for feature work.
-- All work lands on a short-lived branch cut **from `dev`**, then PRs into `dev`.
+| Branch | Role |
+|--------|------|
+| `dev` | **Staging / integration** — all PRs land here |
+| `main` | **Production** — updated only by promoting `dev` |
+
+- There is **no** `staging` branch. If the user says "staging", "merge to staging", or "commit in staging", that means **`dev`**.
+- Never invent or push a `staging` branch unless the user explicitly asks to create one.
+
+## Protected branches — never push feature work directly
+
+- **Never** commit feature work on `main` or `dev`, and never push `origin/main` (or HEAD while on `main`/`dev`) for features.
+- All work lands on a short-lived branch cut **from `dev`**, then merges/PRs **into `dev`**.
 - The **only** allowed update to remote `main` is promoting `dev` (see below).
-- If the user asks to push feature work onto `main` / `dev`, refuse, explain this workflow, and do the correct path instead.
+- If the user asks to push feature work onto `main` / `dev`, refuse, explain this workflow, and use a topic branch → `dev` instead.
+- Exception: when the user **explicitly** asks to commit a tiny rules/docs-only change "directly on dev", do that, then they may ask to promote to `main`.
 
 ## Branches always start from `dev`
 
@@ -36,9 +47,9 @@ Use kebab-case after the type slash:
 
 - Small, focused Conventional Commits (see `commits.mdc`).
 - Prefer several clean commits over one dump commit.
-- Push only the **feature branch**, never `main` / `dev`.
+- Push only the **feature branch**, never `main` / `dev` (for features).
 
-## PR path: branch → `dev`
+## PR path: branch → `dev` (staging)
 
 - Open a PR **into `dev`** (not into `main`).
 - After review/merge into `dev`, delete the topic branch when done.
@@ -59,8 +70,9 @@ git push origin dev:main
 
 ## Agent checklist
 
-1. Ensure current base is up-to-date `dev`.
-2. Create `feature/*` | `ui/*` | `fix/*` (etc.) from `dev`.
-3. Commit cleanly; push the topic branch.
-4. PR → `dev`.
-5. Only when asked to release: `git push origin dev:main` (after `git pull origin dev`).
+1. Treat "staging" as `dev`.
+2. Ensure current base is up-to-date `dev`.
+3. Create `feature/*` | `ui/*` | `fix/*` (etc.) from `dev`.
+4. Commit cleanly; push the topic branch.
+5. Merge / PR → `dev`.
+6. Only when asked to release / merge to production: `git push origin dev:main` (after `git pull origin dev`).
