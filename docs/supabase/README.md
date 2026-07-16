@@ -32,6 +32,7 @@ npm run db:stop
 npm run db:status
 npm run db:reset    # apply migrations (+ seed if configured)
 npm run db:push     # push migrations to linked remote
+npm run db:seed     # run supabase/seed.sql on linked remote
 npm run db:types    # regenerate src/lib/supabase/database.types.ts from local DB
 ```
 
@@ -48,6 +49,17 @@ See [auth.md](./auth.md) — sign-in, forgot/reset password, Google OAuth redire
 1. Fill `.env.local` with your project URL + anon key.
 2. `supabase link --project-ref <ref>` (optional, for remote).
 3. `npm run db:reset` (local) or `npm run db:push` (remote).
-4. `npm run db:types` (regenerate `database.types.ts` from the live DB).
+4. `npm run db:seed` (linked remote) or rely on seed during local `db:reset`.
+5. `npm run db:types` (regenerate `database.types.ts` from the live DB).
+
+## Seed admin (dev)
+
+After migrations, `supabase/seed.sql` creates:
+
+| Email | Name | Role | Password |
+|-------|------|------|----------|
+| `ali@2hws.at` | Ali Haider | admin | see `supabase/seed.sql` (dev/staging only) |
+
+Local: `npm run db:reset` · Remote: `npm run db:seed`
 
 Use `getSupabaseClient()` from `@/lib/supabase` in services — not in low-level UI.
