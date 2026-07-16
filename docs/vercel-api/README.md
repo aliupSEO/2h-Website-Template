@@ -6,6 +6,7 @@ Yes — Vercel has a full **REST API** (plus official `@vercel/sdk`) so Central 
 |-----|----------------|
 | [research-notes.md](./research-notes.md) | Endpoints, tokens, redeploy options, SDK, curl |
 | [implementation-plan.md](./implementation-plan.md) | Phased plan for `/vercel` in this app |
+| [webhooks.md](./webhooks.md) | Which events to select + Hub endpoint URL |
 
 **Official sources**
 

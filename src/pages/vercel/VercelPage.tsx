@@ -1,4 +1,5 @@
-import { PagePlaceholder } from '@/components/common';
+import { VercelProjectsView } from '@/features/vercel';
+
 export const VercelPage = () => {
-    return <PagePlaceholder title="Vercel"/>;
+    return <VercelProjectsView />;
 };
