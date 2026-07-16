@@ -1,4 +1,5 @@
-import { PagePlaceholder } from '@/components/common';
+import { ReposList } from '@/features/git';
+
 export const GitPage = () => {
-    return <PagePlaceholder title="Git"/>;
+    return <ReposList />;
 };
