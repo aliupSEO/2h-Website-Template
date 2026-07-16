@@ -49,6 +49,16 @@ Use kebab-case after the type slash:
 - Prefer several clean commits over one dump commit.
 - Push only the **feature branch**, never `main` / `dev` (for features).
 
+### Commit identity (this repo)
+
+- Author **and** committer must be **`aliupSEO <ali@up-seo.at>`** (repo-local `user.name` / `user.email`).
+- Do not use personal emails (`aleeyhaider…`, `ali@2hws.at`) for commits here — Vercel/GitHub map those to non-team identities.
+
+### Always verify build before push
+
+- Before **every** branch push (and before merging to `dev`), run **`npm run build`** and fix failures first.
+- Do not push / merge known broken builds.
+
 ## PR path: branch → `dev` (staging)
 
 - Open a PR **into `dev`** (not into `main`).
@@ -73,6 +83,8 @@ git push origin dev:main
 1. Treat "staging" as `dev`.
 2. Ensure current base is up-to-date `dev`.
 3. Create `feature/*` | `ui/*` | `fix/*` (etc.) from `dev`.
-4. Commit cleanly; push the topic branch.
-5. Merge / PR → `dev`.
-6. Only when asked to release / merge to production: `git push origin dev:main` (after `git pull origin dev`).
+4. Confirm commit identity is `aliupSEO <ali@up-seo.at>`.
+5. Run `npm run build` — fix before continuing.
+6. Commit cleanly; push the topic branch.
+7. Merge / PR → `dev`.
+8. Only when asked to release / merge to production: `git push origin dev:main` (after `git pull origin dev`).

@@ -1,7 +1,7 @@
 .git
 .cursor
 docs
-supabase
+/supabase
 node_modules
 dist
 .env*
