@@ -10,7 +10,7 @@ Set `VERCEL_WEBHOOK_SECRET` in `.env.local` (and Vercel project env) to the sign
 
 The Hub verifies the `x-vercel-signature` header with that secret; mismatched or missing values reject webhook POSTs.
 
-Local testing needs a public tunnel (e.g. ngrok) pointing at `http://localhost:5173/api/webhooks/vercel`.
+Local testing needs a public tunnel (e.g. ngrok) pointing at `http://localhost:5173/api/webhooks/vercel`. Use the same webhook secret as production.
 
 ## Projects
 
