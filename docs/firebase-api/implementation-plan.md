@@ -1,21 +1,17 @@
 # Implementation plan — Firebase in Central Hub
 
-Goal: turn **`/firebase`** from a placeholder into a useful ops surface: list projects/apps, Hosting releases, then Auth admin — always through a BFF.
+Goal: turn **`/firebase`** into a scalable ops surface for Firebase projects, apps, Auth config, and service enablement — always through a BFF.
 
-Git: branch from `dev` (e.g. `feature/firebase-projects`) → PR into `dev`.
+Git: branch from `dev` (e.g. `feature/firebase-foundation`) → PR into `dev`.
 
 ---
 
-## Auth / credentials path
+## Locked defaults
 
-| Phase | Approach |
-|-------|----------|
-| **0 – Spike** | One service account JSON for a test project; Management list + Admin `listUsers` |
-| **1 – Hub MVP** | BFF holds SA(s); UI lists projects/apps |
-| **2 – Multi-client** | SA (or OAuth) per client project; map Client → `firebaseProjectId` |
-| **3 – Ops** | Auth user tools + Hosting release history / rollback |
-
-Never `VITE_` a service account.
+| Decision | Choice |
+|----------|--------|
+| Create depth | **Semi-create** — list available GCP projects → `addFirebase` → create apps → configure Auth / Firestore / Storage. Full GCP `projects.create` is Phase 5. |
+| Credentials | Phase 0: one default SA. Architecture: **multi-project registry** from day one (`env_default` now; `secret_ref` later). |
 
 ---
 
@@ -24,136 +20,106 @@ Never `VITE_` a service account.
 ```
 ┌────────────────────┐     ┌─────────────────────────────┐     ┌──────────────────────┐
 │  Firebase page UI  │────▶│  Hub API / BFF              │────▶│  firebase.googleapis  │
-│  features/firebase │     │  firebase-admin + Google    │     │  hosting.googleapis   │
-└────────────────────┘     │  Auth access tokens         │     │  (Admin SDK gRPC/HTTP)│
+│  features/firebase │     │  google-auth + firebase-admin│    │  identitytoolkit      │
+└────────────────────┘     │  credential resolver        │     │  Firestore / Storage  │
                            └─────────────────────────────┘     └──────────────────────┘
 ```
+
+### Multi-project credential model
+
+| Module | Role |
+|--------|------|
+| `server/firebase/registry.ts` | Maps `projectId` → credential source (`env_default` \| `secret_ref`) |
+| `server/firebase/credentials.ts` | Loads SA; mints OAuth access token |
+| `server/firebase/admin-apps.ts` | Cached `admin.app.App` per `projectId` |
+| `server/firebase/client.ts` | Management / Identity Toolkit / GCP REST helpers |
+
+Never `VITE_` a service account. Never return SA JSON to the browser.
 
 ---
 
 ## Folder placement
 
 ```
-src/
-  features/firebase/
-    components/    # ProjectList, AppsTable, HostingReleases, AuthUsersTable
-    hooks/
-    schemas.ts
-    types.ts
-    index.ts
-  services/
-    firebaseService.ts   # Hub BFF only
-  pages/firebase/
-    FirebasePage.tsx
+docs/firebase-api/
+server/firebase/          # env, credentials, registry, admin-apps, client, handlers, types
+api/firebase/**           # Vercel serverless mirrors
+src/features/firebase/    # components, schemas, types, index
+src/services/firebaseService.ts
+src/stores/firebaseStore.ts
+src/pages/firebase/FirebasePage.tsx
+src/lib/api-endpoints.ts  # firebase paths + parsers
 ```
 
 ---
 
 ## Phases
 
-### Phase 0 — Spike
+### Phase 0 — Foundation
 
-- [ ] Create service account key for one Firebase project.
-- [ ] Call Management `GET /v1beta1/projects` (or get single project).
-- [ ] Init `firebase-admin`, run `auth.listUsers(10)`.
-- [ ] Optional: Hosting `sites.list` + `releases.list`.
-- [ ] `.env.example` placeholders only: `FIREBASE_PROJECT_ID=`, document that SA JSON is server-mounted (path or secret manager), not committed.
+- [x] `firebase-admin` + `google-auth-library`
+- [x] `env.ts`, `credentials.ts`, `registry.ts`, `admin-apps.ts`, `client.ts`
+- [x] `apiEndpoints.firebase` + path matchers
+- [x] Vite BFF + `api/firebase/*`
+- [x] `.env.example`: `FIREBASE_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS`, optional `FIREBASE_SERVICE_ACCOUNT_JSON`
+- [x] `GET /api/firebase/status` → `{ configured, defaultProjectId? }`
 
-### Phase 1 — Inventory UI (MVP)
-
-BFF routes (example):
+### Phase 1 — Inventory
 
 | Hub route | Backend |
 |-----------|---------|
 | `GET /api/firebase/projects` | Management `projects.list` |
 | `GET /api/firebase/projects/:projectId` | `projects.get` + `searchApps` |
-| `GET /api/firebase/projects/:projectId/apps` | web/ios/android list or searchApps |
-| `GET /api/firebase/projects/:projectId/hosting/releases` | Hosting releases.list |
+| `GET /api/firebase/projects/:projectId/apps` | apps from searchApps / platform lists |
 
-- [ ] `/firebase`: project cards/table → detail with apps + console links.
-- [ ] Loading via shared Loading components; Zod only if forms appear.
-- [ ] Link out: `https://console.firebase.google.com/project/{projectId}`.
+UI: project list → select → apps table + console deep link.
 
-**Exit:** operators see which Firebase projects/apps exist without leaving Hub.
+### Phase 2 — Create & app config
 
-### Phase 2 — Client linkage
+| Hub route | Backend |
+|-----------|---------|
+| `GET /api/firebase/available-projects` | `availableProjects` |
+| `POST /api/firebase/projects` | `addFirebase` `{ projectId }` |
+| `POST …/apps/web` | `webApps.create` |
+| `GET …/apps/:appId/config` | `webApps.getConfig` |
+| `DELETE …/apps/:appId` | `webApps.remove` |
 
-- [ ] Client field: `firebaseProjectId` (+ optional web `appId`).
-- [ ] From Clients → Firebase detail; filter Hub Firebase list by linked clients.
+### Phase 3 — Auth config + services
 
-### Phase 3 — Auth ops
+| Hub route | Backend |
+|-----------|---------|
+| `GET/PATCH …/auth/config` | authorizedDomains |
+| `GET/POST/PATCH …/auth/providers` | IdP configs |
+| `POST …/firestore/enable` | create Firestore database |
+| `POST …/storage/enable` | enable Storage + default bucket |
 
-| Hub route | Admin SDK |
-|-----------|-----------|
-| `GET /api/firebase/projects/:id/auth/users` | `listUsers` (+ pageToken) |
-| `GET …/users?email=` | `getUserByEmail` |
-| `PATCH …/users/:uid` | disable/enable, claims (narrow) |
-| `DELETE …/users/:uid` | delete — ConfirmModal + role check |
+UI tabs: **Projects | Apps | Auth | Services**.
 
-- [ ] Never bulk-export emails to logs.
-- [ ] Minimal toasts; confirm destructive actions.
+### Phase 4 — Ops (later)
 
-### Phase 4 — Hosting ops (optional)
+Auth users (Admin SDK), Hosting releases / rollback. Admin role + ConfirmModal for destructive actions.
 
-- [ ] Show last N releases (time, version, user).
-- [ ] “Rollback to this version” → `releases.create` with prior `versionName` + ConfirmModal.
-- [ ] Defer full file-upload deploy from Hub (use CI/Vercel).
+### Phase 5 — Hardening (later)
 
-### Phase 5 — Hardening
-
-- [ ] Secret manager; per-project IAM.
-- [ ] Google OAuth for operator identity instead of shared SA where possible.
-- [ ] Audit table for Auth/Hosting mutations.
+Per-project SA in secret store, audit log, GCP `projects.create` + `projects.delete`.
 
 ---
 
-## MVP types (UI)
+## Security rules
 
-```ts
-type FirebaseProject = {
-  projectId: string
-  displayName: string
-  state: string
-}
-
-type FirebaseAppSummary = {
-  appId: string
-  platform: 'web' | 'ios' | 'android'
-  displayName: string
-}
-
-type HostingRelease = {
-  name: string
-  releaseTime: string
-  type: string
-  versionName?: string
-}
-```
+- Privileged secrets only on BFF; fail loud if missing when calling Google.
+- Destructive actions: `ConfirmModal` (+ Hub `admin` when roles are wired).
+- Do not log emails, tokens, or SA JSON.
+- Client config (`apiKey`, `appId`) is public-by-design — still only expose via authenticated Hub session.
 
 ---
 
-## Testing plan
+## Testing checklist
 
-- [ ] Inventory works with SA that only has Viewer/Firebase Admin on one project.
-- [ ] Missing SA for project → clear 404/403 in UI.
-- [ ] Auth list paginates; disable user reflects in Firebase Console.
-- [ ] No SA JSON appears in network responses to the browser.
-
----
-
-## First PR slices
-
-1. Docs (this folder).  
-2. `feature/firebase-projects` — list + detail apps.  
-3. `feature/firebase-client-link` — Client field.  
-4. `feature/firebase-auth-users` — support tools.  
-5. Optional: Hosting releases / rollback.
-
----
-
-## Out of scope for early Hub
-
-- Full Firestore data browser  
-- Recreating Firebase Console  
-- Deploying entire static sites from Hub UI (Hosting upload pipeline)  
-- Replacing Vercel for frontends that already live there
+- [ ] Status returns `configured: false` without SA; clear UI message.
+- [ ] With SA: list projects; open detail; see apps.
+- [ ] addFirebase on available GCP project; create web app; copy config.
+- [ ] Add/remove authorized domain; enable Google provider (with client id/secret).
+- [ ] Enable Firestore / Storage once; second call is idempotent or clear error.
+- [ ] No SA JSON in network responses to the browser.
+- [ ] `npm run build` passes.
