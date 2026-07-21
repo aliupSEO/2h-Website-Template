@@ -1,14 +1,43 @@
 import type { Plugin } from 'vite';
 import {
+    isFirebaseApiPath,
     isGitHubApiPath,
     isVercelApiPath,
     isVercelWebhookPath,
+    parseFirebaseAppConfigPath,
+    parseFirebaseAppPath,
+    parseFirebaseAppsPath,
+    parseFirebaseAuthConfigPath,
+    parseFirebaseAuthProviderPath,
+    parseFirebaseAuthProvidersPath,
+    parseFirebaseFirestoreEnablePath,
+    parseFirebaseProjectPath,
+    parseFirebaseStorageEnablePath,
+    parseFirebaseWebAppsPath,
     parseGitHubRepoPath,
     parseVercelEnvPath,
     parseVercelProjectDeploymentsPath,
     parseVercelRedeployPath,
 } from '../../src/lib/api-endpoints.js';
 import { applyLocalEnv, readBody, sendJson } from '../bff/http.js';
+import {
+    handleAddFirebase,
+    handleCreateProvider,
+    handleCreateWebApp,
+    handleEnableFirestore,
+    handleEnableStorage,
+    handleFirebaseStatus,
+    handleGetAuthConfig,
+    handleGetProject,
+    handleGetWebAppConfig,
+    handleListApps,
+    handleListAvailableProjects,
+    handleListProjects as handleListFirebaseProjects,
+    handleListProviders,
+    handleRemoveWebApp,
+    handleUpdateAuthConfig,
+    handleUpdateProvider,
+} from '../firebase/handlers.js';
 import {
     handleCreateRepo,
     handleDeleteRepo,
@@ -63,7 +92,8 @@ export const hubApiPlugin = (): Plugin => {
                 if (
                     !isGitHubApiPath(pathname) &&
                     !isVercelApiPath(pathname) &&
-                    !isVercelWebhookPath(pathname)
+                    !isVercelWebhookPath(pathname) &&
+                    !isFirebaseApiPath(pathname)
                 ) {
                     next();
                     return;
@@ -294,6 +324,244 @@ export const hubApiPlugin = (): Plugin => {
                                 );
                                 return;
                             }
+                        }
+                    }
+
+                    if (isFirebaseApiPath(pathname)) {
+                        if (
+                            pathname === '/api/firebase/status' ||
+                            pathname === '/api/firebase/status/'
+                        ) {
+                            if (req.method === 'GET') {
+                                const result = handleFirebaseStatus();
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        if (
+                            pathname === '/api/firebase/available-projects' ||
+                            pathname === '/api/firebase/available-projects/'
+                        ) {
+                            if (req.method === 'GET') {
+                                const result =
+                                    await handleListAvailableProjects();
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        if (
+                            pathname === '/api/firebase/projects' ||
+                            pathname === '/api/firebase/projects/'
+                        ) {
+                            if (req.method === 'GET') {
+                                const result = await handleListFirebaseProjects();
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+
+                            if (req.method === 'POST') {
+                                const body = await readBody(req);
+                                const result = await handleAddFirebase(body);
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        const firestoreEnable =
+                            parseFirebaseFirestoreEnablePath(pathname);
+                        if (firestoreEnable && req.method === 'POST') {
+                            const body = await readBody(req);
+                            const result = await handleEnableFirestore(
+                                firestoreEnable.projectId,
+                                body,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        const storageEnable =
+                            parseFirebaseStorageEnablePath(pathname);
+                        if (storageEnable && req.method === 'POST') {
+                            const body = await readBody(req);
+                            const result = await handleEnableStorage(
+                                storageEnable.projectId,
+                                body,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        const authConfigPath =
+                            parseFirebaseAuthConfigPath(pathname);
+                        if (authConfigPath) {
+                            if (req.method === 'GET') {
+                                const result = await handleGetAuthConfig(
+                                    authConfigPath.projectId,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+
+                            if (req.method === 'PATCH') {
+                                const body = await readBody(req);
+                                const result = await handleUpdateAuthConfig(
+                                    authConfigPath.projectId,
+                                    body,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        const authProvidersPath =
+                            parseFirebaseAuthProvidersPath(pathname);
+                        if (authProvidersPath) {
+                            if (req.method === 'GET') {
+                                const result = await handleListProviders(
+                                    authProvidersPath.projectId,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+
+                            if (req.method === 'POST') {
+                                const body = await readBody(req);
+                                const result = await handleCreateProvider(
+                                    authProvidersPath.projectId,
+                                    body,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        const authProviderPath =
+                            parseFirebaseAuthProviderPath(pathname);
+                        if (authProviderPath && req.method === 'PATCH') {
+                            const body = await readBody(req);
+                            const result = await handleUpdateProvider(
+                                authProviderPath.projectId,
+                                authProviderPath.idpId,
+                                body,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        const webAppsPath = parseFirebaseWebAppsPath(pathname);
+                        if (webAppsPath && req.method === 'POST') {
+                            const body = await readBody(req);
+                            const result = await handleCreateWebApp(
+                                webAppsPath.projectId,
+                                body,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        const appConfigPath =
+                            parseFirebaseAppConfigPath(pathname);
+                        if (appConfigPath && req.method === 'GET') {
+                            const result = await handleGetWebAppConfig(
+                                appConfigPath.projectId,
+                                appConfigPath.appId,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        const appPath = parseFirebaseAppPath(pathname);
+                        if (appPath && req.method === 'DELETE') {
+                            const result = await handleRemoveWebApp(
+                                appPath.projectId,
+                                appPath.appId,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        const appsPath = parseFirebaseAppsPath(pathname);
+                        if (appsPath && req.method === 'GET') {
+                            const result = await handleListApps(
+                                appsPath.projectId,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        const projectPath = parseFirebaseProjectPath(pathname);
+                        if (projectPath && req.method === 'GET') {
+                            const result = await handleGetProject(
+                                projectPath.projectId,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
                         }
                     }
 

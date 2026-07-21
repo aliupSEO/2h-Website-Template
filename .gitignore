@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Google / Firebase service account keys (never commit)
+*firebase*adminsdk*.json
+*central-hub-ops*.json
+*-fd2ed66a761b.json
+secrets/
+*.pem
+*.p12
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

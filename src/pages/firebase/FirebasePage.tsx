@@ -1,4 +1,5 @@
-import { PagePlaceholder } from '@/components/common';
+import { FirebaseProjectsView } from '@/features/firebase';
+
 export const FirebasePage = () => {
-    return <PagePlaceholder title="Firebase"/>;
+    return <FirebaseProjectsView />;
 };
