@@ -39,7 +39,7 @@ export const AuthLayout = ({
                 className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80"
             />
 
-            <Card className="relative z-10 w-full max-w-[26rem] min-h-[36rem] gap-0 overflow-hidden rounded-2xl border-0 bg-[#1a1a1a] py-0 shadow-[0_40px_120px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)]">
+            <Card className="relative z-10 w-full max-w-[32rem] min-h-[36rem] gap-0 overflow-hidden rounded-2xl border-0 bg-[#1a1a1a] py-0 shadow-[0_40px_120px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)]">
                 {/* Brand accent bar */}
                 <div
                     aria-hidden
@@ -66,7 +66,7 @@ export const AuthLayout = ({
                     <CardTitle className="text-[1.65rem] font-semibold tracking-tight text-foreground">
                         {title}
                     </CardTitle>
-                    <CardDescription className="mt-2 max-w-[18rem] text-center text-sm leading-relaxed text-muted-foreground">
+                    <CardDescription className="mt-2 max-w-[24rem] text-center text-sm leading-relaxed text-muted-foreground">
                         {description}
                     </CardDescription>
                 </CardHeader>
