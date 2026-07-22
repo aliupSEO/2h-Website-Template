@@ -1,6 +1,7 @@
 export { Button, buttonVariants } from './button';
 export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent, } from './card';
 export { Input } from './input';
+export { PasswordInput } from './password-input';
 export { Label } from './label';
 export { Separator } from './separator';
 export { FormField } from './form-field';

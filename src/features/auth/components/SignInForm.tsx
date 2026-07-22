@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonSpinner } from '@/components/common';
-import { Button, FormField, Input, Separator } from '@/components/ui';
+import { Button, FormField, Input, PasswordInput, Separator } from '@/components/ui';
 import {
     getAuthErrorMessage,
     InactiveAccountError,
@@ -90,9 +90,8 @@ export const SignInForm = () => {
                         </Link>
                     }
                 >
-                    <Input
+                    <PasswordInput
                         id="sign-in-password"
-                        type="password"
                         autoComplete="current-password"
                         placeholder="••••••••"
                         className="h-11 bg-[#2a2a2a] aria-invalid:bg-[#2a2a2a]"
