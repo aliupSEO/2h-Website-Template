@@ -4,7 +4,7 @@ type ButtonSpinnerProps = {
     className?: string;
 };
 
-/** Compact CSS spinner for buttons (not the chatbot robot). */
+/** Compact circular spinner for auth buttons (sign in / sign out). */
 export const ButtonSpinner = ({ className }: ButtonSpinnerProps) => {
     return (
         <span
