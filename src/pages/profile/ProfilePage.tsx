@@ -11,7 +11,7 @@ export const ProfilePage = () => {
         <div className="w-full space-y-6">
             <DocumentTitle title="Profile" />
 
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex animate-in fade-in slide-in-from-top-2 fill-mode-both duration-500 items-center justify-between gap-4">
                 <div className="min-w-0">
                     <h1 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
                         Profile
@@ -23,10 +23,10 @@ export const ProfilePage = () => {
                 <Button
                     type="button"
                     variant="outline"
-                    className="h-11 shrink-0 gap-2 rounded-md px-4 text-sm ring-1 ring-white/12 hover:bg-white/[0.06]"
+                    className="group h-11 shrink-0 gap-2 rounded-md px-4 text-sm ring-1 ring-white/12 transition-[background-color,box-shadow,color] duration-200 hover:bg-primary/15 hover:text-primary hover:ring-primary/35"
                     onClick={() => navigate(-1)}
                 >
-                    <ArrowLeft className="size-4" />
+                    <ArrowLeft className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
                     Back
                 </Button>
             </div>

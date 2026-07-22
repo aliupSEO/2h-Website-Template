@@ -9,7 +9,7 @@ import {
 } from '../schemas';
 
 const FIELD_CLASS =
-    'h-12 rounded-md bg-[#111111] px-4 text-base text-foreground ring-1 ring-white/10 placeholder:text-foreground/35 aria-invalid:bg-[#111111]';
+    'h-12 rounded-md bg-field px-4 text-base text-foreground ring-1 ring-white/15 placeholder:text-foreground/40 transition-[box-shadow,ring-color,background-color] duration-200 hover:ring-primary/35 hover:bg-[#303030] aria-invalid:bg-field';
 
 export const ProfilePasswordForm = () => {
     const {
@@ -104,7 +104,7 @@ export const ProfilePasswordForm = () => {
                 <Button
                     type="submit"
                     variant="brand"
-                    className="h-11 rounded-md px-6 text-sm"
+                    className="h-11 rounded-md px-6 text-sm transition-[transform,box-shadow,background-color] duration-200 hover:shadow-[0_0_24px_rgba(198,245,50,0.25)] hover:brightness-105 active:scale-[0.98]"
                     disabled={isSubmitting}
                 >
                     {isSubmitting ? <Loading size="sm" /> : 'Update password'}
