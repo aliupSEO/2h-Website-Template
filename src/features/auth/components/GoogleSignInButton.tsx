@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loading } from '@/components/common';
+import { ButtonSpinner } from '@/components/common';
 import { Button } from '@/components/ui';
 import { getAuthErrorMessage } from '@/features/auth/utils/authErrors';
 import { toast } from '@/lib/toast';
@@ -28,7 +28,13 @@ const GoogleIcon = ({ className }: { className?: string }) => {
     );
 };
 
-export const GoogleSignInButton = () => {
+type GoogleSignInButtonProps = {
+    disabled?: boolean;
+};
+
+export const GoogleSignInButton = ({
+    disabled = false,
+}: GoogleSignInButtonProps) => {
     const [pending, setPending] = useState(false);
 
     const handleGoogleSignIn = async () => {
@@ -53,12 +59,15 @@ export const GoogleSignInButton = () => {
             type="button"
             variant="outline"
             size="lg"
-            className="w-full gap-2 border-white/20 bg-transparent hover:bg-white/5"
-            disabled={pending}
+            className="h-11 w-full gap-2 border-white/15 bg-white/[0.03] hover:bg-white/[0.07]"
+            disabled={disabled || pending}
             onClick={() => void handleGoogleSignIn()}
         >
             {pending ? (
-                <Loading size="sm" />
+                <>
+                    <ButtonSpinner />
+                    Connecting…
+                </>
             ) : (
                 <>
                     <GoogleIcon className="size-4" />

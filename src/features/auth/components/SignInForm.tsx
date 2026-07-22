@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import { Loading } from '@/components/common';
+import { ButtonSpinner } from '@/components/common';
 import { Button, FormField, Input, Separator } from '@/components/ui';
 import {
     getAuthErrorMessage,
@@ -54,7 +54,7 @@ export const SignInForm = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-7">
             <form
                 className="space-y-5"
                 onSubmit={handleSubmit(onSubmit)}
@@ -63,7 +63,6 @@ export const SignInForm = () => {
                 <FormField
                     label="Email"
                     htmlFor="sign-in-email"
-                    required
                     error={errors.email?.message}
                 >
                     <Input
@@ -71,8 +70,9 @@ export const SignInForm = () => {
                         type="email"
                         autoComplete="email"
                         placeholder="you@example.com"
-                        className="h-10"
+                        className="h-11 bg-[#2a2a2a] aria-invalid:bg-[#2a2a2a]"
                         aria-invalid={Boolean(errors.email)}
+                        disabled={isSubmitting}
                         {...register('email')}
                     />
                 </FormField>
@@ -80,7 +80,6 @@ export const SignInForm = () => {
                 <FormField
                     label="Password"
                     htmlFor="sign-in-password"
-                    required
                     error={errors.password?.message}
                     action={
                         <Link
@@ -96,8 +95,9 @@ export const SignInForm = () => {
                         type="password"
                         autoComplete="current-password"
                         placeholder="••••••••"
-                        className="h-10"
+                        className="h-11 bg-[#2a2a2a] aria-invalid:bg-[#2a2a2a]"
                         aria-invalid={Boolean(errors.password)}
+                        disabled={isSubmitting}
                         {...register('password')}
                     />
                 </FormField>
@@ -106,10 +106,17 @@ export const SignInForm = () => {
                     type="submit"
                     variant="brand"
                     size="lg"
-                    className="mt-1 h-11 w-full"
+                    className="mt-2 h-11 w-full gap-2 font-semibold"
                     disabled={isSubmitting}
                 >
-                    {isSubmitting ? <Loading size="sm" /> : 'Sign in'}
+                    {isSubmitting ? (
+                        <>
+                            <ButtonSpinner />
+                            Signing in…
+                        </>
+                    ) : (
+                        'Sign in'
+                    )}
                 </Button>
             </form>
 
@@ -119,7 +126,7 @@ export const SignInForm = () => {
                 <Separator className="flex-1 bg-white/10" />
             </div>
 
-            <GoogleSignInButton />
+            <GoogleSignInButton disabled={isSubmitting} />
         </div>
     );
 };

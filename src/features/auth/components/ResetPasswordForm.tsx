@@ -121,7 +121,7 @@ export const ResetPasswordForm = () => {
                     type="password"
                     autoComplete="new-password"
                     placeholder="••••••••"
-                    className="h-10"
+                    className="h-11 bg-[#2a2a2a] aria-invalid:bg-[#2a2a2a]"
                     aria-invalid={Boolean(errors.password)}
                     {...register('password')}
                 />
@@ -138,7 +138,7 @@ export const ResetPasswordForm = () => {
                     type="password"
                     autoComplete="new-password"
                     placeholder="••••••••"
-                    className="h-10"
+                    className="h-11 bg-[#2a2a2a] aria-invalid:bg-[#2a2a2a]"
                     aria-invalid={Boolean(errors.confirmPassword)}
                     {...register('confirmPassword')}
                 />

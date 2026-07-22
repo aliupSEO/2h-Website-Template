@@ -88,7 +88,7 @@ export const ForgotPasswordForm = () => {
                     type="email"
                     autoComplete="email"
                     placeholder="you@example.com"
-                    className="h-10"
+                    className="h-11 bg-[#2a2a2a] aria-invalid:bg-[#2a2a2a]"
                     aria-invalid={Boolean(errors.email)}
                     {...register('email')}
                 />
