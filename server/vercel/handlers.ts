@@ -168,6 +168,7 @@ export const handleCreateProject = async (
 
 export const handleListDeployments = async (
     projectId: string,
+    limit?: number,
 ): Promise<HandlerResult<{ deployments: VercelDeploymentDto[] }>> => {
     if (!projectId) {
         return {
@@ -178,7 +179,10 @@ export const handleListDeployments = async (
     }
 
     try {
-        const deployments = await listDeployments(projectId);
+        const deployments = await listDeployments(
+            projectId,
+            limit && Number.isFinite(limit) && limit > 0 ? limit : 50,
+        );
         return { ok: true, data: { deployments }, status: 200 };
     }
     catch (error) {

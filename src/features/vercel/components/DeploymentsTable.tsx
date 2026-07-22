@@ -1,5 +1,5 @@
-import { ExternalLink, RefreshCw } from 'lucide-react';
-import { Loading } from '@/components/common';
+import { ExternalLink, GitBranch, RefreshCw } from 'lucide-react';
+import { ButtonSpinner } from '@/components/common';
 import {
     Button,
     Table,
@@ -10,7 +10,12 @@ import {
     TableRow,
 } from '@/components/ui';
 import type { VercelDeployment } from '@/features/vercel/types';
+import {
+    formatVercelDateTime,
+    formatVercelRelative,
+} from '@/features/vercel/utils';
 import { DeploymentStatusBadge } from './DeploymentStatusBadge';
+import { VercelEmptyState } from './VercelEmptyState';
 
 type DeploymentsTableProps = {
     deployments: VercelDeployment[];
@@ -18,17 +23,8 @@ type DeploymentsTableProps = {
     onRedeploy: (deployment: VercelDeployment) => void;
 };
 
-const formatDate = (value: number) => {
-    if (!value) return '—';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '—';
-    return date.toLocaleString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-};
+const headClass =
+    'h-12 px-4 text-xs font-bold tracking-[0.1em] text-primary uppercase sm:px-6';
 
 export const DeploymentsTable = ({
     deployments,
@@ -37,55 +33,92 @@ export const DeploymentsTable = ({
 }: DeploymentsTableProps) => {
     if (deployments.length === 0) {
         return (
-            <p className="text-sm text-muted-foreground">
-                No deployments found for this project.
-            </p>
+            <VercelEmptyState
+                title="No deployments yet"
+                description="Deployments for this project will show up here."
+            />
         );
     }
 
     return (
-        <div className="rounded-xl border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 border-t border-white/5 bg-card shadow-none">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-white/5 hover:bg-transparent">
-                        <TableHead>Status</TableHead>
-                        <TableHead>Target</TableHead>
-                        <TableHead>Branch</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="border-b-2 border-primary/40 bg-primary/15 hover:bg-primary/15">
+                        <TableHead className={headClass}>Status</TableHead>
+                        <TableHead className={headClass}>Target</TableHead>
+                        <TableHead className={headClass}>Branch</TableHead>
+                        <TableHead className={headClass}>Created</TableHead>
+                        <TableHead
+                            className={`${headClass} w-[9rem] text-right`}
+                        >
+                            Actions
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {deployments.map((deployment) => {
+                    {deployments.map((deployment, index) => {
                         const busy = redeployingId === deployment.id;
                         return (
-                            <TableRow key={deployment.id} className="border-white/5">
-                                <TableCell>
-                                    <DeploymentStatusBadge state={deployment.state} />
+                            <TableRow
+                                key={deployment.id}
+                                style={{
+                                    animationDelay: `${Math.min(index, 16) * 35}ms`,
+                                }}
+                                className="group/row animate-in fade-in fill-mode-both border-white/5 duration-300 hover:bg-white/[0.035]"
+                            >
+                                <TableCell className="px-4 py-3.5 sm:px-6">
+                                    <DeploymentStatusBadge
+                                        state={deployment.state}
+                                    />
                                 </TableCell>
-                                <TableCell>
-                                    {deployment.target ?? 'preview'}
+                                <TableCell className="px-4 py-3.5 sm:px-6">
+                                    <span className="inline-flex rounded-md bg-white/10 px-2 py-1 text-xs font-medium capitalize text-foreground/90 ring-1 ring-white/10">
+                                        {deployment.target ?? 'preview'}
+                                    </span>
                                 </TableCell>
-                                <TableCell>
-                                    <div className="space-y-0.5">
-                                        <p>{deployment.branch ?? '—'}</p>
+                                <TableCell className="px-4 py-3.5 sm:px-6">
+                                    <div className="space-y-1">
+                                        <span className="inline-flex max-w-[10rem] items-center gap-1.5 truncate rounded-md bg-white/10 px-2 py-1 text-xs font-medium text-foreground/90 ring-1 ring-white/10">
+                                            <GitBranch className="size-3.5 shrink-0 text-primary" />
+                                            <span className="truncate">
+                                                {deployment.branch ?? '—'}
+                                            </span>
+                                        </span>
                                         {deployment.sha ? (
-                                            <p className="font-mono text-xs text-muted-foreground">
+                                            <p className="font-mono text-[11px] text-muted-foreground">
                                                 {deployment.sha.slice(0, 7)}
                                             </p>
                                         ) : null}
                                     </div>
                                 </TableCell>
-                                <TableCell>
-                                    {formatDate(deployment.createdAt)}
+                                <TableCell className="px-4 py-3.5 sm:px-6">
+                                    <div className="space-y-0.5">
+                                        <p
+                                            className="text-sm text-foreground/90"
+                                            title={formatVercelDateTime(
+                                                deployment.createdAt,
+                                            )}
+                                        >
+                                            {formatVercelRelative(
+                                                deployment.createdAt,
+                                            )}
+                                        </p>
+                                        <p className="text-[11px] text-muted-foreground">
+                                            {formatVercelDateTime(
+                                                deployment.createdAt,
+                                            )}
+                                        </p>
+                                    </div>
                                 </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-1">
+                                <TableCell className="px-4 py-3.5 text-right sm:px-6">
+                                    <div className="flex items-center justify-end gap-0.5">
                                         {deployment.url ? (
                                             <Button
                                                 asChild
                                                 size="icon-sm"
                                                 variant="ghost"
+                                                className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
                                                 aria-label="Open deployment"
                                             >
                                                 <a
@@ -98,7 +131,12 @@ export const DeploymentsTable = ({
                                             </Button>
                                         ) : null}
                                         {deployment.inspectorUrl ? (
-                                            <Button asChild size="sm" variant="outline">
+                                            <Button
+                                                asChild
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-8 px-2 text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                                            >
                                                 <a
                                                     href={deployment.inspectorUrl}
                                                     target="_blank"
@@ -112,13 +150,16 @@ export const DeploymentsTable = ({
                                             type="button"
                                             size="sm"
                                             variant="outline"
+                                            className="h-8 gap-1.5 rounded-md ring-1 ring-white/10 hover:bg-primary/15 hover:text-primary hover:ring-primary/30"
                                             disabled={Boolean(redeployingId)}
-                                            onClick={() => onRedeploy(deployment)}
+                                            onClick={() =>
+                                                onRedeploy(deployment)
+                                            }
                                         >
                                             {busy ? (
-                                                <Loading size="sm" />
+                                                <ButtonSpinner />
                                             ) : (
-                                                <RefreshCw className="size-4" />
+                                                <RefreshCw className="size-3.5" />
                                             )}
                                             Redeploy
                                         </Button>

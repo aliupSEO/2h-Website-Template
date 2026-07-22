@@ -21,8 +21,6 @@ type ReposTableProps = {
     repos: GitRepo[];
     onEdit: (repo: GitRepo) => void;
     onDelete: (repo: GitRepo) => void;
-    /** Remount rows so filter changes replay entrance animation */
-    animationKey?: string;
 };
 
 const headClass =
@@ -32,10 +30,9 @@ export const ReposTable = ({
     repos,
     onEdit,
     onDelete,
-    animationKey = 'all',
 }: ReposTableProps) => {
     return (
-        <div className="overflow-hidden rounded-none border-0 border-t border-white/5 bg-card shadow-none">
+        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 border-t border-white/5 bg-card shadow-none">
             <Table>
                 <TableHeader>
                     <TableRow className="border-b-2 border-primary/40 bg-primary/15 hover:bg-primary/15">
@@ -52,13 +49,10 @@ export const ReposTable = ({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {repos.map((repo, index) => (
+                    {repos.map((repo) => (
                         <TableRow
-                            key={`${animationKey}-${repo.id}`}
-                            style={{
-                                animationDelay: `${Math.min(index, 16) * 35}ms`,
-                            }}
-                            className="group/row animate-in fade-in slide-in-from-bottom-2 fill-mode-both border-white/5 duration-500 hover:bg-white/[0.035]"
+                            key={repo.id}
+                            className="group/row border-white/5 hover:bg-white/[0.035]"
                         >
                             <TableCell className="max-w-[22rem] px-4 py-3.5 whitespace-normal sm:px-6">
                                 <div className="min-w-0 space-y-1">

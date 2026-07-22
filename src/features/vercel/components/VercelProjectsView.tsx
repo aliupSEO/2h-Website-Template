@@ -1,16 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { FolderGit2 } from 'lucide-react';
 import {
-    ConfirmModal,
     DocumentTitle,
     Loading,
     LoadingScreen,
+    ConfirmModal,
 } from '@/components/common';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@/components/ui';
+import { PROJECTS_PER_PAGE } from '@/features/vercel/constants';
 import type {
     CreateEnvVarSchema,
     CreateProjectSchema,
@@ -27,15 +23,28 @@ import { CreateProjectDialog } from './CreateProjectDialog';
 import { DeploymentsTable } from './DeploymentsTable';
 import { EditEnvVarDialog } from './EditEnvVarDialog';
 import { EnvVarsTable } from './EnvVarsTable';
-import { ProjectSelect } from './ProjectSelect';
+import { ProjectDetailHeader } from './ProjectDetailHeader';
+import { ProjectsCardGrid } from './ProjectsCardGrid';
+import { ProjectsPagination } from './ProjectsPagination';
 import { ProjectsTable } from './ProjectsTable';
-import { ProjectsToolbar } from './ProjectsToolbar';
+import {
+    ProjectsToolbar,
+    type ProjectsViewMode,
+} from './ProjectsToolbar';
+import { VercelEmptyState } from './VercelEmptyState';
 
 export const VercelProjectsView = () => {
     const projects = useVercelStore((state) => state.projects);
     const selectedProjectId = useVercelStore((state) => state.selectedProjectId);
     const deployments = useVercelStore((state) => state.deployments);
     const envVars = useVercelStore((state) => state.envVars);
+    const projectDetails = useVercelStore((state) => state.projectDetails);
+    const hydrateProjectDetails = useVercelStore(
+        (state) => state.hydrateProjectDetails,
+    );
+    const getProjectSummary = useVercelStore(
+        (state) => state.getProjectSummary,
+    );
     const loadingProjects = useVercelStore((state) => state.loadingProjects);
     const loadingDetail = useVercelStore((state) => state.loadingDetail);
     const error = useVercelStore((state) => state.error);
@@ -48,13 +57,19 @@ export const VercelProjectsView = () => {
     const redeploy = useVercelStore((state) => state.redeploy);
     const syncFromWebhooks = useVercelStore((state) => state.syncFromWebhooks);
 
-    const [tab, setTab] = useState('projects');
+    const [tab, setTab] = useState<'projects' | 'deployments' | 'env'>(
+        'projects',
+    );
+    const [viewMode, setViewMode] = useState<ProjectsViewMode>('cards');
     const [query, setQuery] = useState('');
+    const [page, setPage] = useState(1);
     const [createProjectOpen, setCreateProjectOpen] = useState(false);
     const [createEnvOpen, setCreateEnvOpen] = useState(false);
     const [editingEnv, setEditingEnv] = useState<VercelEnvVar | null>(null);
-    const [pendingDeleteEnv, setPendingDeleteEnv] = useState<VercelEnvVar | null>(null);
-    const [pendingRedeploy, setPendingRedeploy] = useState<VercelDeployment | null>(null);
+    const [pendingDeleteEnv, setPendingDeleteEnv] =
+        useState<VercelEnvVar | null>(null);
+    const [pendingRedeploy, setPendingRedeploy] =
+        useState<VercelDeployment | null>(null);
     const [redeployingId, setRedeployingId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -83,9 +98,50 @@ export const VercelProjectsView = () => {
         });
     }, [projects, query]);
 
+    const totalPages = Math.max(
+        1,
+        Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE),
+    );
+
+    useEffect(() => {
+        setPage(1);
+    }, [query]);
+
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+    }, [page, totalPages]);
+
+    const pagedProjects = useMemo(() => {
+        const start = (page - 1) * PROJECTS_PER_PAGE;
+        return filteredProjects.slice(start, start + PROJECTS_PER_PAGE);
+    }, [filteredProjects, page]);
+
+    useEffect(() => {
+        if (tab !== 'projects' || pagedProjects.length === 0) return;
+        void hydrateProjectDetails(pagedProjects.map((project) => project.id));
+    }, [tab, pagedProjects, hydrateProjectDetails]);
+
     const selectedProject = useMemo(() => {
-        return projects.find((project) => project.id === selectedProjectId) ?? null;
+        return (
+            projects.find((project) => project.id === selectedProjectId) ?? null
+        );
     }, [projects, selectedProjectId]);
+
+    const projectSummaries = useMemo(() => {
+        const map: Record<string, ReturnType<typeof getProjectSummary>> = {};
+        for (const project of pagedProjects) {
+            map[project.id] = getProjectSummary(project.id);
+        }
+        return map;
+    }, [pagedProjects, getProjectSummary, projectDetails]);
+
+    const handlePageChange = (nextPage: number) => {
+        setPage(nextPage);
+        const main = document.querySelector('main');
+        if (main instanceof HTMLElement) {
+            main.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
 
     const handleProjectChange = (projectId: string) => {
         void selectProject(projectId).catch((selectError) => {
@@ -95,6 +151,18 @@ export const VercelProjectsView = () => {
                     : 'Could not load project',
             );
         });
+    };
+
+    const openProjectTab = (
+        project: (typeof projects)[number],
+        nextTab: 'deployments' | 'env',
+    ) => {
+        handleProjectChange(project.id);
+        setTab(nextTab);
+    };
+
+    const backToProjects = () => {
+        setTab('projects');
     };
 
     const handleCreateProject = async (values: CreateProjectSchema) => {
@@ -194,116 +262,170 @@ export const VercelProjectsView = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="-m-4 space-y-0 bg-card sm:-m-6">
             <DocumentTitle title="Vercel" />
-            <div className="space-y-1">
-                <h1 className="font-heading text-2xl font-semibold tracking-tight">
-                    Vercel
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                    Import GitHub repos, watch deployments, and manage env vars.
-                </p>
-            </div>
+
+            {tab === 'projects' ? (
+                <ProjectsToolbar
+                    query={query}
+                    onQueryChange={setQuery}
+                    onCreate={() => setCreateProjectOpen(true)}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                />
+            ) : (
+                <div className="border-b border-white/5 px-4 py-4 sm:px-6">
+                    <h1 className="font-heading text-3xl font-semibold tracking-tight">
+                        Vercel
+                    </h1>
+                </div>
+            )}
 
             {error && projects.length === 0 ? (
-                <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-                    <p className="text-sm text-destructive">{error}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Check `VERCEL_TOKEN` and `VERCEL_TEAM_ID` in `.env.local`,
-                        then restart the dev server.
-                    </p>
-                </div>
-            ) : (
-                <Tabs value={tab} onValueChange={setTab}>
-                    <TabsList>
-                        <TabsTrigger value="projects">Projects</TabsTrigger>
-                        <TabsTrigger value="deployments">Deployments</TabsTrigger>
-                        <TabsTrigger value="env">Environment</TabsTrigger>
-                    </TabsList>
+                <VercelEmptyState
+                    title="Could not load projects"
+                    description="Check VERCEL_TOKEN and VERCEL_TEAM_ID in .env.local, then restart the dev server."
+                />
+            ) : null}
 
-                    <TabsContent value="projects" className="mt-4 space-y-4">
-                        <ProjectsToolbar
-                            query={query}
-                            onQueryChange={setQuery}
-                            onCreate={() => setCreateProjectOpen(true)}
-                        />
-
-                        {filteredProjects.length === 0 ? (
-                            <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-                                <p className="text-sm text-muted-foreground">
-                                    {query.trim()
-                                        ? 'No projects match your search.'
-                                        : 'No Vercel projects found. Import one from GitHub.'}
-                                </p>
-                            </div>
+            {!error || projects.length > 0 ? (
+                <>
+                    {tab === 'projects' ? (
+                        filteredProjects.length === 0 ? (
+                            <VercelEmptyState
+                                icon={<FolderGit2 className="size-5" />}
+                                title={
+                                    query.trim()
+                                        ? 'No matching projects'
+                                        : 'No projects yet'
+                                }
+                                description={
+                                    query.trim()
+                                        ? 'Try another search on this page.'
+                                        : 'Import a GitHub repository to get started.'
+                                }
+                                actionLabel={
+                                    query.trim()
+                                        ? undefined
+                                        : 'Import from GitHub'
+                                }
+                                onAction={
+                                    query.trim()
+                                        ? undefined
+                                        : () => setCreateProjectOpen(true)
+                                }
+                            />
+                        ) : viewMode === 'cards' ? (
+                            <>
+                                <ProjectsCardGrid
+                                    projects={pagedProjects}
+                                    summaries={projectSummaries}
+                                    selectedProjectId={selectedProjectId}
+                                    onOpenDeployments={(project) =>
+                                        openProjectTab(project, 'deployments')
+                                    }
+                                    onOpenEnv={(project) =>
+                                        openProjectTab(project, 'env')
+                                    }
+                                />
+                                <ProjectsPagination
+                                    page={page}
+                                    totalCount={filteredProjects.length}
+                                    onPageChange={handlePageChange}
+                                />
+                            </>
                         ) : (
-                            <ProjectsTable
-                                projects={filteredProjects}
-                                selectedProjectId={selectedProjectId}
-                                onSelect={(project) => {
-                                    handleProjectChange(project.id);
-                                    setTab('deployments');
-                                }}
-                            />
-                        )}
-                    </TabsContent>
+                            <>
+                                <ProjectsTable
+                                    projects={pagedProjects}
+                                    summaries={projectSummaries}
+                                    selectedProjectId={selectedProjectId}
+                                    onOpenDeployments={(project) =>
+                                        openProjectTab(project, 'deployments')
+                                    }
+                                    onOpenEnv={(project) =>
+                                        openProjectTab(project, 'env')
+                                    }
+                                />
+                                <ProjectsPagination
+                                    page={page}
+                                    totalCount={filteredProjects.length}
+                                    onPageChange={handlePageChange}
+                                />
+                            </>
+                        )
+                    ) : null}
 
-                    <TabsContent value="deployments" className="mt-4 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <ProjectSelect
-                                projects={projects}
-                                value={selectedProjectId}
-                                onChange={handleProjectChange}
-                                placeholder="Select a Vercel project"
+                    {tab === 'deployments' ? (
+                        <div>
+                            <ProjectDetailHeader
+                                projectName={
+                                    selectedProject?.name ?? 'Project'
+                                }
+                                title="Deployments"
+                                onBack={backToProjects}
                             />
+
+                            {!selectedProject ? (
+                                <VercelEmptyState
+                                    title="No project selected"
+                                    description="Go back and open deployments from a project."
+                                    actionLabel="Back to projects"
+                                    onAction={backToProjects}
+                                />
+                            ) : loadingDetail ? (
+                                <div className="flex justify-center py-16">
+                                    <Loading
+                                        size="md"
+                                        label="Loading deployments…"
+                                    />
+                                </div>
+                            ) : (
+                                <DeploymentsTable
+                                    deployments={deployments}
+                                    redeployingId={redeployingId}
+                                    onRedeploy={setPendingRedeploy}
+                                />
+                            )}
                         </div>
+                    ) : null}
 
-                        {!selectedProject ? (
-                            <p className="text-sm text-muted-foreground">
-                                Choose a project to view deployments.
-                            </p>
-                        ) : loadingDetail ? (
-                            <div className="flex justify-center py-10">
-                                <Loading size="md" label="Loading deployments…" />
-                            </div>
-                        ) : (
-                            <DeploymentsTable
-                                deployments={deployments}
-                                redeployingId={redeployingId}
-                                onRedeploy={setPendingRedeploy}
+                    {tab === 'env' ? (
+                        <div>
+                            <ProjectDetailHeader
+                                projectName={
+                                    selectedProject?.name ?? 'Project'
+                                }
+                                title="Environment"
+                                onBack={backToProjects}
                             />
-                        )}
-                    </TabsContent>
 
-                    <TabsContent value="env" className="mt-4 space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <ProjectSelect
-                                projects={projects}
-                                value={selectedProjectId}
-                                onChange={handleProjectChange}
-                                placeholder="Select a Vercel project"
-                            />
+                            {!selectedProject ? (
+                                <VercelEmptyState
+                                    title="No project selected"
+                                    description="Go back and open environment from a project."
+                                    actionLabel="Back to projects"
+                                    onAction={backToProjects}
+                                />
+                            ) : loadingDetail ? (
+                                <div className="flex justify-center py-16">
+                                    <Loading
+                                        size="md"
+                                        label="Loading env vars…"
+                                    />
+                                </div>
+                            ) : (
+                                <EnvVarsTable
+                                    envVars={envVars}
+                                    onCreate={() => setCreateEnvOpen(true)}
+                                    onEdit={setEditingEnv}
+                                    onDelete={setPendingDeleteEnv}
+                                />
+                            )}
                         </div>
-
-                        {!selectedProject ? (
-                            <p className="text-sm text-muted-foreground">
-                                Choose a project to manage environment variables.
-                            </p>
-                        ) : loadingDetail ? (
-                            <div className="flex justify-center py-10">
-                                <Loading size="md" label="Loading env vars…" />
-                            </div>
-                        ) : (
-                            <EnvVarsTable
-                                envVars={envVars}
-                                onCreate={() => setCreateEnvOpen(true)}
-                                onEdit={setEditingEnv}
-                                onDelete={setPendingDeleteEnv}
-                            />
-                        )}
-                    </TabsContent>
-                </Tabs>
-            )}
+                    ) : null}
+                </>
+            ) : null}
 
             <CreateProjectDialog
                 open={createProjectOpen}

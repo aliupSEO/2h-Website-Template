@@ -22,14 +22,12 @@ type RepoCardProps = {
     repo: GitRepo;
     onEdit: (repo: GitRepo) => void;
     onDelete: (repo: GitRepo) => void;
-    index?: number;
 };
 
 export const RepoCard = ({
     repo,
     onEdit,
     onDelete,
-    index = 0,
 }: RepoCardProps) => {
     const description = repo.description?.trim();
     const [copied, setCopied] = useState(false);
@@ -48,9 +46,8 @@ export const RepoCard = ({
 
     return (
         <article
-            style={{ animationDelay: `${Math.min(index, 12) * 45}ms` }}
             className={cn(
-                'group/repo relative flex h-full animate-in fade-in zoom-in-95 slide-in-from-bottom-4 fill-mode-both duration-500 flex-col overflow-hidden rounded-3xl',
+                'group/repo relative flex h-full flex-col overflow-hidden rounded-3xl',
                 'bg-[#1a1a1a] ring-1 ring-white/[0.08]',
                 'transition-[box-shadow,ring-color,background-color] duration-300 ease-out',
                 'hover:bg-[#1f1f1f] hover:ring-primary/40',

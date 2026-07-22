@@ -241,8 +241,15 @@ export const hubApiPlugin = (): Plugin => {
                         const deploymentsPath =
                             parseVercelProjectDeploymentsPath(pathname);
                         if (deploymentsPath && req.method === 'GET') {
+                            const rawLimit = Number(
+                                requestUrl.searchParams.get('limit'),
+                            );
+                            const limit = Number.isFinite(rawLimit)
+                                ? rawLimit
+                                : undefined;
                             const result = await handleListDeployments(
                                 deploymentsPath.projectId,
+                                limit,
                             );
                             sendJson(
                                 res,

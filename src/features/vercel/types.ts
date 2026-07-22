@@ -30,6 +30,15 @@ export type VercelEnvVar = {
     configured: boolean;
 };
 
+export type VercelProjectSummary = {
+    latestDeployment: VercelDeployment | null;
+    deploymentCount: number;
+    envVarCount: number;
+    loading: boolean;
+    /** True when only a lightweight deployments sample was fetched for cards. */
+    summaryOnly: boolean;
+};
+
 export type CreateProjectInput = {
     name: string;
     framework?: string;

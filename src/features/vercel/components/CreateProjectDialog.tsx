@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { FolderGit2, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Loading } from '@/components/common';
+import { ButtonSpinner } from '@/components/common';
 import {
     Button,
     Dialog,
@@ -12,25 +13,23 @@ import {
     DialogTitle,
     FormField,
     Input,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
 } from '@/components/ui';
+import type { GitRepo } from '@/features/git/types';
 import {
     createProjectSchema,
-    VERCEL_FRAMEWORKS,
     type CreateProjectSchema,
 } from '@/features/vercel/schemas';
-import type { GitRepo } from '@/features/git/types';
 import { githubService } from '@/services/githubService';
+import { FrameworkPicker } from './FrameworkPicker';
+import { GitRepoPicker } from './GitRepoPicker';
 
 type CreateProjectDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: CreateProjectSchema) => Promise<void>;
 };
+
+const FIELD_CLASS = 'h-11 rounded-md bg-[#2a2a2a] text-foreground';
 
 export const CreateProjectDialog = ({
     open,
@@ -40,6 +39,7 @@ export const CreateProjectDialog = ({
     const [repos, setRepos] = useState<GitRepo[]>([]);
     const [loadingRepos, setLoadingRepos] = useState(false);
     const [reposError, setReposError] = useState<string | null>(null);
+    const [reloadKey, setReloadKey] = useState(0);
 
     const {
         register,
@@ -74,6 +74,7 @@ export const CreateProjectDialog = ({
             }
             catch (error) {
                 if (!active) return;
+                setRepos([]);
                 setReposError(
                     error instanceof Error
                         ? error.message
@@ -89,7 +90,7 @@ export const CreateProjectDialog = ({
         return () => {
             active = false;
         };
-    }, [open, reset]);
+    }, [open, reset, reloadKey]);
 
     const submit = handleSubmit(async (values) => {
         await onSubmit(values);
@@ -99,131 +100,155 @@ export const CreateProjectDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Import from GitHub</DialogTitle>
-                    <DialogDescription>
-                        Create a Vercel project linked to a GitHub repository.
-                    </DialogDescription>
+            <DialogContent className="flex max-h-[min(90dvh,42rem)] w-full flex-col gap-0 overflow-hidden rounded-2xl border-0 bg-[#1a1a1a] p-0 shadow-[0_28px_90px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.08] sm:max-w-lg">
+                <div className="h-0.5 shrink-0 bg-primary" aria-hidden />
+
+                <DialogHeader className="shrink-0 space-y-0 border-b border-white/5 px-5 py-4 pr-12">
+                    <div className="flex items-start gap-3">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/30">
+                            <FolderGit2 className="size-4" />
+                        </div>
+                        <div className="min-w-0 space-y-1">
+                            <DialogTitle className="font-heading text-lg">
+                                Import from GitHub
+                            </DialogTitle>
+                            <DialogDescription className="text-sm leading-snug">
+                                Link a repository to create a Vercel project.
+                            </DialogDescription>
+                        </div>
+                    </div>
                 </DialogHeader>
 
                 <form
-                    className="space-y-4"
+                    className="flex min-h-0 flex-1 flex-col"
                     onSubmit={(event) => void submit(event)}
                     noValidate
                 >
-                    <FormField
-                        label="GitHub repository"
-                        htmlFor="vercel-git-repo"
-                        required
-                        error={errors.gitRepository?.message ?? reposError ?? undefined}
-                    >
-                        {loadingRepos ? (
-                            <div className="flex h-10 items-center">
-                                <Loading size="sm" label="Loading repos…" />
-                            </div>
-                        ) : (
-                            <Controller
-                                control={control}
-                                name="gitRepository"
-                                render={({ field }) => (
-                                    <Select
-                                        value={field.value || undefined}
-                                        onValueChange={(value) => {
-                                            field.onChange(value);
-                                            const repo = repos.find(
-                                                (item) => item.fullName === value,
-                                            );
-                                            if (repo) {
+                    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-5 py-4">
+                        <FormField
+                            label="GitHub repository"
+                            htmlFor="vercel-git-repo"
+                            required
+                            error={
+                                errors.gitRepository?.message ??
+                                reposError ??
+                                undefined
+                            }
+                        >
+                            {loadingRepos ? (
+                                <div className="flex h-32 flex-col items-center justify-center gap-2.5 rounded-xl bg-[#111111] ring-1 ring-white/10">
+                                    <ButtonSpinner className="size-5 text-primary" />
+                                    <p className="text-sm text-muted-foreground">
+                                        Loading repos…
+                                    </p>
+                                </div>
+                            ) : reposError ? (
+                                <div className="flex flex-col items-center gap-3 rounded-xl bg-[#111111] px-4 py-6 text-center ring-1 ring-white/10">
+                                    <p className="max-w-xs text-sm text-muted-foreground">
+                                        {reposError}
+                                    </p>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="h-9 gap-2 rounded-md ring-1 ring-white/12"
+                                        onClick={() =>
+                                            setReloadKey((value) => value + 1)
+                                        }
+                                    >
+                                        <RefreshCw className="size-3.5" />
+                                        Try again
+                                    </Button>
+                                </div>
+                            ) : repos.length === 0 ? (
+                                <div className="flex flex-col items-center gap-2 rounded-xl bg-[#111111] px-4 py-6 text-center ring-1 ring-white/10">
+                                    <FolderGit2 className="size-5 text-muted-foreground" />
+                                    <p className="text-sm text-muted-foreground">
+                                        No repositories found on the linked
+                                        GitHub account.
+                                    </p>
+                                </div>
+                            ) : (
+                                <Controller
+                                    control={control}
+                                    name="gitRepository"
+                                    render={({ field }) => (
+                                        <GitRepoPicker
+                                            repos={repos}
+                                            value={field.value}
+                                            disabled={isSubmitting}
+                                            onChange={(fullName, repo) => {
+                                                field.onChange(fullName);
                                                 setValue('name', repo.name, {
                                                     shouldDirty: true,
                                                     shouldValidate: true,
                                                 });
-                                            }
-                                        }}
-                                    >
-                                        <SelectTrigger
-                                            id="vercel-git-repo"
-                                            className="w-full"
-                                        >
-                                            <SelectValue placeholder="Select a repository" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {repos.map((repo) => (
-                                                <SelectItem
-                                                    key={repo.id}
-                                                    value={repo.fullName}
-                                                >
-                                                    {repo.fullName}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                            }}
+                                        />
+                                    )}
+                                />
+                            )}
+                        </FormField>
+
+                        <FormField
+                            label="Project name"
+                            htmlFor="vercel-project-name"
+                            required
+                            error={errors.name?.message}
+                        >
+                            <Input
+                                id="vercel-project-name"
+                                placeholder="my-app"
+                                className={FIELD_CLASS}
+                                aria-invalid={Boolean(errors.name)}
+                                {...register('name')}
+                            />
+                        </FormField>
+
+                        <FormField
+                            label="Framework"
+                            htmlFor="vercel-project-framework"
+                            error={errors.framework?.message}
+                        >
+                            <Controller
+                                control={control}
+                                name="framework"
+                                render={({ field }) => (
+                                    <FrameworkPicker
+                                        id="vercel-project-framework"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                    />
                                 )}
                             />
-                        )}
-                    </FormField>
+                        </FormField>
+                    </div>
 
-                    <FormField
-                        label="Project name"
-                        htmlFor="vercel-project-name"
-                        required
-                        error={errors.name?.message}
-                    >
-                        <Input
-                            id="vercel-project-name"
-                            placeholder="my-app"
-                            className="h-10"
-                            aria-invalid={Boolean(errors.name)}
-                            {...register('name')}
-                        />
-                    </FormField>
-
-                    <FormField
-                        label="Framework"
-                        htmlFor="vercel-project-framework"
-                        error={errors.framework?.message}
-                    >
-                        <Controller
-                            control={control}
-                            name="framework"
-                            render={({ field }) => (
-                                <Select
-                                    value={field.value}
-                                    onValueChange={field.onChange}
-                                >
-                                    <SelectTrigger
-                                        id="vercel-project-framework"
-                                        className="w-full"
-                                    >
-                                        <SelectValue placeholder="Select a framework" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {VERCEL_FRAMEWORKS.map((framework) => (
-                                            <SelectItem
-                                                key={framework.value}
-                                                value={framework.value}
-                                            >
-                                                {framework.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        />
-                    </FormField>
-
-                    <DialogFooter className="gap-2 pt-2">
+                    <DialogFooter className="shrink-0 gap-2 border-t border-white/5 bg-[#1a1a1a] px-5 py-4 sm:justify-end">
                         <Button
                             type="button"
                             variant="outline"
+                            className="h-11 rounded-md"
                             disabled={isSubmitting}
                             onClick={() => onOpenChange(false)}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" variant="brand" disabled={isSubmitting}>
-                            {isSubmitting ? <Loading size="sm" /> : 'Import project'}
+                        <Button
+                            type="submit"
+                            variant="brand"
+                            className="h-11 min-w-[8.5rem] rounded-md"
+                            disabled={
+                                isSubmitting ||
+                                loadingRepos ||
+                                Boolean(reposError) ||
+                                repos.length === 0
+                            }
+                        >
+                            {isSubmitting ? (
+                                <ButtonSpinner />
+                            ) : (
+                                'Import project'
+                            )}
                         </Button>
                     </DialogFooter>
                 </form>

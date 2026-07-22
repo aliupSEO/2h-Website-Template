@@ -18,9 +18,31 @@ type VercelProjectRaw = {
     createdAt?: number;
     updatedAt?: number;
     targets?: {
-        production?: { alias?: string; url?: string };
+        production?: {
+            alias?: string | string[];
+            url?: string;
+        };
     };
     link?: { type?: string; repo?: string };
+};
+
+const toAbsoluteHttpUrl = (hostOrUrl: string | null | undefined): string | null => {
+    if (!hostOrUrl?.trim()) return null;
+    const value = hostOrUrl.trim();
+    if (/^https?:\/\//i.test(value)) return value;
+    return `https://${value}`;
+};
+
+const pickProductionUrl = (project: VercelProjectRaw): string | null => {
+    const production = project.targets?.production;
+    if (!production) return null;
+
+    const alias = production.alias;
+    const preferred = Array.isArray(alias)
+        ? alias.find((value) => Boolean(value?.trim()))
+        : alias;
+
+    return toAbsoluteHttpUrl(preferred || production.url || null);
 };
 
 type VercelDeploymentRaw = {
@@ -56,7 +78,7 @@ const mapProject = (project: VercelProjectRaw): VercelProjectDto => ({
     framework: project.framework ?? null,
     createdAt: project.createdAt ?? 0,
     updatedAt: project.updatedAt ?? 0,
-    productionUrl: project.targets?.production?.url ?? null,
+    productionUrl: pickProductionUrl(project),
 });
 
 const mapDeployment = (deployment: VercelDeploymentRaw): VercelDeploymentDto => ({

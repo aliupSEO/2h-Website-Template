@@ -179,7 +179,6 @@ export const ReposList = () => {
                 ) : viewMode === 'table' ? (
                     <ReposTable
                         repos={filtered}
-                        animationKey={visibilityFilter}
                         onEdit={setEditingRepo}
                         onDelete={setPendingDelete}
                     />
@@ -192,7 +191,6 @@ export const ReposList = () => {
                         <div className="relative">
                             <ReposCardGrid
                                 repos={filtered}
-                                animationKey={visibilityFilter}
                                 onEdit={setEditingRepo}
                                 onDelete={setPendingDelete}
                             />

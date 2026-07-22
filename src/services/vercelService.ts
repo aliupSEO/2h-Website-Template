@@ -54,9 +54,16 @@ export const vercelService = {
         return data.project;
     },
 
-    listDeployments: async (projectId: string): Promise<VercelDeployment[]> => {
+    listDeployments: async (
+        projectId: string,
+        options?: { limit?: number },
+    ): Promise<VercelDeployment[]> => {
+        const params =
+            options?.limit !== undefined
+                ? `?limit=${encodeURIComponent(String(options.limit))}`
+                : '';
         const data = await request<{ deployments: VercelDeployment[] }>(
-            apiEndpoints.vercel.projectDeployments(projectId),
+            `${apiEndpoints.vercel.projectDeployments(projectId)}${params}`,
         );
         return data.deployments;
     },
