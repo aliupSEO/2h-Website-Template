@@ -31,6 +31,10 @@ export const AppHeader = () => {
     const clearSession = useAuthStore((state) => state.clearSession);
     const [confirmOpen, setConfirmOpen] = useState(false);
 
+    const initials = getInitials(user?.name, user?.email);
+    const displayName = user?.name ?? 'Account';
+    const displayEmail = user?.email ?? '';
+
     const handleSignOut = async () => {
         try {
             await authService.signOut();
@@ -47,49 +51,77 @@ export const AppHeader = () => {
             );
         }
     };
-    return (<>
-      <header className="flex h-14 shrink-0 items-center justify-end border-0 bg-surface px-4 shadow-[0_28px_90px_rgba(0,0,0,0.75)] sm:px-6">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="rounded-full outline-none transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-0">
-            <Avatar className="size-9 cursor-pointer ring-0">
-              <AvatarFallback className="bg-primary font-semibold text-primary-foreground">
-                {getInitials(user?.name, user?.email)}
-              </AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={8} className="w-52 rounded-xl border-0 bg-surface p-1.5 text-foreground shadow-[0_28px_90px_rgba(0,0,0,0.75)] ring-0">
-            <div className="px-2.5 py-2">
-              <p className="truncate text-sm font-medium text-foreground">
-                {user?.name ?? 'Account'}
-              </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {user?.email ?? ''}
-              </p>
-            </div>
 
-            <DropdownMenuItem className="mt-1 cursor-pointer gap-2 rounded-lg px-2.5 py-2 text-foreground focus:bg-white/10 focus:text-foreground" onClick={() => navigate('/profile')}>
-              <UserRound className="size-4 text-foreground"/>
-              Profile
-            </DropdownMenuItem>
+    return (
+        <>
+            <header className="flex h-14 shrink-0 items-center justify-end border-0 bg-surface px-4 shadow-[0_28px_90px_rgba(0,0,0,0.75)] sm:px-6">
+                <DropdownMenu>
+                    <DropdownMenuTrigger className="rounded-full outline-none transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-0">
+                        <Avatar className="size-9 cursor-pointer ring-0">
+                            <AvatarFallback className="bg-primary font-semibold text-primary-foreground">
+                                {initials}
+                            </AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
 
-            <DropdownMenuSeparator className="my-1 bg-white/10"/>
+                    <DropdownMenuContent
+                        align="end"
+                        sideOffset={10}
+                        className="w-64 rounded-2xl border-0 bg-[#1a1a1a] p-0 text-foreground shadow-[0_24px_80px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)] ring-0"
+                    >
+                        <div className="flex items-center gap-3 px-4 pt-4 pb-3">
+                            <Avatar className="size-10 shrink-0 ring-0">
+                                <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
+                                    {initials}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold tracking-tight text-foreground">
+                                    {displayName}
+                                </p>
+                                {displayEmail ? (
+                                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                                        {displayEmail}
+                                    </p>
+                                ) : null}
+                            </div>
+                        </div>
 
-            <DropdownMenuItem variant="destructive" className="cursor-pointer gap-2 rounded-lg px-2.5 py-2 text-destructive focus:bg-destructive/15 focus:text-destructive focus:[&_svg]:text-destructive data-[highlighted]:bg-destructive/15 data-[highlighted]:text-destructive data-[highlighted]:[&_svg]:text-destructive [&_svg]:text-destructive" onClick={() => setConfirmOpen(true)}>
-              <LogOut className="size-4 text-destructive"/>
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </header>
+                        <div className="mx-4 h-px bg-white/10" />
 
-      <ConfirmModal
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        title="Sign out?"
-        description="You will need to sign in again to access the hub."
-        confirmLabel="Sign out"
-        variant="destructive"
-        onConfirm={handleSignOut}
-      />
-    </>);
+                        <div className="p-2">
+                            <DropdownMenuItem
+                                className="cursor-pointer gap-2.5 rounded-xl px-3 py-2.5 text-sm text-foreground focus:bg-white/10 focus:text-foreground"
+                                onClick={() => navigate('/profile')}
+                            >
+                                <UserRound className="size-4 text-muted-foreground" />
+                                Profile
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator className="my-1.5 bg-white/10" />
+
+                            <DropdownMenuItem
+                                variant="destructive"
+                                className="cursor-pointer gap-2.5 rounded-xl px-3 py-2.5 text-sm text-destructive focus:bg-destructive/10 focus:text-destructive focus:[&_svg]:text-destructive data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive data-[highlighted]:[&_svg]:text-destructive [&_svg]:text-destructive"
+                                onClick={() => setConfirmOpen(true)}
+                            >
+                                <LogOut className="size-4" />
+                                Sign out
+                            </DropdownMenuItem>
+                        </div>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </header>
+
+            <ConfirmModal
+                open={confirmOpen}
+                onOpenChange={setConfirmOpen}
+                title="Sign out?"
+                description="You will need to sign in again to access the hub."
+                confirmLabel="Sign out"
+                variant="destructive"
+                onConfirm={handleSignOut}
+            />
+        </>
+    );
 };
