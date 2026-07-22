@@ -150,4 +150,15 @@
     @apply font-sans;
     color-scheme: dark;
   }
+
+  /* Browser autofill often tints email/password differently — lock to field surface */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--foreground) !important;
+    caret-color: var(--foreground);
+    transition: background-color 99999s ease-in-out 0s;
+    box-shadow: inset 0 0 0 1000px var(--muted) !important;
+  }
 }

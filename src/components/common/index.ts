@@ -10,3 +10,4 @@ export { DocumentTitle } from './DocumentTitle';
 export { Loading } from './Loading';
 export { LoadingScreen } from './LoadingScreen';
 export { LoadingOverlay } from './LoadingOverlay';
+export { ButtonSpinner } from './ButtonSpinner';
