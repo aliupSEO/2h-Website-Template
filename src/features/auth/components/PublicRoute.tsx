@@ -10,9 +10,10 @@ type PublicRouteProps = {
 };
 
 export const PublicRoute = ({ guestOnly = true }: PublicRouteProps) => {
+    const status = useAuthStore((state) => state.status);
     const user = useAuthStore((state) => state.user);
 
-    if (guestOnly && user) {
+    if (status === 'ready' && guestOnly && user) {
         return <Navigate to="/dashboard" replace />;
     }
 

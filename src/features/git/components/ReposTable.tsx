@@ -1,6 +1,5 @@
-import { Copy, ExternalLink, Pencil, Trash2 } from 'lucide-react';
+import { GitBranch } from 'lucide-react';
 import {
-    Button,
     Table,
     TableBody,
     TableCell,
@@ -9,114 +8,127 @@ import {
     TableRow,
 } from '@/components/ui';
 import type { GitRepo } from '@/features/git/types';
-import { toast } from '@/lib/toast';
+import {
+    formatRepoRelativeUpdatedAt,
+    formatRepoUpdatedAt,
+    getRepoOwnerInitial,
+} from '@/features/git/utils';
+import { cn } from '@/lib/utils';
+import { RepoRowActions } from './RepoRowActions';
 import { RepoVisibilityBadge } from './RepoVisibilityBadge';
 
 type ReposTableProps = {
     repos: GitRepo[];
     onEdit: (repo: GitRepo) => void;
     onDelete: (repo: GitRepo) => void;
+    /** Remount rows so filter changes replay entrance animation */
+    animationKey?: string;
 };
 
-const formatUpdatedAt = (value: string) => {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '—';
-    return date.toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-};
+const headClass =
+    'h-14 px-4 text-sm font-bold tracking-[0.12em] text-primary uppercase sm:px-6';
 
-export const ReposTable = ({ repos, onEdit, onDelete }: ReposTableProps) => {
-    const copyCloneUrl = async (repo: GitRepo) => {
-        try {
-            await navigator.clipboard.writeText(repo.cloneUrl);
-            toast.success('Clone URL copied');
-        }
-        catch {
-            toast.error('Could not copy URL');
-        }
-    };
-
+export const ReposTable = ({
+    repos,
+    onEdit,
+    onDelete,
+    animationKey = 'all',
+}: ReposTableProps) => {
     return (
-        <div className="rounded-xl border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+        <div className="overflow-hidden rounded-none border-0 border-t border-white/5 bg-card shadow-none">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-white/5 hover:bg-transparent">
-                        <TableHead>Name</TableHead>
-                        <TableHead>Owner</TableHead>
-                        <TableHead>Visibility</TableHead>
-                        <TableHead>Default branch</TableHead>
-                        <TableHead>Updated</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="border-b-2 border-primary/40 bg-primary/15 hover:bg-primary/15">
+                        <TableHead className={headClass}>Repository</TableHead>
+                        <TableHead className={headClass}>Owner</TableHead>
+                        <TableHead className={headClass}>Visibility</TableHead>
+                        <TableHead className={headClass}>Branch</TableHead>
+                        <TableHead className={headClass}>Updated</TableHead>
+                        <TableHead
+                            className={cn(headClass, 'w-[7.5rem] text-right')}
+                        >
+                            Actions
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {repos.map((repo) => (
-                        <TableRow key={repo.id} className="border-white/5">
-                            <TableCell>
-                                <div className="space-y-0.5">
+                    {repos.map((repo, index) => (
+                        <TableRow
+                            key={`${animationKey}-${repo.id}`}
+                            style={{
+                                animationDelay: `${Math.min(index, 16) * 35}ms`,
+                            }}
+                            className="group/row animate-in fade-in slide-in-from-bottom-2 fill-mode-both border-white/5 duration-500 hover:bg-white/[0.035]"
+                        >
+                            <TableCell className="max-w-[22rem] px-4 py-3.5 whitespace-normal sm:px-6">
+                                <div className="min-w-0 space-y-1">
                                     <a
                                         href={repo.htmlUrl}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="font-medium text-foreground underline-offset-4 hover:underline"
+                                        className="block truncate font-heading text-[15px] font-semibold tracking-tight text-foreground transition-colors hover:text-primary"
                                     >
                                         {repo.name}
                                     </a>
-                                    {repo.description ? (
-                                        <p className="max-w-xs truncate text-xs text-muted-foreground">
-                                            {repo.description}
-                                        </p>
-                                    ) : null}
+                                    <p className="line-clamp-1 text-xs text-muted-foreground">
+                                        {repo.description?.trim() ||
+                                            'No description'}
+                                    </p>
                                 </div>
                             </TableCell>
-                            <TableCell>{repo.owner}</TableCell>
-                            <TableCell>
+
+                            <TableCell className="px-4 py-3.5 sm:px-6">
+                                <div className="inline-flex max-w-[12rem] items-center gap-2.5">
+                                    <span
+                                        aria-hidden
+                                        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[12px] font-bold text-primary ring-1 ring-primary/35"
+                                    >
+                                        {getRepoOwnerInitial(repo.owner)}
+                                    </span>
+                                    <span className="truncate text-sm font-medium text-foreground">
+                                        {repo.owner}
+                                    </span>
+                                </div>
+                            </TableCell>
+
+                            <TableCell className="px-4 py-3.5 sm:px-6">
                                 <RepoVisibilityBadge isPrivate={repo.private} />
                             </TableCell>
-                            <TableCell>{repo.defaultBranch}</TableCell>
-                            <TableCell>{formatUpdatedAt(repo.updatedAt)}</TableCell>
-                            <TableCell className="text-right">
-                                <div className="flex justify-end gap-1">
-                                    <Button
-                                        type="button"
-                                        size="icon-sm"
-                                        variant="ghost"
-                                        aria-label={`Open ${repo.fullName} on GitHub`}
-                                        onClick={() => window.open(repo.htmlUrl, '_blank', 'noreferrer')}
+
+                            <TableCell className="px-4 py-3.5 sm:px-6">
+                                <span className="inline-flex max-w-[9rem] items-center gap-1.5 truncate rounded-md bg-white/10 px-2 py-1 text-xs font-medium text-foreground/90 ring-1 ring-white/10">
+                                    <GitBranch className="size-3.5 shrink-0 text-primary" />
+                                    <span className="truncate">
+                                        {repo.defaultBranch}
+                                    </span>
+                                </span>
+                            </TableCell>
+
+                            <TableCell className="px-4 py-3.5 sm:px-6">
+                                <div className="space-y-0.5">
+                                    <p
+                                        className="text-sm text-foreground/90"
+                                        title={formatRepoUpdatedAt(
+                                            repo.updatedAt,
+                                        )}
                                     >
-                                        <ExternalLink className="size-4" />
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        size="icon-sm"
-                                        variant="ghost"
-                                        aria-label={`Copy clone URL for ${repo.fullName}`}
-                                        onClick={() => void copyCloneUrl(repo)}
-                                    >
-                                        <Copy className="size-4" />
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        size="icon-sm"
-                                        variant="ghost"
-                                        aria-label={`Edit ${repo.fullName}`}
-                                        onClick={() => onEdit(repo)}
-                                    >
-                                        <Pencil className="size-4" />
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        size="icon-sm"
-                                        variant="ghost"
-                                        aria-label={`Delete ${repo.fullName}`}
-                                        onClick={() => onDelete(repo)}
-                                    >
-                                        <Trash2 className="size-4 text-destructive" />
-                                    </Button>
+                                        {formatRepoRelativeUpdatedAt(
+                                            repo.updatedAt,
+                                        )}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground">
+                                        {formatRepoUpdatedAt(repo.updatedAt)}
+                                    </p>
                                 </div>
+                            </TableCell>
+
+                            <TableCell className="px-4 py-3.5 text-right sm:px-6">
+                                <RepoRowActions
+                                    dense
+                                    repo={repo}
+                                    onEdit={onEdit}
+                                    onDelete={onDelete}
+                                />
                             </TableCell>
                         </TableRow>
                     ))}

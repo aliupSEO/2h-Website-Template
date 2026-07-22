@@ -1,5 +1,4 @@
 import { useEffect, type ReactNode } from 'react';
-import { LoadingScreen } from '@/components/common';
 import { InactiveAccountError } from '@/features/auth/utils/authErrors';
 import { authService } from '@/services/authService';
 import { useAuthStore } from '@/stores/authStore';
@@ -9,7 +8,6 @@ type AuthBootstrapProps = {
 };
 
 export const AuthBootstrap = ({ children }: AuthBootstrapProps) => {
-    const status = useAuthStore((state) => state.status);
     const setUser = useAuthStore((state) => state.setUser);
     const setStatus = useAuthStore((state) => state.setStatus);
     const clearSession = useAuthStore((state) => state.clearSession);
@@ -72,15 +70,6 @@ export const AuthBootstrap = ({ children }: AuthBootstrapProps) => {
             subscription.unsubscribe();
         };
     }, [clearSession, setStatus, setUser]);
-
-    if (status === 'bootstrapping') {
-        return (
-            <LoadingScreen
-                label="Loading…"
-                className="min-h-svh bg-background"
-            />
-        );
-    }
 
     return children;
 };
