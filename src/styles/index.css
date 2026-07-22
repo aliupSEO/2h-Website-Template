@@ -44,6 +44,7 @@
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
+  --color-field: var(--field);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -83,6 +84,7 @@
   --secondary-foreground: var(--brand-white);
   --muted: #1a1a1a;
   --muted-foreground: #a3a3a3;
+  --field: #2a2a2a;
   --accent: color-mix(in srgb, var(--brand-green) 16%, transparent);
   --accent-foreground: var(--brand-green);
   --destructive: #ef4444;
@@ -118,6 +120,7 @@
   --secondary-foreground: var(--brand-white);
   --muted: #1a1a1a;
   --muted-foreground: #a3a3a3;
+  --field: #2a2a2a;
   --accent: color-mix(in srgb, var(--brand-green) 16%, transparent);
   --accent-foreground: var(--brand-green);
   --destructive: #ef4444;
@@ -159,6 +162,6 @@
     -webkit-text-fill-color: var(--foreground) !important;
     caret-color: var(--foreground);
     transition: background-color 99999s ease-in-out 0s;
-    box-shadow: inset 0 0 0 1000px var(--muted) !important;
+    box-shadow: inset 0 0 0 1000px var(--field) !important;
   }
 }

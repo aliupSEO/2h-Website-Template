@@ -59,10 +59,14 @@ export const ProfileIdentity = ({
             <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="group relative shrink-0 rounded-full outline-none"
+                className="group relative shrink-0 rounded-full outline-none transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
                 aria-label="Change profile photo"
             >
-                <Avatar className="size-20 after:hidden ring-2 ring-primary/40 transition-shadow group-hover:ring-primary sm:size-24">
+                <span
+                    aria-hidden
+                    className="absolute -inset-1 rounded-full bg-primary/25 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
+                />
+                <Avatar className="relative size-20 after:hidden ring-2 ring-primary/40 transition-[box-shadow,ring-color] duration-300 group-hover:ring-primary group-hover:shadow-[0_0_24px_rgba(198,245,50,0.25)] sm:size-24">
                     {previewUrl ? (
                         <AvatarImage src={previewUrl} alt={name ?? 'Profile'} />
                     ) : null}
@@ -70,14 +74,14 @@ export const ProfileIdentity = ({
                         {getInitials(name, email)}
                     </AvatarFallback>
                 </Avatar>
-                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/55 opacity-0 transition-opacity group-hover:opacity-100">
-                    <Camera className="size-5 text-white" />
+                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/55 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    <Camera className="size-5 text-white transition-transform duration-200 group-hover:scale-110" />
                 </span>
             </button>
 
             <div className="min-w-0 flex-1 space-y-2.5">
                 <div className="space-y-1">
-                    <p className="truncate font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                    <p className="truncate font-heading text-2xl font-semibold tracking-tight text-foreground transition-colors duration-200 sm:text-3xl">
                         {name?.trim() || 'Account'}
                     </p>
                     {email ? (
@@ -86,7 +90,7 @@ export const ProfileIdentity = ({
                         </p>
                     ) : null}
                 </div>
-                <span className="inline-flex rounded-md bg-primary px-3 py-1.5 text-xs font-bold tracking-wide text-primary-foreground uppercase">
+                <span className="inline-flex rounded-md bg-primary px-3 py-1.5 text-xs font-bold tracking-wide text-primary-foreground uppercase transition-[transform,box-shadow] duration-200 hover:shadow-[0_0_16px_rgba(198,245,50,0.35)] hover:brightness-110">
                     {roleLabel}
                 </span>
             </div>
@@ -95,7 +99,7 @@ export const ProfileIdentity = ({
                 <Button
                     type="button"
                     variant="outline"
-                    className="h-11 gap-2 rounded-md bg-transparent px-4 text-sm ring-1 ring-white/12 hover:bg-primary/15 hover:text-primary hover:ring-primary/30"
+                    className="h-11 gap-2 rounded-md bg-transparent px-4 text-sm ring-1 ring-white/12 transition-[background-color,box-shadow,color,transform] duration-200 hover:bg-primary/15 hover:text-primary hover:ring-primary/35 hover:shadow-[0_0_20px_rgba(198,245,50,0.12)] active:scale-[0.98]"
                     onClick={() => inputRef.current?.click()}
                 >
                     <Camera className="size-4" />
@@ -105,7 +109,7 @@ export const ProfileIdentity = ({
                     <Button
                         type="button"
                         variant="ghost"
-                        className="h-11 gap-2 px-3 text-foreground/55 hover:text-foreground"
+                        className="h-11 gap-2 px-3 text-foreground/55 transition-colors duration-200 hover:bg-white/[0.06] hover:text-foreground"
                         onClick={handleRemove}
                     >
                         <Trash2 className="size-4" />
