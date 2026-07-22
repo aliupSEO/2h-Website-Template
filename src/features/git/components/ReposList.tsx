@@ -6,9 +6,14 @@ import { toast } from '@/lib/toast';
 import { useGitStore } from '@/stores/gitStore';
 import { CreateRepoDialog } from './CreateRepoDialog';
 import { EditRepoDialog } from './EditRepoDialog';
-import { ReposPagination } from './ReposPagination';
+import { ReposCardGrid } from './ReposCardGrid';
+import { ReposEmptyState } from './ReposEmptyState';
 import { ReposTable } from './ReposTable';
-import { ReposToolbar } from './ReposToolbar';
+import {
+    ReposToolbar,
+    type ReposViewMode,
+    type ReposVisibilityFilter,
+} from './ReposToolbar';
 
 export const ReposList = () => {
     const repos = useGitStore((state) => state.repos);
@@ -22,6 +27,9 @@ export const ReposList = () => {
     const deleteRepo = useGitStore((state) => state.deleteRepo);
 
     const [query, setQuery] = useState('');
+    const [viewMode, setViewMode] = useState<ReposViewMode>('cards');
+    const [visibilityFilter, setVisibilityFilter] =
+        useState<ReposVisibilityFilter>('all');
     const [createOpen, setCreateOpen] = useState(false);
     const [editingRepo, setEditingRepo] = useState<GitRepo | null>(null);
     const [pendingDelete, setPendingDelete] = useState<GitRepo | null>(null);
@@ -32,8 +40,12 @@ export const ReposList = () => {
 
     const filtered = useMemo(() => {
         const needle = query.trim().toLowerCase();
-        if (!needle) return repos;
+
         return repos.filter((repo) => {
+            if (visibilityFilter === 'public' && repo.private) return false;
+            if (visibilityFilter === 'private' && !repo.private) return false;
+            if (!needle) return true;
+
             const haystack = [
                 repo.name,
                 repo.fullName,
@@ -44,7 +56,16 @@ export const ReposList = () => {
                 .toLowerCase();
             return haystack.includes(needle);
         });
-    }, [query, repos]);
+    }, [query, repos, visibilityFilter]);
+
+    const publicCount = useMemo(
+        () => repos.filter((repo) => !repo.private).length,
+        [repos],
+    );
+    const privateCount = useMemo(
+        () => repos.filter((repo) => repo.private).length,
+        [repos],
+    );
 
     const handlePageChange = (nextPage: number) => {
         setQuery('');
@@ -106,54 +127,79 @@ export const ReposList = () => {
         return <LoadingScreen label="Loading repositories…" />;
     }
 
+    const isSearchOrFilter =
+        Boolean(query.trim()) || visibilityFilter !== 'all';
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <DocumentTitle title="Git" />
-            <div className="space-y-1">
-                <h1 className="font-heading text-2xl font-semibold tracking-tight">
-                    Git
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                    Live repositories from GitHub — 50 per page, fetched on demand.
-                </p>
-            </div>
 
-            <ReposToolbar
-                query={query}
-                onQueryChange={setQuery}
-                onCreate={() => setCreateOpen(true)}
-            />
-
-            {error && repos.length === 0 ? (
-                <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-                    <p className="text-sm text-destructive">{error}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Check `GITHUB_TOKEN` (and optional `GITHUB_ORG`) in
-                        `.env.local`, then restart the dev server.
-                    </p>
-                </div>
-            ) : filtered.length === 0 ? (
-                <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-                    <p className="text-sm text-muted-foreground">
-                        {query.trim()
-                            ? 'No repositories on this page match your search.'
-                            : 'No repositories found for this account.'}
-                    </p>
-                </div>
-            ) : (
-                <ReposTable
-                    repos={filtered}
-                    onEdit={setEditingRepo}
-                    onDelete={setPendingDelete}
+            <div className="-m-4 space-y-0 bg-card sm:-m-6">
+                <ReposToolbar
+                    query={query}
+                    onQueryChange={setQuery}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    visibilityFilter={visibilityFilter}
+                    onVisibilityFilterChange={setVisibilityFilter}
+                    onCreate={() => setCreateOpen(true)}
+                    publicCount={publicCount}
+                    privateCount={privateCount}
+                    page={page}
+                    repoCount={repos.length}
+                    hasNextPage={hasNextPage}
+                    loading={loading}
+                    onPageChange={handlePageChange}
                 />
-            )}
 
-            <ReposPagination
-                page={page}
-                hasNextPage={hasNextPage}
-                loading={loading}
-                onPageChange={handlePageChange}
-            />
+                {error && repos.length === 0 ? (
+                    <div className="border-t border-white/5">
+                        <ReposEmptyState
+                            title="Could not load repositories"
+                            description={error}
+                        />
+                    </div>
+                ) : filtered.length === 0 ? (
+                    <div className="border-t border-white/5">
+                        <ReposEmptyState
+                            title={
+                                isSearchOrFilter
+                                    ? 'No matching repositories'
+                                    : 'No repositories yet'
+                            }
+                            description={
+                                isSearchOrFilter
+                                    ? 'Try another search or visibility filter on this page.'
+                                    : 'Create your first repository to get started.'
+                            }
+                            showCreate={!isSearchOrFilter}
+                            onCreate={() => setCreateOpen(true)}
+                        />
+                    </div>
+                ) : viewMode === 'table' ? (
+                    <ReposTable
+                        repos={filtered}
+                        animationKey={visibilityFilter}
+                        onEdit={setEditingRepo}
+                        onDelete={setPendingDelete}
+                    />
+                ) : (
+                    <div className="relative border-t border-white/5 px-4 py-6 sm:px-6">
+                        <div
+                            aria-hidden
+                            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(198,245,50,0.06),transparent_55%)]"
+                        />
+                        <div className="relative">
+                            <ReposCardGrid
+                                repos={filtered}
+                                animationKey={visibilityFilter}
+                                onEdit={setEditingRepo}
+                                onDelete={setPendingDelete}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
 
             <CreateRepoDialog
                 open={createOpen}
