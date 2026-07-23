@@ -134,7 +134,7 @@ export const ReposList = () => {
         <div className="space-y-4">
             <DocumentTitle title="Git" />
 
-            <div className="-m-4 space-y-0 bg-card sm:-m-6">
+            <div className="-m-4 space-y-0 bg-muted sm:-m-6">
                 <ReposToolbar
                     query={query}
                     onQueryChange={setQuery}
@@ -153,29 +153,25 @@ export const ReposList = () => {
                 />
 
                 {error && repos.length === 0 ? (
-                    <div className="border-t border-white/5">
-                        <ReposEmptyState
-                            title="Could not load repositories"
-                            description={error}
-                        />
-                    </div>
+                    <ReposEmptyState
+                        title="Could not load repositories"
+                        description={error}
+                    />
                 ) : filtered.length === 0 ? (
-                    <div className="border-t border-white/5">
-                        <ReposEmptyState
-                            title={
-                                isSearchOrFilter
-                                    ? 'No matching repositories'
-                                    : 'No repositories yet'
-                            }
-                            description={
-                                isSearchOrFilter
-                                    ? 'Try another search or visibility filter on this page.'
-                                    : 'Create your first repository to get started.'
-                            }
-                            showCreate={!isSearchOrFilter}
-                            onCreate={() => setCreateOpen(true)}
-                        />
-                    </div>
+                    <ReposEmptyState
+                        title={
+                            isSearchOrFilter
+                                ? 'No matching repositories'
+                                : 'No repositories yet'
+                        }
+                        description={
+                            isSearchOrFilter
+                                ? 'Try another search or visibility filter on this page.'
+                                : 'Create your first repository to get started.'
+                        }
+                        showCreate={!isSearchOrFilter}
+                        onCreate={() => setCreateOpen(true)}
+                    />
                 ) : viewMode === 'table' ? (
                     <ReposTable
                         repos={filtered}
@@ -183,18 +179,12 @@ export const ReposList = () => {
                         onDelete={setPendingDelete}
                     />
                 ) : (
-                    <div className="relative border-t border-white/5 px-4 py-6 sm:px-6">
-                        <div
-                            aria-hidden
-                            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(198,245,50,0.06),transparent_55%)]"
+                    <div className="relative px-4 py-6 sm:px-6">
+                        <ReposCardGrid
+                            repos={filtered}
+                            onEdit={setEditingRepo}
+                            onDelete={setPendingDelete}
                         />
-                        <div className="relative">
-                            <ReposCardGrid
-                                repos={filtered}
-                                onEdit={setEditingRepo}
-                                onDelete={setPendingDelete}
-                            />
-                        </div>
                     </div>
                 )}
             </div>

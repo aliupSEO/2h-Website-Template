@@ -75,6 +75,14 @@ export const vercelService = {
         return data.envVars;
     },
 
+    /** Lightweight env count for project cards (no secret payloads). */
+    countEnvVars: async (projectId: string): Promise<number> => {
+        const data = await request<{ count: number }>(
+            `${apiEndpoints.vercel.projectEnv(projectId)}?countOnly=1`,
+        );
+        return data.count;
+    },
+
     createEnvVar: async (
         projectId: string,
         input: CreateEnvVarInput,

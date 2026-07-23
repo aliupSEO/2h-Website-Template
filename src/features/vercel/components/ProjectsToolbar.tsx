@@ -23,7 +23,7 @@ export const ProjectsToolbar = ({
 
     return (
         <section className="overflow-hidden rounded-none">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 px-4 py-4 sm:px-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
                 <h1 className="font-heading text-3xl font-semibold tracking-tight">
                     Vercel
                 </h1>
@@ -38,7 +38,7 @@ export const ProjectsToolbar = ({
                 </Button>
             </div>
 
-            <div className="flex flex-col gap-3 border-b border-white/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
+            <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
                 <div className="relative min-w-0 w-full sm:max-w-md">
                     <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-foreground/50" />
                     <Input

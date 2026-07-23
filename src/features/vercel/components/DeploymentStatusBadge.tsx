@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui';
+import { ButtonSpinner } from '@/components/common';
 import { cn } from '@/lib/utils';
 
 type DeploymentStatusBadgeProps = {
@@ -6,29 +6,36 @@ type DeploymentStatusBadgeProps = {
 };
 
 const STATE_CLASS: Record<string, string> = {
-    READY: 'border-0 bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground',
-    BUILDING:
-        'border-0 bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-200 ring-1 ring-amber-400/30',
-    QUEUED:
-        'border-0 bg-white/10 px-2 py-0.5 text-xs font-semibold text-foreground/80 ring-1 ring-white/10',
-    INITIALIZING:
-        'border-0 bg-white/10 px-2 py-0.5 text-xs font-semibold text-foreground/80 ring-1 ring-white/10',
-    ERROR: 'border-0 bg-destructive/20 px-2 py-0.5 text-xs font-semibold text-destructive ring-1 ring-destructive/30',
-    CANCELED:
-        'border-0 bg-white/5 px-2 py-0.5 text-xs font-medium text-muted-foreground ring-1 ring-white/10',
-    BLOCKED:
-        'border-0 bg-destructive/20 px-2 py-0.5 text-xs font-semibold text-destructive ring-1 ring-destructive/30',
+    READY: 'bg-primary text-black',
+    BUILDING: 'bg-amber-400 text-black',
+    QUEUED: 'bg-zinc-400 text-black',
+    INITIALIZING: 'bg-sky-400 text-black',
+    ERROR: 'bg-destructive text-white',
+    CANCELED: 'bg-zinc-500 text-white',
+    BLOCKED: 'bg-destructive text-white',
 };
+
+const IN_PROGRESS = new Set(['BUILDING', 'QUEUED', 'INITIALIZING']);
 
 export const DeploymentStatusBadge = ({
     state,
 }: DeploymentStatusBadgeProps) => {
     const normalized = state.toUpperCase();
-    const className =
-        STATE_CLASS[normalized] ??
-        'border-0 bg-white/10 px-2 py-0.5 text-xs font-medium text-foreground/80 ring-1 ring-white/10';
+    const isLoading = IN_PROGRESS.has(normalized);
 
     return (
-        <Badge className={cn('rounded-md', className)}>{normalized}</Badge>
+        <span
+            aria-busy={isLoading || undefined}
+            className={cn(
+                'inline-flex h-6 items-center gap-1.5 rounded px-2.5 text-xs font-bold tracking-wide',
+                STATE_CLASS[normalized] ?? 'bg-zinc-400 text-black',
+                isLoading && 'animate-pulse',
+            )}
+        >
+            {isLoading ? (
+                <ButtonSpinner className="size-3 border-[1.5px]" />
+            ) : null}
+            {normalized}
+        </span>
     );
 };

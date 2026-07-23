@@ -1,3 +1,4 @@
+import { Loading } from '@/components/common';
 import { KeyRound, Rocket } from 'lucide-react';
 import {
     Button,
@@ -8,6 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui';
+import { PROJECT_DEPLOYMENTS_ACTION_CLASS, PROJECT_OUTLINE_ACTION_CLASS } from '@/features/vercel/constants';
 import type {
     VercelProject,
     VercelProjectSummary,
@@ -18,35 +20,42 @@ import {
 } from '@/features/vercel/utils';
 import { cn } from '@/lib/utils';
 import { DeploymentStatusBadge } from './DeploymentStatusBadge';
+import { EnvVarCountBadge } from './EnvVarCountBadge';
 import { FrameworkBadge } from './FrameworkBadge';
 
 type ProjectsTableProps = {
     projects: VercelProject[];
     summaries: Record<string, VercelProjectSummary>;
-    selectedProjectId: string | null;
     onOpenDeployments: (project: VercelProject) => void;
     onOpenEnv: (project: VercelProject) => void;
 };
 
 const headClass =
-    'h-12 px-4 text-xs font-bold tracking-[0.1em] text-primary uppercase sm:px-6';
+    'h-12 px-4 text-sm font-extrabold tracking-wide text-black uppercase sm:px-6';
+const headCenterClass = `${headClass} text-center`;
+const cellCenterClass = 'px-4 py-3.5 text-center sm:px-6';
 
 export const ProjectsTable = ({
     projects,
     summaries,
-    selectedProjectId,
     onOpenDeployments,
     onOpenEnv,
 }: ProjectsTableProps) => {
     return (
-        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 border-t border-white/5 bg-card shadow-none">
+        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 bg-muted shadow-none">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-b-2 border-primary/40 bg-primary/15 hover:bg-primary/15">
+                    <TableRow className="border-b-0 bg-primary hover:bg-primary">
                         <TableHead className={headClass}>Name</TableHead>
-                        <TableHead className={headClass}>Framework</TableHead>
-                        <TableHead className={headClass}>Deployment</TableHead>
-                        <TableHead className={headClass}>Env vars</TableHead>
+                        <TableHead className={headCenterClass}>
+                            Framework
+                        </TableHead>
+                        <TableHead className={headCenterClass}>
+                            Deployment
+                        </TableHead>
+                        <TableHead className={headCenterClass}>
+                            Env vars
+                        </TableHead>
                         <TableHead className={headClass}>Updated</TableHead>
                         <TableHead
                             className={`${headClass} w-[12rem] text-right`}
@@ -62,6 +71,8 @@ export const ProjectsTable = ({
                             deploymentCount: 0,
                             envVarCount: 0,
                             loading: true,
+                            loadingDeployment: true,
+                            loadingEnv: true,
                             summaryOnly: true,
                         };
                         const latest = summary.latestDeployment;
@@ -69,11 +80,7 @@ export const ProjectsTable = ({
                         return (
                             <TableRow
                                 key={project.id}
-                                className={cn(
-                                    'group/row border-white/5 hover:bg-white/[0.035]',
-                                    selectedProjectId === project.id &&
-                                        'bg-primary/10 hover:bg-primary/15',
-                                )}
+                                className="group/row border-white/5 hover:bg-white/[0.035]"
                             >
                                 <TableCell className="px-4 py-3.5 sm:px-6">
                                     <div className="min-w-0 space-y-1">
@@ -90,7 +97,7 @@ export const ProjectsTable = ({
                                         ) : null}
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-4 py-3.5 sm:px-6">
+                                <TableCell className={cellCenterClass}>
                                     {project.framework ? (
                                         <FrameworkBadge
                                             framework={project.framework}
@@ -101,40 +108,26 @@ export const ProjectsTable = ({
                                         </span>
                                     )}
                                 </TableCell>
-                                <TableCell className="px-4 py-3.5 sm:px-6">
-                                    {summary.loading ? (
-                                        <span className="text-xs text-muted-foreground">
-                                            Loading…
-                                        </span>
+                                <TableCell className={cellCenterClass}>
+                                    {summary.loadingDeployment ? (
+                                        <Loading size="sm" />
                                     ) : latest ? (
-                                        <div className="space-y-1.5">
-                                            <DeploymentStatusBadge
-                                                state={latest.state}
-                                            />
-                                            <p className="text-xs text-muted-foreground">
-                                                {summary.summaryOnly
-                                                    ? formatVercelRelative(
-                                                          latest.createdAt,
-                                                      )
-                                                    : `${summary.deploymentCount} total`}
-                                            </p>
-                                        </div>
+                                        <DeploymentStatusBadge
+                                            state={latest.state}
+                                        />
                                     ) : (
                                         <span className="text-xs text-muted-foreground">
                                             No deployments
                                         </span>
                                     )}
                                 </TableCell>
-                                <TableCell className="px-4 py-3.5 sm:px-6">
-                                    {summary.loading ? (
-                                        <span className="text-xs text-muted-foreground">
-                                            Loading…
-                                        </span>
+                                <TableCell className={cellCenterClass}>
+                                    {summary.loadingEnv ? (
+                                        <Loading size="sm" />
                                     ) : (
-                                        <span className="inline-flex items-center gap-1.5 rounded-md bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary ring-1 ring-primary/25">
-                                            <KeyRound className="size-3.5" />
-                                            {summary.envVarCount}
-                                        </span>
+                                        <EnvVarCountBadge
+                                            count={summary.envVarCount}
+                                        />
                                     )}
                                 </TableCell>
                                 <TableCell className="px-4 py-3.5 sm:px-6">
@@ -162,7 +155,7 @@ export const ProjectsTable = ({
                                             type="button"
                                             size="sm"
                                             variant="outline"
-                                            className="h-8 gap-1.5 rounded-md px-2.5 ring-1 ring-white/10 hover:bg-primary/15 hover:text-primary hover:ring-primary/30"
+                                            className={PROJECT_DEPLOYMENTS_ACTION_CLASS}
                                             onClick={() =>
                                                 onOpenDeployments(project)
                                             }
@@ -174,7 +167,10 @@ export const ProjectsTable = ({
                                             type="button"
                                             size="sm"
                                             variant="outline"
-                                            className="h-8 gap-1.5 rounded-md px-2.5 ring-1 ring-white/10 hover:bg-primary/15 hover:text-primary hover:ring-primary/30"
+                                            className={cn(
+                                                PROJECT_OUTLINE_ACTION_CLASS,
+                                                'ring-white/10',
+                                            )}
                                             onClick={() => onOpenEnv(project)}
                                         >
                                             <KeyRound className="size-3.5" />

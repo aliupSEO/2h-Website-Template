@@ -23,7 +23,10 @@ export const RepoVisibilityToggle = ({
             <div className="relative grid grid-cols-2">
                 <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-sm bg-primary transition-transform duration-300 ease-out"
+                    className={cn(
+                        'pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-sm transition-transform duration-300 ease-out',
+                        isPrivate ? 'bg-amber-400' : 'bg-primary',
+                    )}
                     style={{
                         transform: `translateX(${activeIndex * 100}%)`,
                     }}
@@ -33,7 +36,7 @@ export const RepoVisibilityToggle = ({
                     className={cn(
                         'relative z-10 h-10 rounded-sm text-sm font-medium',
                         isPrivate
-                            ? 'text-primary-foreground'
+                            ? 'text-black'
                             : 'text-foreground/75 hover:text-foreground',
                     )}
                     onClick={() => onChange(true)}
@@ -45,7 +48,7 @@ export const RepoVisibilityToggle = ({
                     className={cn(
                         'relative z-10 h-10 rounded-sm text-sm font-medium',
                         !isPrivate
-                            ? 'text-primary-foreground'
+                            ? 'text-black'
                             : 'text-foreground/75 hover:text-foreground',
                     )}
                     onClick={() => onChange(false)}

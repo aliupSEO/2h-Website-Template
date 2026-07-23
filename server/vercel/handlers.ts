@@ -1,4 +1,5 @@
 import {
+    countEnvVars,
     createEnvVar,
     createProject,
     deleteEnvVar,
@@ -245,6 +246,27 @@ export const handleListEnvVars = async (
     try {
         const envVars = await listEnvVars(projectId);
         return { ok: true, data: { envVars }, status: 200 };
+    }
+    catch (error) {
+        const body = toError(error);
+        return { ok: false, body, status: body.status };
+    }
+};
+
+export const handleCountEnvVars = async (
+    projectId: string,
+): Promise<HandlerResult<{ count: number }>> => {
+    if (!projectId) {
+        return {
+            ok: false,
+            body: { error: 'Project id is required', status: 400 },
+            status: 400,
+        };
+    }
+
+    try {
+        const count = await countEnvVars(projectId);
+        return { ok: true, data: { count }, status: 200 };
     }
     catch (error) {
         const body = toError(error);

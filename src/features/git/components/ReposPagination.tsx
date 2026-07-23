@@ -22,8 +22,7 @@ export const ReposPagination = ({
     variant = 'bar',
 }: ReposPaginationProps) => {
     const canGoBack = page > 1;
-    const canGoNext =
-        hasNextPage || repoCount >= REPOS_PER_PAGE;
+    const canGoNext = hasNextPage || repoCount >= REPOS_PER_PAGE;
     const showNavigation = canGoBack || canGoNext;
 
     if (!showNavigation) return null;
@@ -33,7 +32,7 @@ export const ReposPagination = ({
             className={cn(
                 'flex items-center gap-2',
                 variant === 'bar' &&
-                    'justify-end border-t border-white/5 bg-card px-4 py-2.5 sm:px-6',
+                    'justify-end border-t border-white/5 bg-muted px-4 py-2.5 sm:px-6',
             )}
         >
             <Button

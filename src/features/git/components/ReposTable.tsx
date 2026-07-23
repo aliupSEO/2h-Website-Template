@@ -24,7 +24,7 @@ type ReposTableProps = {
 };
 
 const headClass =
-    'h-14 px-4 text-sm font-bold tracking-[0.12em] text-primary uppercase sm:px-6';
+    'h-14 px-4 text-sm font-extrabold tracking-wide text-black uppercase sm:px-6';
 
 export const ReposTable = ({
     repos,
@@ -32,10 +32,10 @@ export const ReposTable = ({
     onDelete,
 }: ReposTableProps) => {
     return (
-        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 border-t border-white/5 bg-card shadow-none">
+        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 bg-muted shadow-none">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-b-2 border-primary/40 bg-primary/15 hover:bg-primary/15">
+                    <TableRow className="border-b-0 bg-primary hover:bg-primary">
                         <TableHead className={headClass}>Repository</TableHead>
                         <TableHead className={headClass}>Owner</TableHead>
                         <TableHead className={headClass}>Visibility</TableHead>
@@ -75,7 +75,7 @@ export const ReposTable = ({
                                 <div className="inline-flex max-w-[12rem] items-center gap-2.5">
                                     <span
                                         aria-hidden
-                                        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[12px] font-bold text-primary ring-1 ring-primary/35"
+                                        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-black"
                                     >
                                         {getRepoOwnerInitial(repo.owner)}
                                     </span>
@@ -90,8 +90,8 @@ export const ReposTable = ({
                             </TableCell>
 
                             <TableCell className="px-4 py-3.5 sm:px-6">
-                                <span className="inline-flex max-w-[9rem] items-center gap-1.5 truncate rounded-md bg-white/10 px-2 py-1 text-xs font-medium text-foreground/90 ring-1 ring-white/10">
-                                    <GitBranch className="size-3.5 shrink-0 text-primary" />
+                                <span className="inline-flex max-w-[9rem] items-center gap-1.5 truncate rounded bg-primary px-2 py-1 text-xs font-bold text-black">
+                                    <GitBranch className="size-3.5 shrink-0 text-black" />
                                     <span className="truncate">
                                         {repo.defaultBranch}
                                     </span>
@@ -101,7 +101,7 @@ export const ReposTable = ({
                             <TableCell className="px-4 py-3.5 sm:px-6">
                                 <div className="space-y-0.5">
                                     <p
-                                        className="text-sm text-foreground/90"
+                                        className="text-sm font-semibold text-primary"
                                         title={formatRepoUpdatedAt(
                                             repo.updatedAt,
                                         )}

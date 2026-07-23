@@ -4,9 +4,7 @@ import {
     Copy,
     ExternalLink,
     GitBranch,
-    Lock,
     Pencil,
-    Unlock,
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import type { GitRepo } from '@/features/git/types';
@@ -17,6 +15,7 @@ import {
 import { toast } from '@/lib/toast';
 import { cn } from '@/lib/utils';
 import { RepoRowActions } from './RepoRowActions';
+import { RepoVisibilityBadge } from './RepoVisibilityBadge';
 
 type RepoCardProps = {
     repo: GitRepo;
@@ -48,9 +47,9 @@ export const RepoCard = ({
         <article
             className={cn(
                 'group/repo relative flex h-full flex-col overflow-hidden rounded-3xl',
-                'bg-[#1a1a1a] ring-1 ring-white/[0.08]',
+                'bg-card ring-1 ring-white/[0.08]',
                 'transition-[box-shadow,ring-color,background-color] duration-300 ease-out',
-                'hover:bg-[#1f1f1f] hover:ring-primary/40',
+                'hover:bg-[#323232] hover:ring-primary/40',
                 'hover:shadow-[0_0_0_1px_rgba(198,245,50,0.1),0_12px_40px_rgba(0,0,0,0.45)]',
             )}
         >
@@ -61,21 +60,7 @@ export const RepoCard = ({
 
             <div className="relative flex flex-1 flex-col p-5">
                 <div className="mb-4 flex items-start justify-between gap-3">
-                    <span
-                        className={cn(
-                            'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold',
-                            repo.private
-                                ? 'bg-amber-500/20 text-amber-200 ring-1 ring-amber-400/30'
-                                : 'bg-primary/15 text-primary ring-1 ring-primary/30',
-                        )}
-                    >
-                        {repo.private ? (
-                            <Lock className="size-3" />
-                        ) : (
-                            <Unlock className="size-3" />
-                        )}
-                        {repo.private ? 'Private' : 'Public'}
-                    </span>
+                    <RepoVisibilityBadge isPrivate={repo.private} />
                     <RepoRowActions
                         repo={repo}
                         onEdit={onEdit}
@@ -108,9 +93,9 @@ export const RepoCard = ({
                 </p>
 
                 <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5 ring-1 ring-white/[0.05] transition-colors duration-300 group-hover/repo:bg-primary/10 group-hover/repo:ring-primary/20">
-                        <GitBranch className="size-3.5 text-primary" />
-                        <span className="font-medium text-foreground/90">
+                    <span className="inline-flex items-center gap-1.5 rounded bg-primary px-2.5 py-1 text-xs font-bold text-black">
+                        <GitBranch className="size-3.5 text-black" />
+                        <span className="font-bold text-black">
                             {repo.defaultBranch}
                         </span>
                     </span>
@@ -119,7 +104,7 @@ export const RepoCard = ({
                         title={formatRepoUpdatedAt(repo.updatedAt)}
                     >
                         Updated{' '}
-                        <span className="text-foreground/80">
+                        <span className="font-semibold text-primary">
                             {formatRepoRelativeUpdatedAt(repo.updatedAt)}
                         </span>
                     </span>
@@ -131,7 +116,7 @@ export const RepoCard = ({
                     asChild
                     size="sm"
                     variant="brand"
-                    className="h-10 min-w-0 flex-1 rounded-md"
+                    className="h-10 min-w-0 flex-1 rounded-md transition-[box-shadow,filter] duration-200 ease-out hover:shadow-[0_0_20px_rgba(198,245,50,0.3)] hover:brightness-110 active:scale-[0.99]"
                 >
                     <a href={repo.htmlUrl} target="_blank" rel="noreferrer">
                         <ExternalLink data-icon="inline-start" />
@@ -142,7 +127,7 @@ export const RepoCard = ({
                     type="button"
                     size="icon"
                     variant="outline"
-                    className="size-10 rounded-md"
+                    className="size-10 rounded-md border-0 border-transparent ring-1 ring-inset ring-white/12 transition-[background-color,color,box-shadow,ring-color] duration-200 ease-out hover:bg-primary hover:text-black hover:shadow-[0_0_18px_rgba(198,245,50,0.25)] hover:ring-primary active:scale-[0.98]"
                     aria-label={`Edit ${repo.fullName}`}
                     onClick={() => onEdit(repo)}
                 >
@@ -152,12 +137,12 @@ export const RepoCard = ({
                     type="button"
                     size="icon"
                     variant="outline"
-                    className="size-10 rounded-md"
+                    className="size-10 rounded-md border-0 border-transparent ring-1 ring-inset ring-white/12 transition-[background-color,color,box-shadow,ring-color] duration-200 ease-out hover:bg-primary hover:text-black hover:shadow-[0_0_18px_rgba(198,245,50,0.25)] hover:ring-primary active:scale-[0.98]"
                     aria-label={`Copy clone URL for ${repo.fullName}`}
                     onClick={() => void copyCloneUrl()}
                 >
                     {copied ? (
-                        <Check className="size-4 text-primary" />
+                        <Check className="size-4" />
                     ) : (
                         <Copy className="size-4" />
                     )}

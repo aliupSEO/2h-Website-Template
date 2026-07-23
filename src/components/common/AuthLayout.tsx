@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import authBg from '@/assets/authbg-developers.jpg';
+import authBg from '@/assets/authbg-hub-7.jpg';
 import logo2h from '@/assets/logo-2h.png';
 import { DocumentTitle } from '@/components/common/DocumentTitle';
 import {
@@ -36,7 +36,11 @@ export const AuthLayout = ({
             />
             <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/75 via-black/65 to-black/85"
+            />
+            <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(0,0,0,0.55)_100%)]"
             />
 
             <Card className="relative z-10 w-full max-w-[32rem] min-h-[36rem] gap-0 overflow-hidden rounded-2xl border-0 bg-[#1a1a1a] py-0 shadow-[0_40px_120px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.08)]">
