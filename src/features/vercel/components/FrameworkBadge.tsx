@@ -12,9 +12,10 @@ export const FrameworkBadge = ({
     return (
         <span
             className={cn(
-                'inline-flex items-center rounded-md bg-primary/20 px-2.5 py-1 text-xs font-semibold tracking-wide text-primary capitalize ring-1 ring-primary/40',
+                'inline-flex h-6 w-[4.75rem] shrink-0 items-center justify-center truncate rounded bg-primary px-2 text-xs font-bold tracking-wide text-black capitalize',
                 className,
             )}
+            title={framework}
         >
             {framework}
         </span>

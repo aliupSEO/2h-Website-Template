@@ -34,7 +34,10 @@ export type VercelProjectSummary = {
     latestDeployment: VercelDeployment | null;
     deploymentCount: number;
     envVarCount: number;
+    /** True while either deployments or env count is still loading. */
     loading: boolean;
+    loadingDeployment: boolean;
+    loadingEnv: boolean;
     /** True when only a lightweight deployments sample was fetched for cards. */
     summaryOnly: boolean;
 };

@@ -49,6 +49,7 @@ import {
     handleCreateProject,
     handleDeleteEnvVar,
     handleListDeployments,
+    handleCountEnvVars,
     handleListEnvVars,
     handleListProjects,
     handleRedeploy,
@@ -277,9 +278,14 @@ export const hubApiPlugin = (): Plugin => {
                         const envPath = parseVercelEnvPath(pathname);
                         if (envPath && !envPath.envId) {
                             if (req.method === 'GET') {
-                                const result = await handleListEnvVars(
-                                    envPath.projectId,
-                                );
+                                const countOnly =
+                                    requestUrl.searchParams.get('countOnly') ===
+                                        '1' ||
+                                    requestUrl.searchParams.get('countOnly') ===
+                                        'true';
+                                const result = countOnly
+                                    ? await handleCountEnvVars(envPath.projectId)
+                                    : await handleListEnvVars(envPath.projectId);
                                 sendJson(
                                     res,
                                     result.status,

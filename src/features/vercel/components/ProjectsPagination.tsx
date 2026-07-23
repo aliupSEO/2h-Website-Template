@@ -23,7 +23,7 @@ export const ProjectsPagination = ({
     const end = Math.min(page * PROJECTS_PER_PAGE, totalCount);
 
     return (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/5 bg-card px-4 py-3 sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/5 bg-muted px-4 py-3 sm:px-6">
             <p className="text-sm text-muted-foreground">
                 Showing{' '}
                 <span className="font-semibold text-primary">

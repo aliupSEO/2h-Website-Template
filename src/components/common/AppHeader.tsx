@@ -54,7 +54,7 @@ export const AppHeader = () => {
 
     return (
         <>
-            <header className="flex h-14 shrink-0 items-center justify-end border-0 bg-surface px-4 shadow-[0_28px_90px_rgba(0,0,0,0.75)] sm:px-6">
+            <header className="flex h-16 shrink-0 items-center justify-end border-0 bg-surface px-4 sm:h-[4.5rem] sm:px-6">
                 <DropdownMenu>
                     <DropdownMenuTrigger className="rounded-full outline-none transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-0">
                         <Avatar className="size-9 cursor-pointer ring-0">

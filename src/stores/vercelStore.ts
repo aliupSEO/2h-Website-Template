@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import {
     PROJECT_DETAIL_CONCURRENCY,
     PROJECT_SUMMARY_DEPLOYMENT_LIMIT,
+    VERCEL_CACHE_TTL_MS,
+    VERCEL_SESSION_CACHE_KEY,
 } from '@/features/vercel/constants';
 import type {
     CreateEnvVarInput,
@@ -14,14 +16,26 @@ import type {
 } from '@/features/vercel/types';
 import { vercelService } from '@/services/vercelService';
 
-const CACHE_TTL_MS = 60_000;
-
 type ProjectDetailCache = {
     deployments: VercelDeployment[];
     envVars: VercelEnvVar[];
+    envVarCount: number;
     fetchedAt: number;
-    loading: boolean;
+    loadingDeployment: boolean;
+    loadingEnv: boolean;
     summaryOnly: boolean;
+};
+
+type SessionSummary = {
+    latestDeployment: VercelDeployment | null;
+    envVarCount: number;
+    fetchedAt: number;
+};
+
+type SessionCache = {
+    projects: VercelProject[];
+    projectsFetchedAt: number;
+    summaries: Record<string, SessionSummary>;
 };
 
 type VercelState = {
@@ -52,7 +66,79 @@ type VercelState = {
 
 const isCacheFresh = (fetchedAt: number | null) => {
     if (!fetchedAt) return false;
-    return Date.now() - fetchedAt < CACHE_TTL_MS;
+    return Date.now() - fetchedAt < VERCEL_CACHE_TTL_MS;
+};
+
+const readSessionCache = (): SessionCache | null => {
+    if (typeof sessionStorage === 'undefined') return null;
+    try {
+        const raw = sessionStorage.getItem(VERCEL_SESSION_CACHE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw) as SessionCache;
+    }
+    catch {
+        return null;
+    }
+};
+
+const writeSessionCache = (cache: SessionCache) => {
+    if (typeof sessionStorage === 'undefined') return;
+    try {
+        sessionStorage.setItem(VERCEL_SESSION_CACHE_KEY, JSON.stringify(cache));
+    }
+    catch {
+        // quota / private mode — ignore
+    }
+};
+
+const persistSession = (
+    projects: VercelProject[],
+    projectsFetchedAt: number | null,
+    projectDetails: Record<string, ProjectDetailCache>,
+) => {
+    if (!projectsFetchedAt) return;
+
+    const summaries: Record<string, SessionSummary> = {};
+    for (const [projectId, detail] of Object.entries(projectDetails)) {
+        if (detail.loadingDeployment || detail.loadingEnv) continue;
+        const latest =
+            detail.deployments.length > 0
+                ? [...detail.deployments].sort(
+                      (a, b) => b.createdAt - a.createdAt,
+                  )[0]!
+                : null;
+        summaries[projectId] = {
+            latestDeployment: latest,
+            envVarCount: detail.envVarCount,
+            fetchedAt: detail.fetchedAt,
+        };
+    }
+
+    writeSessionCache({
+        projects,
+        projectsFetchedAt,
+        summaries,
+    });
+};
+
+const detailsFromSession = (
+    summaries: Record<string, SessionSummary>,
+): Record<string, ProjectDetailCache> => {
+    const details: Record<string, ProjectDetailCache> = {};
+    for (const [projectId, summary] of Object.entries(summaries)) {
+        details[projectId] = {
+            deployments: summary.latestDeployment
+                ? [summary.latestDeployment]
+                : [],
+            envVars: [],
+            envVarCount: summary.envVarCount,
+            fetchedAt: summary.fetchedAt,
+            loadingDeployment: false,
+            loadingEnv: false,
+            summaryOnly: true,
+        };
+    }
+    return details;
 };
 
 const toSummary = (
@@ -64,6 +150,8 @@ const toSummary = (
             deploymentCount: 0,
             envVarCount: 0,
             loading: true,
+            loadingDeployment: true,
+            loadingEnv: true,
             summaryOnly: true,
         };
     }
@@ -78,8 +166,10 @@ const toSummary = (
     return {
         latestDeployment: latest,
         deploymentCount: detail.deployments.length,
-        envVarCount: detail.envVars.length,
-        loading: detail.loading,
+        envVarCount: detail.envVarCount,
+        loading: detail.loadingDeployment || detail.loadingEnv,
+        loadingDeployment: detail.loadingDeployment,
+        loadingEnv: detail.loadingEnv,
         summaryOnly: detail.summaryOnly,
     };
 };
@@ -122,25 +212,50 @@ const loadProjectDetail = async (
     return { deployments, envVars };
 };
 
+const hydratingProjectIds = new Set<string>();
+
 export const useVercelStore = create<VercelState>((set, get) => {
     const writeDetail = (
         projectId: string,
-        deployments: VercelDeployment[],
-        envVars: VercelEnvVar[],
-        summaryOnly: boolean,
+        patch: Partial<ProjectDetailCache> & {
+            deployments?: VercelDeployment[];
+            envVars?: VercelEnvVar[];
+        },
     ) => {
-        set((state) => ({
-            projectDetails: {
+        set((state) => {
+            const previous = state.projectDetails[projectId];
+            const next: ProjectDetailCache = {
+                deployments:
+                    patch.deployments ?? previous?.deployments ?? [],
+                envVars: patch.envVars ?? previous?.envVars ?? [],
+                envVarCount:
+                    patch.envVarCount ??
+                    patch.envVars?.length ??
+                    previous?.envVarCount ??
+                    0,
+                fetchedAt: patch.fetchedAt ?? Date.now(),
+                loadingDeployment:
+                    patch.loadingDeployment ??
+                    previous?.loadingDeployment ??
+                    false,
+                loadingEnv:
+                    patch.loadingEnv ?? previous?.loadingEnv ?? false,
+                summaryOnly: patch.summaryOnly ?? previous?.summaryOnly ?? true,
+            };
+
+            const projectDetails = {
                 ...state.projectDetails,
-                [projectId]: {
-                    deployments,
-                    envVars,
-                    fetchedAt: Date.now(),
-                    loading: false,
-                    summaryOnly,
-                },
-            },
-        }));
+                [projectId]: next,
+            };
+
+            persistSession(
+                state.projects,
+                state.projectsFetchedAt,
+                projectDetails,
+            );
+
+            return { projectDetails };
+        });
     };
 
     return {
@@ -160,20 +275,42 @@ export const useVercelStore = create<VercelState>((set, get) => {
         },
 
         fetchProjects: async ({ force } = {}) => {
-            const { projectsFetchedAt, loadingProjects } = get();
-            if (!force && isCacheFresh(projectsFetchedAt)) {
+            const { projectsFetchedAt, loadingProjects, projects } = get();
+            if (!force && isCacheFresh(projectsFetchedAt) && projects.length > 0) {
                 return;
             }
             if (loadingProjects) return;
 
-            set({ loadingProjects: true, error: null });
+            // Show the page robot when we have nothing to display yet.
+            if (projects.length === 0) {
+                set({ loadingProjects: true, error: null });
+            }
+            else {
+                set({ error: null });
+            }
+
             try {
-                const projects = await vercelService.listProjects();
-                set({
-                    projects,
-                    projectsFetchedAt: Date.now(),
-                    loadingProjects: false,
-                    error: null,
+                const nextProjects = await vercelService.listProjects();
+                const fetchedAt = Date.now();
+                const session = readSessionCache();
+                const seededDetails =
+                    session?.summaries
+                        ? detailsFromSession(session.summaries)
+                        : {};
+
+                set((state) => {
+                    const projectDetails = {
+                        ...seededDetails,
+                        ...state.projectDetails,
+                    };
+                    persistSession(nextProjects, fetchedAt, projectDetails);
+                    return {
+                        projects: nextProjects,
+                        projectsFetchedAt: fetchedAt,
+                        projectDetails,
+                        loadingProjects: false,
+                        error: null,
+                    };
                 });
             }
             catch (error) {
@@ -196,53 +333,69 @@ export const useVercelStore = create<VercelState>((set, get) => {
                 uniqueIds,
                 PROJECT_DETAIL_CONCURRENCY,
                 async (projectId) => {
+                    if (hydratingProjectIds.has(projectId)) return;
+
                     const cached = get().projectDetails[projectId];
                     if (
                         cached &&
                         isCacheFresh(cached.fetchedAt) &&
-                        !cached.loading
+                        !cached.loadingDeployment &&
+                        !cached.loadingEnv
                     ) {
                         return;
                     }
-                    if (cached?.loading) return;
 
-                    set((state) => ({
-                        projectDetails: {
-                            ...state.projectDetails,
-                            [projectId]: {
-                                deployments: cached?.deployments ?? [],
-                                envVars: cached?.envVars ?? [],
-                                fetchedAt: cached?.fetchedAt ?? 0,
-                                loading: true,
-                                summaryOnly: cached?.summaryOnly ?? true,
-                            },
-                        },
-                    }));
+                    const keepVisible = Boolean(cached && cached.fetchedAt > 0);
+                    hydratingProjectIds.add(projectId);
+
+                    writeDetail(projectId, {
+                        deployments: cached?.deployments ?? [],
+                        envVars: cached?.envVars ?? [],
+                        envVarCount: cached?.envVarCount ?? 0,
+                        fetchedAt: cached?.fetchedAt ?? 0,
+                        loadingDeployment: !keepVisible,
+                        loadingEnv: !keepVisible,
+                        summaryOnly: cached?.summaryOnly ?? true,
+                    });
 
                     try {
-                        const detail = await loadProjectDetail(projectId, {
-                            summary: true,
+                        // Deployments first so READY paints before env count.
+                        const deployments =
+                            await vercelService.listDeployments(projectId, {
+                                limit: PROJECT_SUMMARY_DEPLOYMENT_LIMIT,
+                            });
+                        writeDetail(projectId, {
+                            deployments,
+                            loadingDeployment: false,
+                            loadingEnv: !keepVisible,
+                            summaryOnly: true,
+                            fetchedAt: Date.now(),
                         });
-                        writeDetail(
-                            projectId,
-                            detail.deployments,
-                            detail.envVars,
-                            true,
-                        );
+
+                        const envVarCount =
+                            await vercelService.countEnvVars(projectId);
+                        writeDetail(projectId, {
+                            envVarCount,
+                            envVars: [],
+                            loadingDeployment: false,
+                            loadingEnv: false,
+                            summaryOnly: true,
+                            fetchedAt: Date.now(),
+                        });
                     }
                     catch {
-                        set((state) => ({
-                            projectDetails: {
-                                ...state.projectDetails,
-                                [projectId]: {
-                                    deployments: cached?.deployments ?? [],
-                                    envVars: cached?.envVars ?? [],
-                                    fetchedAt: cached?.fetchedAt ?? 0,
-                                    loading: false,
-                                    summaryOnly: cached?.summaryOnly ?? true,
-                                },
-                            },
-                        }));
+                        writeDetail(projectId, {
+                            deployments: cached?.deployments ?? [],
+                            envVars: cached?.envVars ?? [],
+                            envVarCount: cached?.envVarCount ?? 0,
+                            fetchedAt: cached?.fetchedAt ?? 0,
+                            loadingDeployment: false,
+                            loadingEnv: false,
+                            summaryOnly: cached?.summaryOnly ?? true,
+                        });
+                    }
+                    finally {
+                        hydratingProjectIds.delete(projectId);
                     }
                 },
             );
@@ -277,7 +430,8 @@ export const useVercelStore = create<VercelState>((set, get) => {
             if (
                 cached &&
                 isCacheFresh(cached.fetchedAt) &&
-                !cached.loading &&
+                !cached.loadingDeployment &&
+                !cached.loadingEnv &&
                 !cached.summaryOnly
             ) {
                 set({
@@ -293,12 +447,15 @@ export const useVercelStore = create<VercelState>((set, get) => {
             set({ loadingDetail: true, error: null });
             try {
                 const detail = await loadProjectDetail(projectId);
-                writeDetail(
-                    projectId,
-                    detail.deployments,
-                    detail.envVars,
-                    false,
-                );
+                writeDetail(projectId, {
+                    deployments: detail.deployments,
+                    envVars: detail.envVars,
+                    envVarCount: detail.envVars.length,
+                    loadingDeployment: false,
+                    loadingEnv: false,
+                    summaryOnly: false,
+                    fetchedAt: Date.now(),
+                });
                 set({
                     deployments: detail.deployments,
                     envVars: detail.envVars,
@@ -321,13 +478,22 @@ export const useVercelStore = create<VercelState>((set, get) => {
 
         createProject: async (input) => {
             const project = await vercelService.createProject(input);
-            set((state) => ({
-                projects: [
+            set((state) => {
+                const projects = [
                     project,
                     ...state.projects.filter((p) => p.id !== project.id),
-                ],
-                projectsFetchedAt: Date.now(),
-            }));
+                ];
+                const projectsFetchedAt = Date.now();
+                persistSession(
+                    projects,
+                    projectsFetchedAt,
+                    state.projectDetails,
+                );
+                return {
+                    projects,
+                    projectsFetchedAt,
+                };
+            });
             await get().selectProject(project.id);
             return project;
         },
@@ -346,20 +512,28 @@ export const useVercelStore = create<VercelState>((set, get) => {
                     envVar,
                     ...state.envVars.filter((item) => item.id !== envVar.id),
                 ];
+                const projectDetails = {
+                    ...state.projectDetails,
+                    [selectedProjectId]: {
+                        deployments:
+                            cached?.deployments ?? state.deployments,
+                        envVars: nextEnvVars,
+                        envVarCount: nextEnvVars.length,
+                        fetchedAt: Date.now(),
+                        loadingDeployment: false,
+                        loadingEnv: false,
+                        summaryOnly: false,
+                    },
+                };
+                persistSession(
+                    state.projects,
+                    state.projectsFetchedAt,
+                    projectDetails,
+                );
                 return {
                     envVars: nextEnvVars,
                     detailFetchedAt: Date.now(),
-                    projectDetails: {
-                        ...state.projectDetails,
-                        [selectedProjectId]: {
-                            deployments:
-                                cached?.deployments ?? state.deployments,
-                            envVars: nextEnvVars,
-                            fetchedAt: Date.now(),
-                            loading: false,
-                            summaryOnly: false,
-                        },
-                    },
+                    projectDetails,
                 };
             });
             return envVar;
@@ -379,20 +553,28 @@ export const useVercelStore = create<VercelState>((set, get) => {
                     item.id === envId ? envVar : item,
                 );
                 const cached = state.projectDetails[selectedProjectId];
+                const projectDetails = {
+                    ...state.projectDetails,
+                    [selectedProjectId]: {
+                        deployments:
+                            cached?.deployments ?? state.deployments,
+                        envVars: nextEnvVars,
+                        envVarCount: nextEnvVars.length,
+                        fetchedAt: Date.now(),
+                        loadingDeployment: false,
+                        loadingEnv: false,
+                        summaryOnly: false,
+                    },
+                };
+                persistSession(
+                    state.projects,
+                    state.projectsFetchedAt,
+                    projectDetails,
+                );
                 return {
                     envVars: nextEnvVars,
                     detailFetchedAt: Date.now(),
-                    projectDetails: {
-                        ...state.projectDetails,
-                        [selectedProjectId]: {
-                            deployments:
-                                cached?.deployments ?? state.deployments,
-                            envVars: nextEnvVars,
-                            fetchedAt: Date.now(),
-                            loading: false,
-                            summaryOnly: false,
-                        },
-                    },
+                    projectDetails,
                 };
             });
             return envVar;
@@ -408,20 +590,28 @@ export const useVercelStore = create<VercelState>((set, get) => {
                     (item) => item.id !== envId,
                 );
                 const cached = state.projectDetails[selectedProjectId];
+                const projectDetails = {
+                    ...state.projectDetails,
+                    [selectedProjectId]: {
+                        deployments:
+                            cached?.deployments ?? state.deployments,
+                        envVars: nextEnvVars,
+                        envVarCount: nextEnvVars.length,
+                        fetchedAt: Date.now(),
+                        loadingDeployment: false,
+                        loadingEnv: false,
+                        summaryOnly: false,
+                    },
+                };
+                persistSession(
+                    state.projects,
+                    state.projectsFetchedAt,
+                    projectDetails,
+                );
                 return {
                     envVars: nextEnvVars,
                     detailFetchedAt: Date.now(),
-                    projectDetails: {
-                        ...state.projectDetails,
-                        [selectedProjectId]: {
-                            deployments:
-                                cached?.deployments ?? state.deployments,
-                            envVars: nextEnvVars,
-                            fetchedAt: Date.now(),
-                            loading: false,
-                            summaryOnly: false,
-                        },
-                    },
+                    projectDetails,
                 };
             });
         },
@@ -451,8 +641,12 @@ export const useVercelStore = create<VercelState>((set, get) => {
                         envVars:
                             state.projectDetails[selectedProjectId]?.envVars ??
                             [],
+                        envVarCount:
+                            state.projectDetails[selectedProjectId]
+                                ?.envVarCount ?? 0,
                         fetchedAt: 0,
-                        loading: false,
+                        loadingDeployment: false,
+                        loadingEnv: false,
                         summaryOnly: false,
                     },
                 },

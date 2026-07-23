@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import {
+    handleCountEnvVars,
     handleCreateEnvVar,
     handleListEnvVars,
 } from '../../../../server/vercel/handlers.js';
@@ -22,7 +23,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         typeof req.query.projectId === 'string' ? req.query.projectId : '';
 
     if (req.method === 'GET') {
-        const result = await handleListEnvVars(projectId);
+        const countOnly =
+            req.query.countOnly === '1' || req.query.countOnly === 'true';
+        const result = countOnly
+            ? await handleCountEnvVars(projectId)
+            : await handleListEnvVars(projectId);
         return res
             .status(result.status)
             .json(result.ok ? result.data : result.body);

@@ -218,6 +218,14 @@ export const listEnvVars = async (
     return (data.envs ?? []).map(mapEnvVar);
 };
 
+/** Count only — skips mapping secret payloads for card summaries. */
+export const countEnvVars = async (projectId: string): Promise<number> => {
+    const data = await vercelFetch<{ envs: unknown[] }>(
+        `/v9/projects/${encodeURIComponent(projectId)}/env`,
+    );
+    return (data.envs ?? []).length;
+};
+
 export const createEnvVar = async (
     projectId: string,
     input: CreateEnvVarInput,

@@ -1,5 +1,4 @@
 import { Lock, Unlock } from 'lucide-react';
-import { Badge } from '@/components/ui';
 
 type RepoVisibilityBadgeProps = {
     isPrivate: boolean;
@@ -8,17 +7,17 @@ type RepoVisibilityBadgeProps = {
 export const RepoVisibilityBadge = ({ isPrivate }: RepoVisibilityBadgeProps) => {
     if (isPrivate) {
         return (
-            <Badge className="inline-flex items-center gap-1 rounded-md border-0 bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-200 ring-1 ring-amber-400/30">
-                <Lock className="size-3" />
+            <span className="inline-flex h-6 items-center gap-1 rounded bg-amber-400 px-2.5 text-xs font-bold text-black">
+                <Lock className="size-3 text-black" />
                 Private
-            </Badge>
+            </span>
         );
     }
 
     return (
-        <Badge className="inline-flex items-center gap-1 rounded-md border-0 bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-            <Unlock className="size-3" />
+        <span className="inline-flex h-6 items-center gap-1 rounded bg-primary px-2.5 text-xs font-bold text-black">
+            <Unlock className="size-3 text-black" />
             Public
-        </Badge>
+        </span>
     );
 };

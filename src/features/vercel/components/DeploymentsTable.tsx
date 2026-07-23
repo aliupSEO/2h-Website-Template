@@ -24,7 +24,7 @@ type DeploymentsTableProps = {
 };
 
 const headClass =
-    'h-12 px-4 text-xs font-bold tracking-[0.1em] text-primary uppercase sm:px-6';
+    'h-12 px-4 text-sm font-extrabold tracking-wide text-black uppercase sm:px-6';
 
 export const DeploymentsTable = ({
     deployments,
@@ -41,10 +41,10 @@ export const DeploymentsTable = ({
     }
 
     return (
-        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 border-t border-white/5 bg-card shadow-none">
+        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 border-t border-white/5 bg-muted shadow-none">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-b-2 border-primary/40 bg-primary/15 hover:bg-primary/15">
+                    <TableRow className="border-b-0 bg-primary hover:bg-primary">
                         <TableHead className={headClass}>Status</TableHead>
                         <TableHead className={headClass}>Target</TableHead>
                         <TableHead className={headClass}>Branch</TableHead>

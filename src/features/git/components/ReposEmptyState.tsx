@@ -15,8 +15,8 @@ export const ReposEmptyState = ({
     onCreate,
 }: ReposEmptyStateProps) => {
     return (
-        <div className="flex flex-col items-center bg-card px-6 py-16 text-center">
-            <div className="mb-4 flex size-12 items-center justify-center bg-muted text-muted-foreground">
+        <div className="flex flex-col items-center px-6 py-16 text-center">
+            <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
                 <FolderGit2 className="size-6" />
             </div>
             <h2 className="font-heading text-lg font-semibold tracking-tight">
