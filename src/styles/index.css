@@ -101,8 +101,8 @@
   --sidebar-foreground: var(--brand-white);
   --sidebar-primary: var(--brand-green);
   --sidebar-primary-foreground: var(--brand-black);
-  --sidebar-accent: color-mix(in srgb, var(--brand-green) 14%, transparent);
-  --sidebar-accent-foreground: var(--brand-green);
+  --sidebar-accent: var(--brand-green);
+  --sidebar-accent-foreground: var(--brand-black);
   --sidebar-border: color-mix(in srgb, var(--brand-white) 10%, transparent);
   --sidebar-ring: var(--brand-green);
 }
@@ -136,8 +136,8 @@
   --sidebar-foreground: var(--brand-white);
   --sidebar-primary: var(--brand-green);
   --sidebar-primary-foreground: var(--brand-black);
-  --sidebar-accent: color-mix(in srgb, var(--brand-green) 14%, transparent);
-  --sidebar-accent-foreground: var(--brand-green);
+  --sidebar-accent: var(--brand-green);
+  --sidebar-accent-foreground: var(--brand-black);
   --sidebar-border: color-mix(in srgb, var(--brand-white) 10%, transparent);
   --sidebar-ring: var(--brand-green);
 }

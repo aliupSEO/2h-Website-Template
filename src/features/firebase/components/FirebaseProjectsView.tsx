@@ -2,15 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ConfirmModal,
     DocumentTitle,
-    Loading,
     LoadingScreen,
 } from '@/components/common';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@/components/ui';
 import type {
     AddFirebaseSchema,
     CreateWebAppSchema,
@@ -18,20 +11,22 @@ import type {
 } from '@/features/firebase/schemas';
 import type {
     FirebaseApp,
+    FirebaseProject,
     FirebaseWebAppConfig,
 } from '@/features/firebase/types';
 import { toast } from '@/lib/toast';
 import { useFirebaseStore } from '@/stores/firebaseStore';
 import { AddFirebaseDialog } from './AddFirebaseDialog';
 import { AppConfigDialog } from './AppConfigDialog';
-import { AppsTable } from './AppsTable';
-import { AuthDomainsPanel } from './AuthDomainsPanel';
-import { AuthProvidersPanel } from './AuthProvidersPanel';
 import { CreateWebAppDialog } from './CreateWebAppDialog';
-import { ProjectSelect } from './ProjectSelect';
+import { FirebaseEmptyState } from './FirebaseEmptyState';
+import { ProjectDetailSheet } from './ProjectDetailSheet';
+import { ProjectsCardGrid } from './ProjectsCardGrid';
 import { ProjectsTable } from './ProjectsTable';
-import { ProjectsToolbar } from './ProjectsToolbar';
-import { ServicesPanel } from './ServicesPanel';
+import {
+    ProjectsToolbar,
+    type ProjectsViewMode,
+} from './ProjectsToolbar';
 
 export const FirebaseProjectsView = () => {
     const status = useFirebaseStore((state) => state.status);
@@ -67,8 +62,9 @@ export const FirebaseProjectsView = () => {
     const enableFirestore = useFirebaseStore((state) => state.enableFirestore);
     const enableStorage = useFirebaseStore((state) => state.enableStorage);
 
-    const [tab, setTab] = useState('projects');
     const [query, setQuery] = useState('');
+    const [viewMode, setViewMode] = useState<ProjectsViewMode>('cards');
+    const [detailOpen, setDetailOpen] = useState(false);
     const [addOpen, setAddOpen] = useState(false);
     const [createAppOpen, setCreateAppOpen] = useState(false);
     const [providerOpen, setProviderOpen] = useState(false);
@@ -95,7 +91,11 @@ export const FirebaseProjectsView = () => {
         const needle = query.trim().toLowerCase();
         if (!needle) return projects;
         return projects.filter((project) => {
-            const haystack = [project.displayName, project.projectId, project.state]
+            const haystack = [
+                project.displayName,
+                project.projectId,
+                project.state,
+            ]
                 .join(' ')
                 .toLowerCase();
             return haystack.includes(needle);
@@ -104,13 +104,15 @@ export const FirebaseProjectsView = () => {
 
     const selectedProject = useMemo(() => {
         return (
-            projects.find((project) => project.projectId === selectedProjectId) ??
-            null
+            projects.find(
+                (project) => project.projectId === selectedProjectId,
+            ) ?? null
         );
     }, [projects, selectedProjectId]);
 
-    const handleProjectChange = (projectId: string) => {
-        void selectProject(projectId).catch((selectError) => {
+    const openProjectDetail = (project: FirebaseProject) => {
+        setDetailOpen(true);
+        void selectProject(project.projectId).catch((selectError) => {
             toast.error(
                 selectError instanceof Error
                     ? selectError.message
@@ -139,9 +141,10 @@ export const FirebaseProjectsView = () => {
 
     const handleAddFirebase = async (values: AddFirebaseSchema) => {
         try {
-            await addFirebase(values);
+            const project = await addFirebase(values);
             toast.success('Firebase added to project');
-            setTab('apps');
+            setDetailOpen(true);
+            void selectProject(project.projectId).catch(() => undefined);
         }
         catch (addError) {
             toast.error(
@@ -329,27 +332,17 @@ export const FirebaseProjectsView = () => {
 
     if (status && !status.configured) {
         return (
-            <div className="space-y-6">
+            <div className="-m-4 space-y-0 bg-muted sm:-m-6">
                 <DocumentTitle title="Firebase" />
-                <div className="space-y-1">
-                    <h1 className="font-heading text-2xl font-semibold tracking-tight">
+                <div className="px-4 py-4 sm:px-6">
+                    <h1 className="font-heading text-3xl font-semibold tracking-tight">
                         Firebase
                     </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Manage Firebase projects, apps, Auth, and services.
-                    </p>
                 </div>
-                <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-                    <p className="text-sm text-destructive">
-                        Firebase is not configured on the Hub BFF.
-                    </p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Set `GOOGLE_APPLICATION_CREDENTIALS` (or
-                        `FIREBASE_SERVICE_ACCOUNT_JSON`) in `.env.local`, then
-                        restart the dev server. See
-                        `docs/firebase-api/credentials-runbook.md`.
-                    </p>
-                </div>
+                <FirebaseEmptyState
+                    title="Firebase is not configured"
+                    description="Set GOOGLE_APPLICATION_CREDENTIALS or FIREBASE_SERVICE_ACCOUNT_JSON in .env.local, then restart the dev server."
+                />
             </div>
         );
     }
@@ -359,154 +352,79 @@ export const FirebaseProjectsView = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <DocumentTitle title="Firebase" />
-            <div className="space-y-1">
-                <h1 className="font-heading text-2xl font-semibold tracking-tight">
-                    Firebase
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                    Inventory projects, create apps, configure Auth, and enable
-                    Firestore / Storage.
-                </p>
+
+            <div className="-m-4 space-y-0 bg-muted sm:-m-6">
+                <ProjectsToolbar
+                    query={query}
+                    onQueryChange={setQuery}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    onAddFirebase={() => setAddOpen(true)}
+                    projectCount={filteredProjects.length}
+                />
+
+                {error && projects.length === 0 ? (
+                    <FirebaseEmptyState
+                        title="Could not load projects"
+                        description={error}
+                    />
+                ) : filteredProjects.length === 0 ? (
+                    <FirebaseEmptyState
+                        title={
+                            query.trim()
+                                ? 'No matching projects'
+                                : 'No Firebase projects yet'
+                        }
+                        description={
+                            query.trim()
+                                ? 'Try a different search.'
+                                : 'Add Firebase to a GCP project to get started.'
+                        }
+                        showAdd={!query.trim()}
+                        onAdd={() => setAddOpen(true)}
+                    />
+                ) : viewMode === 'table' ? (
+                    <ProjectsTable
+                        projects={filteredProjects}
+                        onManage={openProjectDetail}
+                    />
+                ) : (
+                    <ProjectsCardGrid
+                        projects={filteredProjects}
+                        onManage={openProjectDetail}
+                    />
+                )}
             </div>
 
-            {error && projects.length === 0 ? (
-                <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-                    <p className="text-sm text-destructive">{error}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Check service-account IAM and enabled Google APIs, then
-                        retry.
-                    </p>
-                </div>
-            ) : (
-                <Tabs value={tab} onValueChange={setTab}>
-                    <TabsList>
-                        <TabsTrigger value="projects">Projects</TabsTrigger>
-                        <TabsTrigger value="apps">Apps</TabsTrigger>
-                        <TabsTrigger value="auth">Auth</TabsTrigger>
-                        <TabsTrigger value="services">Services</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="projects" className="mt-4 space-y-4">
-                        <ProjectsToolbar
-                            query={query}
-                            onQueryChange={setQuery}
-                            onAddFirebase={() => setAddOpen(true)}
-                        />
-
-                        {filteredProjects.length === 0 ? (
-                            <div className="rounded-xl border-0 bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-                                <p className="text-sm text-muted-foreground">
-                                    {query.trim()
-                                        ? 'No projects match your search.'
-                                        : 'No Firebase projects found. Add Firebase to a GCP project.'}
-                                </p>
-                            </div>
-                        ) : (
-                            <ProjectsTable
-                                projects={filteredProjects}
-                                selectedProjectId={selectedProjectId}
-                                onSelect={(project) => {
-                                    handleProjectChange(project.projectId);
-                                    setTab('apps');
-                                }}
-                            />
-                        )}
-                    </TabsContent>
-
-                    <TabsContent value="apps" className="mt-4 space-y-4">
-                        <ProjectSelect
-                            projects={projects}
-                            value={selectedProjectId}
-                            onChange={handleProjectChange}
-                        />
-
-                        {!selectedProject ? (
-                            <p className="text-sm text-muted-foreground">
-                                Choose a project to view apps.
-                            </p>
-                        ) : loadingDetail ? (
-                            <div className="flex justify-center py-10">
-                                <Loading size="md" label="Loading apps…" />
-                            </div>
-                        ) : (
-                            <AppsTable
-                                apps={apps}
-                                onCreate={() => setCreateAppOpen(true)}
-                                onViewConfig={(app) => {
-                                    void handleViewConfig(app);
-                                }}
-                                onDelete={setPendingDeleteApp}
-                            />
-                        )}
-                    </TabsContent>
-
-                    <TabsContent value="auth" className="mt-4 space-y-8">
-                        <ProjectSelect
-                            projects={projects}
-                            value={selectedProjectId}
-                            onChange={handleProjectChange}
-                        />
-
-                        {!selectedProject ? (
-                            <p className="text-sm text-muted-foreground">
-                                Choose a project to manage Auth.
-                            </p>
-                        ) : loadingDetail ? (
-                            <div className="flex justify-center py-10">
-                                <Loading size="md" label="Loading Auth…" />
-                            </div>
-                        ) : (
-                            <>
-                                <div className="space-y-3">
-                                    <h2 className="font-heading text-lg font-semibold">
-                                        Authorized domains
-                                    </h2>
-                                    <AuthDomainsPanel
-                                        domains={
-                                            authConfig?.authorizedDomains ?? []
-                                        }
-                                        onAdd={handleAddDomain}
-                                        onRemove={handleRemoveDomain}
-                                    />
-                                </div>
-                                <div className="space-y-3">
-                                    <h2 className="font-heading text-lg font-semibold">
-                                        Sign-in providers
-                                    </h2>
-                                    <AuthProvidersPanel
-                                        providers={providers}
-                                        createOpen={providerOpen}
-                                        onCreateOpenChange={setProviderOpen}
-                                        onCreate={handleCreateProvider}
-                                        onToggle={handleToggleProvider}
-                                    />
-                                </div>
-                            </>
-                        )}
-                    </TabsContent>
-
-                    <TabsContent value="services" className="mt-4 space-y-4">
-                        <ProjectSelect
-                            projects={projects}
-                            value={selectedProjectId}
-                            onChange={handleProjectChange}
-                        />
-
-                        {!selectedProject ? (
-                            <p className="text-sm text-muted-foreground">
-                                Choose a project to enable services.
-                            </p>
-                        ) : (
-                            <ServicesPanel
-                                onEnableFirestore={handleEnableFirestore}
-                                onEnableStorage={handleEnableStorage}
-                            />
-                        )}
-                    </TabsContent>
-                </Tabs>
-            )}
+            <ProjectDetailSheet
+                open={detailOpen}
+                project={selectedProject}
+                loading={loadingDetail}
+                apps={apps}
+                authConfig={authConfig}
+                providers={providers}
+                providerOpen={providerOpen}
+                onProviderOpenChange={setProviderOpen}
+                onOpenChange={(open) => {
+                    setDetailOpen(open);
+                    if (!open) {
+                        void selectProject(null).catch(() => undefined);
+                    }
+                }}
+                onCreateApp={() => setCreateAppOpen(true)}
+                onViewConfig={(app) => {
+                    void handleViewConfig(app);
+                }}
+                onDeleteApp={setPendingDeleteApp}
+                onAddDomain={handleAddDomain}
+                onRemoveDomain={handleRemoveDomain}
+                onCreateProvider={handleCreateProvider}
+                onToggleProvider={handleToggleProvider}
+                onEnableFirestore={handleEnableFirestore}
+                onEnableStorage={handleEnableStorage}
+            />
 
             <AddFirebaseDialog
                 open={addOpen}

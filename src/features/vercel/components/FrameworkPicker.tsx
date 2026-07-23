@@ -62,7 +62,14 @@ export const FrameworkPicker = ({
                 >
                     <SelectValue placeholder="More frameworks…" />
                 </SelectTrigger>
-                <SelectContent className="max-h-64 border-0 bg-card">
+                <SelectContent
+                    position="popper"
+                    align="start"
+                    side="top"
+                    sideOffset={6}
+                    collisionPadding={12}
+                    className="z-[70] max-h-56 w-[var(--radix-select-trigger-width)] border-0 bg-card"
+                >
                     {VERCEL_FRAMEWORKS.filter(
                         (framework) =>
                             !QUICK_FRAMEWORKS.some(
