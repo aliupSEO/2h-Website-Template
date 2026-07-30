@@ -1,4 +1,5 @@
-import { PagePlaceholder } from '@/components/common';
+import { AdminUsersView } from '@/features/admin';
+
 export const AdminPage = () => {
-    return <PagePlaceholder title="Admin Panel" documentTitle="Admin"/>;
+    return <AdminUsersView />;
 };

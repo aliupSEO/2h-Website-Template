@@ -8,6 +8,7 @@ export type Json = string | number | boolean | null | {
 export type AppRole = 'admin' | 'manager' | 'user';
 export type ClientStatus = 'active' | 'inactive' | 'draft';
 export type ClientFileKind = 'logo' | 'asset' | 'document';
+export type TemplateCategory = 'websites' | 'apps';
 export type Database = {
     public: {
         Tables: {
@@ -147,6 +148,86 @@ export type Database = {
                 Relationships: [
                 ];
             };
+            templates: {
+                Row: {
+                    id: string;
+                    name: string;
+                    git_repository: string;
+                    url: string;
+                    category: TemplateCategory;
+                    created_by: string | null;
+                    updated_by: string | null;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    name: string;
+                    git_repository: string;
+                    url: string;
+                    category: TemplateCategory;
+                    created_by?: string | null;
+                    updated_by?: string | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    name?: string;
+                    git_repository?: string;
+                    url?: string;
+                    category?: TemplateCategory;
+                    created_by?: string | null;
+                    updated_by?: string | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                ];
+            };
+            plugins: {
+                Row: {
+                    id: string;
+                    name: string;
+                    description: string | null;
+                    file_name: string | null;
+                    mime_type: string | null;
+                    size_bytes: number | null;
+                    storage_path: string | null;
+                    created_by: string | null;
+                    updated_by: string | null;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    name: string;
+                    description?: string | null;
+                    file_name?: string | null;
+                    mime_type?: string | null;
+                    size_bytes?: number | null;
+                    storage_path?: string | null;
+                    created_by?: string | null;
+                    updated_by?: string | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    name?: string;
+                    description?: string | null;
+                    file_name?: string | null;
+                    mime_type?: string | null;
+                    size_bytes?: number | null;
+                    storage_path?: string | null;
+                    created_by?: string | null;
+                    updated_by?: string | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                ];
+            };
         };
         Views: {
             [_ in never]: never;
@@ -167,6 +248,7 @@ export type Database = {
             app_role: AppRole;
             client_status: ClientStatus;
             client_file_kind: ClientFileKind;
+            template_category: TemplateCategory;
         };
         CompositeTypes: {
             [_ in never]: never;

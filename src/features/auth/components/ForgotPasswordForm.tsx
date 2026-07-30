@@ -6,7 +6,7 @@ import { Loading } from '@/components/common';
 import { Button, FormField, Input } from '@/components/ui';
 import { getAuthErrorMessage } from '@/features/auth/utils/authErrors';
 import { toast } from '@/lib/toast';
-import { authService } from '@/services/authService';
+import { authApiService } from '@/services/adminService';
 import {
     forgotPasswordSchema,
     type ForgotPasswordSchema,
@@ -30,7 +30,7 @@ export const ForgotPasswordForm = () => {
         const email = values.email.trim();
 
         try {
-            await authService.resetPasswordForEmail(email);
+            await authApiService.forgotPassword(email);
             setSubmittedEmail(email);
             toast.success('Reset link sent');
         }

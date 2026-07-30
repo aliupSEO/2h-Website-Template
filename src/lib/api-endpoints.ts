@@ -55,6 +55,17 @@ export const apiEndpoints = {
     webhooks: {
         vercel: '/api/webhooks/vercel',
     },
+    admin: {
+        base: '/api/admin',
+        users: '/api/admin/users',
+        user: (userId: string) =>
+            `/api/admin/users/${encodeURIComponent(userId)}`,
+        userPassword: (userId: string) =>
+            `/api/admin/users/${encodeURIComponent(userId)}/password`,
+    },
+    auth: {
+        forgotPassword: '/api/auth/forgot-password',
+    },
 } as const;
 
 export const isGitHubApiPath = (pathname: string) => {
@@ -81,6 +92,31 @@ export const isFirebaseApiPath = (pathname: string) => {
 export const isVercelWebhookPath = (pathname: string) => {
     return pathname === apiEndpoints.webhooks.vercel ||
         pathname === `${apiEndpoints.webhooks.vercel}/`;
+};
+
+export const isAdminApiPath = (pathname: string) => {
+    return pathname === '/api/admin' ||
+        pathname === '/api/admin/users' ||
+        pathname.startsWith(`${apiEndpoints.admin.base}/`);
+};
+
+export const isAuthApiPath = (pathname: string) => {
+    return pathname === apiEndpoints.auth.forgotPassword ||
+        pathname === `${apiEndpoints.auth.forgotPassword}/`;
+};
+
+export const parseAdminUserPath = (pathname: string) => {
+    const match = pathname.match(/^\/api\/admin\/users\/([^/]+)\/?$/);
+    if (!match) return null;
+    return { userId: decodeURIComponent(match[1]!) };
+};
+
+export const parseAdminUserPasswordPath = (pathname: string) => {
+    const match = pathname.match(
+        /^\/api\/admin\/users\/([^/]+)\/password\/?$/,
+    );
+    if (!match) return null;
+    return { userId: decodeURIComponent(match[1]!) };
 };
 
 export const parseGitHubRepoPath = (pathname: string) => {

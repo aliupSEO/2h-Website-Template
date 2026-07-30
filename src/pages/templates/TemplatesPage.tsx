@@ -1,4 +1,5 @@
-import { PagePlaceholder } from '@/components/common';
+import { TemplatesView } from '@/features/templates';
+
 export const TemplatesPage = () => {
-    return <PagePlaceholder title="Templates"/>;
+    return <TemplatesView />;
 };

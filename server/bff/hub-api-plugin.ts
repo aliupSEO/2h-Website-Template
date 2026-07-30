@@ -1,9 +1,13 @@
 import type { Plugin } from 'vite';
 import {
+    isAdminApiPath,
+    isAuthApiPath,
     isFirebaseApiPath,
     isGitHubApiPath,
     isVercelApiPath,
     isVercelWebhookPath,
+    parseAdminUserPasswordPath,
+    parseAdminUserPath,
     parseFirebaseAppConfigPath,
     parseFirebaseAppPath,
     parseFirebaseAppsPath,
@@ -60,6 +64,14 @@ import {
     handleGetWebhookState,
     handleVercelWebhook,
 } from '../vercel/webhook-handlers.js';
+import {
+    handleAdminSendPasswordReset,
+    handleAdminSetPassword,
+    handleForgotPassword,
+    handleInviteUser,
+    handleListUsers,
+    handleUpdateUser,
+} from '../admin/handlers.js';
 
 const readRawBody = async (req: import('node:http').IncomingMessage) => {
     const chunks: Buffer[] = [];
@@ -94,7 +106,9 @@ export const hubApiPlugin = (): Plugin => {
                     !isGitHubApiPath(pathname) &&
                     !isVercelApiPath(pathname) &&
                     !isVercelWebhookPath(pathname) &&
-                    !isFirebaseApiPath(pathname)
+                    !isFirebaseApiPath(pathname) &&
+                    !isAdminApiPath(pathname) &&
+                    !isAuthApiPath(pathname)
                 ) {
                     next();
                     return;
@@ -568,6 +582,100 @@ export const hubApiPlugin = (): Plugin => {
                         if (projectPath && req.method === 'GET') {
                             const result = await handleGetProject(
                                 projectPath.projectId,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+                    }
+
+                    if (isAuthApiPath(pathname)) {
+                        if (req.method === 'POST') {
+                            const body = await readBody(req);
+                            const result = await handleForgotPassword(body);
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+                    }
+
+                    if (isAdminApiPath(pathname)) {
+                        const authorization = req.headers.authorization;
+                        const adminUserPath = parseAdminUserPath(pathname);
+                        const adminPasswordPath =
+                            parseAdminUserPasswordPath(pathname);
+
+                        if (
+                            pathname === '/api/admin/users' ||
+                            pathname === '/api/admin/users/'
+                        ) {
+                            if (req.method === 'GET') {
+                                const result = await handleListUsers(authorization);
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+
+                            if (req.method === 'POST') {
+                                const body = await readBody(req);
+                                const result = await handleInviteUser(
+                                    authorization,
+                                    body,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        if (adminPasswordPath) {
+                            if (req.method === 'PUT') {
+                                const body = await readBody(req);
+                                const result = await handleAdminSetPassword(
+                                    authorization,
+                                    adminPasswordPath.userId,
+                                    body,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+
+                            if (req.method === 'POST') {
+                                const result = await handleAdminSendPasswordReset(
+                                    authorization,
+                                    adminPasswordPath.userId,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        if (adminUserPath && req.method === 'PATCH') {
+                            const body = await readBody(req);
+                            const result = await handleUpdateUser(
+                                authorization,
+                                adminUserPath.userId,
+                                body,
                             );
                             sendJson(
                                 res,

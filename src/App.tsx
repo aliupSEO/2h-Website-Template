@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from '@/components/common';
 import {
+    AdminRoute,
     AuthBootstrap,
     PrivateRoute,
     PublicRoute,
@@ -8,6 +9,7 @@ import {
 import { Toaster } from '@/lib/toast';
 import { AdminPage } from '@/pages/admin';
 import { AppsPage } from '@/pages/apps';
+import { AcceptInvitePage } from '@/pages/auth/accept-invite';
 import { ForgotPasswordPage } from '@/pages/auth/forgot-password';
 import { ResetPasswordPage } from '@/pages/auth/reset-password';
 import { SignInPage } from '@/pages/auth/sign-in';
@@ -46,6 +48,10 @@ const App = () => {
                             path="/auth/reset-password"
                             element={<ResetPasswordPage />}
                         />
+                        <Route
+                            path="/auth/accept-invite"
+                            element={<AcceptInvitePage />}
+                        />
                     </Route>
 
                     <Route element={<PrivateRoute />}>
@@ -69,9 +75,14 @@ const App = () => {
                             <Route path="/vercel" element={<VercelPage />} />
                             <Route path="/env" element={<EnvPage />} />
                             <Route path="/invoices" element={<InvoicesPage />} />
-                            <Route path="/admin" element={<AdminPage />} />
                             <Route path="/profile" element={<ProfilePage />} />
                             <Route path="/settings" element={<SettingsPage />} />
+                        </Route>
+
+                        <Route element={<AdminRoute />}>
+                            <Route element={<AppLayout />}>
+                                <Route path="/admin" element={<AdminPage />} />
+                            </Route>
                         </Route>
                     </Route>
 

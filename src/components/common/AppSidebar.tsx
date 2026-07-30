@@ -1,7 +1,9 @@
 import { Link, NavLink } from 'react-router-dom';
 import logo2h from '@/assets/logo-2h.png';
 import { APP_NAV_GROUPS } from '@/constants/navigation';
+import { canManageProfiles } from '@/constants/roles';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/authStore';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -12,6 +14,15 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     );
 
 export const AppSidebar = () => {
+    const user = useAuthStore((state) => state.user);
+    const navGroups = APP_NAV_GROUPS.map((group) => ({
+        ...group,
+        items: group.items.filter((item) => {
+            if (item.to !== '/admin') return true;
+            return user ? canManageProfiles(user.role) : false;
+        }),
+    })).filter((group) => group.items.length > 0);
+
     return (
         <aside className="flex h-full w-64 shrink-0 flex-col self-stretch border-0 bg-surface text-sidebar-foreground">
             <div className="shrink-0 border-b border-white/[0.06] px-4 py-5">
@@ -34,7 +45,7 @@ export const AppSidebar = () => {
                 className="flex min-h-0 w-full flex-1 flex-col gap-6 overflow-y-auto overscroll-contain py-4"
                 aria-label="Main"
             >
-                {APP_NAV_GROUPS.map((group) => (
+                {navGroups.map((group) => (
                     <div key={group.label} className="w-full">
                         <p className="px-4 pb-2 text-[11px] font-semibold tracking-[0.16em] text-primary uppercase">
                             {group.label}
