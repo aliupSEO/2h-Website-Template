@@ -6,6 +6,7 @@ type PluginsCardGridProps = {
     onEdit: (plugin: Plugin) => void;
     onDelete: (plugin: Plugin) => void;
     onDownload: (plugin: Plugin) => Promise<void>;
+    onToggleActive: (plugin: Plugin, isActive: boolean) => Promise<void>;
 };
 
 export const PluginsCardGrid = ({
@@ -13,6 +14,7 @@ export const PluginsCardGrid = ({
     onEdit,
     onDelete,
     onDownload,
+    onToggleActive,
 }: PluginsCardGridProps) => {
     return (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -23,6 +25,7 @@ export const PluginsCardGrid = ({
                     onEdit={onEdit}
                     onDelete={onDelete}
                     onDownload={onDownload}
+                    onToggleActive={onToggleActive}
                 />
             ))}
         </div>

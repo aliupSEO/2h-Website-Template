@@ -9,6 +9,7 @@ type PluginsStore = {
     fetchPlugins: () => Promise<void>;
     createPlugin: (input: PluginInput) => Promise<Plugin>;
     updatePlugin: (id: string, input: PluginInput) => Promise<Plugin>;
+    setPluginActive: (id: string, isActive: boolean) => Promise<Plugin>;
     deletePlugin: (id: string) => Promise<void>;
     getDownloadUrl: (plugin: Plugin) => Promise<string>;
 };
@@ -44,6 +45,17 @@ export const usePluginsStore = create<PluginsStore>((set, get) => ({
 
     updatePlugin: async (id, input) => {
         const plugin = await pluginsService.update(id, input);
+        set({
+            plugins: get().plugins.map((item) =>
+                item.id === id ? plugin : item,
+            ),
+            error: null,
+        });
+        return plugin;
+    },
+
+    setPluginActive: async (id, isActive) => {
+        const plugin = await pluginsService.setActive(id, isActive);
         set({
             plugins: get().plugins.map((item) =>
                 item.id === id ? plugin : item,

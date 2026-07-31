@@ -16,6 +16,7 @@ dist-ssr
 *firebase*adminsdk*.json
 *central-hub-ops*.json
 *-fd2ed66a761b.json
+h-central-hub-ops-fd2ed66a761b.json
 secrets/
 *.pem
 *.p12

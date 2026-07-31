@@ -19,16 +19,18 @@ import {
     SelectValue,
 } from '@/components/ui';
 import {
-    ADMIN_ROLE_OPTIONS,
+    roleOptionsForActor,
     editUserSchema,
     type EditUserSchema,
 } from '@/features/admin/schemas';
 import type { AdminUser } from '@/features/admin/types';
+import { APP_ROLE_LABELS, type AppRole } from '@/constants/roles';
 
 type EditUserDialogProps = {
     open: boolean;
     user: AdminUser | null;
     currentUserId: string | undefined;
+    actorRole: AppRole;
     onOpenChange: (open: boolean) => void;
     onSubmit: (user: AdminUser, values: EditUserSchema) => Promise<void>;
 };
@@ -37,10 +39,12 @@ export const EditUserDialog = ({
     open,
     user,
     currentUserId,
+    actorRole,
     onOpenChange,
     onSubmit,
 }: EditUserDialogProps) => {
     const isSelf = user?.id === currentUserId;
+    const roleOptions = roleOptionsForActor(actorRole);
 
     const {
         register,
@@ -120,7 +124,7 @@ export const EditUserDialog = ({
                                         <SelectValue placeholder="Select role" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {ADMIN_ROLE_OPTIONS.map((option) => (
+                                        {roleOptions.map((option) => (
                                             <SelectItem
                                                 key={option.value}
                                                 value={option.value}
@@ -128,6 +132,19 @@ export const EditUserDialog = ({
                                                 {option.label}
                                             </SelectItem>
                                         ))}
+                                        {user &&
+                                        !roleOptions.some(
+                                            (option) =>
+                                                option.value === user.role,
+                                        ) ? (
+                                            <SelectItem value={user.role}>
+                                                {
+                                                    APP_ROLE_LABELS[
+                                                        user.role as AppRole
+                                                    ]
+                                                }
+                                            </SelectItem>
+                                        ) : null}
                                     </SelectContent>
                                 </Select>
                             )}

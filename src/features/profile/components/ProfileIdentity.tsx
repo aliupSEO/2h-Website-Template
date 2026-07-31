@@ -1,5 +1,6 @@
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { Camera, Trash2 } from 'lucide-react';
+import { Loading } from '@/components/common';
 import {
     Avatar,
     AvatarFallback,
@@ -7,6 +8,8 @@ import {
     Button,
 } from '@/components/ui';
 import { toast } from '@/lib/toast';
+import { profileService } from '@/services/profileService';
+import { useAuthStore } from '@/stores/authStore';
 import { getInitials } from '../utils';
 
 type ProfileIdentityProps = {
@@ -22,44 +25,76 @@ export const ProfileIdentity = ({
     roleLabel,
     avatarUrl,
 }: ProfileIdentityProps) => {
+    const setUser = useAuthStore((state) => state.setUser);
     const inputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(
         avatarUrl ?? null,
     );
+    const [uploading, setUploading] = useState(false);
+    const [removing, setRemoving] = useState(false);
 
-    const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    useEffect(() => {
+        setPreviewUrl(avatarUrl ?? null);
+    }, [avatarUrl]);
+
+    const handleUpload = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+        event.target.value = '';
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
             toast.error('Choose an image file');
-            event.target.value = '';
             return;
         }
 
-        const objectUrl = URL.createObjectURL(file);
-        setPreviewUrl((prev) => {
-            if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
-            return objectUrl;
-        });
-        toast.success('Photo selected');
-        event.target.value = '';
+        setUploading(true);
+        try {
+            const updated = await profileService.uploadAvatar(file);
+            setUser(updated);
+            setPreviewUrl(updated.avatarUrl);
+            toast.success('Photo updated');
+        }
+        catch (error) {
+            toast.error(
+                error instanceof Error
+                    ? error.message
+                    : 'Could not update photo',
+            );
+        }
+        finally {
+            setUploading(false);
+        }
     };
 
-    const handleRemove = () => {
-        setPreviewUrl((prev) => {
-            if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
-            return null;
-        });
-        toast.success('Photo removed');
+    const handleRemove = async () => {
+        setRemoving(true);
+        try {
+            const updated = await profileService.removeAvatar();
+            setUser(updated);
+            setPreviewUrl(null);
+            toast.success('Photo removed');
+        }
+        catch (error) {
+            toast.error(
+                error instanceof Error
+                    ? error.message
+                    : 'Could not remove photo',
+            );
+        }
+        finally {
+            setRemoving(false);
+        }
     };
+
+    const busy = uploading || removing;
 
     return (
         <div className="flex flex-wrap items-center gap-5 sm:gap-6">
             <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="group relative shrink-0 rounded-full outline-none transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                disabled={busy}
+                className="group relative shrink-0 rounded-full outline-none transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60"
                 aria-label="Change profile photo"
             >
                 <span
@@ -75,7 +110,11 @@ export const ProfileIdentity = ({
                     </AvatarFallback>
                 </Avatar>
                 <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/55 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                    <Camera className="size-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    {uploading ? (
+                        <Loading size="sm" />
+                    ) : (
+                        <Camera className="size-5 text-white transition-transform duration-200 group-hover:scale-110" />
+                    )}
                 </span>
             </button>
 
@@ -100,20 +139,34 @@ export const ProfileIdentity = ({
                     type="button"
                     variant="outline"
                     className="h-11 gap-2 rounded-md bg-transparent px-4 text-sm ring-1 ring-white/12 transition-[background-color,box-shadow,color,transform] duration-200 hover:bg-primary/15 hover:text-primary hover:ring-primary/35 hover:shadow-[0_0_20px_rgba(198,245,50,0.12)] active:scale-[0.98]"
+                    disabled={busy}
                     onClick={() => inputRef.current?.click()}
                 >
-                    <Camera className="size-4" />
-                    Change photo
+                    {uploading ? (
+                        <Loading size="sm" />
+                    ) : (
+                        <>
+                            <Camera className="size-4" />
+                            Change photo
+                        </>
+                    )}
                 </Button>
                 {previewUrl ? (
                     <Button
                         type="button"
                         variant="ghost"
                         className="h-11 gap-2 px-3 text-foreground/55 transition-colors duration-200 hover:bg-white/[0.06] hover:text-foreground"
-                        onClick={handleRemove}
+                        disabled={busy}
+                        onClick={() => void handleRemove()}
                     >
-                        <Trash2 className="size-4" />
-                        Remove
+                        {removing ? (
+                            <Loading size="sm" />
+                        ) : (
+                            <>
+                                <Trash2 className="size-4" />
+                                Remove
+                            </>
+                        )}
                     </Button>
                 ) : null}
             </div>
@@ -123,7 +176,7 @@ export const ProfileIdentity = ({
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={handleUpload}
+                onChange={(event) => void handleUpload(event)}
             />
         </div>
     );

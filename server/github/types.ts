@@ -40,3 +40,30 @@ export type ListReposResult = {
     perPage: number;
     hasNextPage: boolean;
 };
+
+export type GitHubBranchDto = {
+    name: string;
+    sha: string;
+    protected: boolean;
+};
+
+export type GitHubCommitDto = {
+    sha: string;
+    message: string;
+    authorName: string;
+    authorDate: string;
+    htmlUrl: string;
+};
+
+export type ListCommitsQuery = {
+    sha?: string;
+    page?: number;
+    perPage?: number;
+};
+
+export type ListCommitsResult = {
+    commits: GitHubCommitDto[];
+    page: number;
+    perPage: number;
+    hasNextPage: boolean;
+};

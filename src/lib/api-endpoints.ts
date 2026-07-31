@@ -12,6 +12,22 @@ export const apiEndpoints = {
         },
         repo: (owner: string, repo: string) =>
             `/api/github/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
+        repoBranches: (owner: string, repo: string) =>
+            `/api/github/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/branches`,
+        repoCommits: (
+            owner: string,
+            repo: string,
+            params?: { sha?: string; page?: number; perPage?: number },
+        ) => {
+            const base = `/api/github/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits`;
+            if (!params?.sha && !params?.page && !params?.perPage) return base;
+
+            const search = new URLSearchParams();
+            if (params.sha) search.set('sha', params.sha);
+            if (params.page) search.set('page', String(params.page));
+            if (params.perPage) search.set('per_page', String(params.perPage));
+            return `${base}?${search.toString()}`;
+        },
     },
     vercel: {
         base: '/api/vercel',
@@ -63,6 +79,14 @@ export const apiEndpoints = {
         userPassword: (userId: string) =>
             `/api/admin/users/${encodeURIComponent(userId)}/password`,
     },
+    env: {
+        base: '/api/env',
+        vars: '/api/env/vars',
+        var: (id: string) => `/api/env/vars/${encodeURIComponent(id)}`,
+        reveal: (id: string) =>
+            `/api/env/vars/${encodeURIComponent(id)}/reveal`,
+        import: '/api/env/import',
+    },
     auth: {
         forgotPassword: '/api/auth/forgot-password',
     },
@@ -105,6 +129,25 @@ export const isAuthApiPath = (pathname: string) => {
         pathname === `${apiEndpoints.auth.forgotPassword}/`;
 };
 
+export const isEnvApiPath = (pathname: string) => {
+    return pathname === '/api/env' ||
+        pathname === '/api/env/vars' ||
+        pathname === '/api/env/import' ||
+        pathname.startsWith(`${apiEndpoints.env.base}/`);
+};
+
+export const parseEnvVarPath = (pathname: string) => {
+    const match = pathname.match(/^\/api\/env\/vars\/([^/]+)\/?$/);
+    if (!match) return null;
+    return { id: decodeURIComponent(match[1]!) };
+};
+
+export const parseEnvRevealPath = (pathname: string) => {
+    const match = pathname.match(/^\/api\/env\/vars\/([^/]+)\/reveal\/?$/);
+    if (!match) return null;
+    return { id: decodeURIComponent(match[1]!) };
+};
+
 export const parseAdminUserPath = (pathname: string) => {
     const match = pathname.match(/^\/api\/admin\/users\/([^/]+)\/?$/);
     if (!match) return null;
@@ -121,6 +164,30 @@ export const parseAdminUserPasswordPath = (pathname: string) => {
 
 export const parseGitHubRepoPath = (pathname: string) => {
     const match = pathname.match(/^\/api\/github\/repos\/([^/]+)\/([^/]+)\/?$/);
+    if (!match) return null;
+
+    return {
+        owner: decodeURIComponent(match[1]!),
+        repo: decodeURIComponent(match[2]!),
+    };
+};
+
+export const parseGitHubRepoBranchesPath = (pathname: string) => {
+    const match = pathname.match(
+        /^\/api\/github\/repos\/([^/]+)\/([^/]+)\/branches\/?$/,
+    );
+    if (!match) return null;
+
+    return {
+        owner: decodeURIComponent(match[1]!),
+        repo: decodeURIComponent(match[2]!),
+    };
+};
+
+export const parseGitHubRepoCommitsPath = (pathname: string) => {
+    const match = pathname.match(
+        /^\/api\/github\/repos\/([^/]+)\/([^/]+)\/commits\/?$/,
+    );
     if (!match) return null;
 
     return {

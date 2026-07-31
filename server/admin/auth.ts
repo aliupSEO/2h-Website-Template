@@ -1,4 +1,9 @@
 import type { AppRole } from '../../src/constants/roles.js';
+import {
+    assignableRolesFor,
+    canManageProfiles,
+    canModifyTargetRole,
+} from '../../src/constants/roles.js';
 import { getSupabaseAdminClient } from '../supabase/admin-client.js';
 
 export type AdminContext = {
@@ -46,7 +51,7 @@ export const requireAdmin = async (
         return { ok: false, status: 403, error: 'Account is inactive' };
     }
 
-    if (profile.role !== 'admin') {
+    if (!canManageProfiles(profile.role as AppRole)) {
         return { ok: false, status: 403, error: 'Admin access required' };
     }
 
@@ -55,7 +60,27 @@ export const requireAdmin = async (
         admin: {
             userId: data.user.id,
             email: profile.email,
-            role: profile.role,
+            role: profile.role as AppRole,
         },
     };
+};
+
+export const assertCanAssignRole = (
+    actor: AppRole,
+    role: AppRole,
+): string | null => {
+    if (!assignableRolesFor(actor).includes(role)) {
+        return 'You cannot assign this role';
+    }
+    return null;
+};
+
+export const assertCanModifyTarget = (
+    actor: AppRole,
+    targetRole: AppRole,
+): string | null => {
+    if (!canModifyTargetRole(actor, targetRole)) {
+        return 'You cannot modify this user';
+    }
+    return null;
 };

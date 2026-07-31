@@ -5,6 +5,7 @@ import { ConfirmModal } from '@/components/common/ConfirmModal';
 import {
     Avatar,
     AvatarFallback,
+    AvatarImage,
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -58,6 +59,12 @@ export const AppHeader = () => {
                 <DropdownMenu>
                     <DropdownMenuTrigger className="rounded-full outline-none transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-0">
                         <Avatar className="size-9 cursor-pointer ring-0">
+                            {user?.avatarUrl ? (
+                                <AvatarImage
+                                    src={user.avatarUrl}
+                                    alt={displayName}
+                                />
+                            ) : null}
                             <AvatarFallback className="bg-primary font-semibold text-primary-foreground">
                                 {initials}
                             </AvatarFallback>
@@ -71,6 +78,12 @@ export const AppHeader = () => {
                     >
                         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
                             <Avatar className="size-10 shrink-0 ring-0">
+                                {user?.avatarUrl ? (
+                                    <AvatarImage
+                                        src={user.avatarUrl}
+                                        alt={displayName}
+                                    />
+                                ) : null}
                                 <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
                                     {initials}
                                 </AvatarFallback>

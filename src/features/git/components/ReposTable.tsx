@@ -21,6 +21,7 @@ type ReposTableProps = {
     repos: GitRepo[];
     onEdit: (repo: GitRepo) => void;
     onDelete: (repo: GitRepo) => void;
+    onViewBranches: (repo: GitRepo) => void;
 };
 
 const headClass =
@@ -30,6 +31,7 @@ export const ReposTable = ({
     repos,
     onEdit,
     onDelete,
+    onViewBranches,
 }: ReposTableProps) => {
     return (
         <div className="overflow-x-auto overflow-y-clip rounded-none border-0 bg-muted shadow-none">
@@ -122,6 +124,7 @@ export const ReposTable = ({
                                     repo={repo}
                                     onEdit={onEdit}
                                     onDelete={onDelete}
+                                    onViewBranches={onViewBranches}
                                 />
                             </TableCell>
                         </TableRow>

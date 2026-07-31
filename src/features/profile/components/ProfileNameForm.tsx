@@ -1,8 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Loading } from '@/components/common';
 import { Button, FormField, Input } from '@/components/ui';
 import { toast } from '@/lib/toast';
+import { profileService } from '@/services/profileService';
+import { useAuthStore } from '@/stores/authStore';
 import { profileNameSchema, type ProfileNameSchema } from '../schemas';
 
 const FIELD_CLASS =
@@ -17,6 +20,8 @@ export const ProfileNameForm = ({
     defaultFirstName,
     defaultLastName,
 }: ProfileNameFormProps) => {
+    const setUser = useAuthStore((state) => state.setUser);
+
     const {
         register,
         handleSubmit,
@@ -30,10 +35,28 @@ export const ProfileNameForm = ({
         },
     });
 
+    useEffect(() => {
+        reset({
+            firstName: defaultFirstName,
+            lastName: defaultLastName,
+        });
+    }, [defaultFirstName, defaultLastName, reset]);
+
     const onSubmit = async (values: ProfileNameSchema) => {
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        reset(values);
-        toast.success('Name updated');
+        try {
+            const updated = await profileService.updateName(values);
+            setUser(updated);
+            reset(values);
+            toast.success('Name updated');
+        }
+        catch (error) {
+            toast.error(
+                error instanceof Error
+                    ? error.message
+                    : 'Could not update name',
+            );
+            throw error;
+        }
     };
 
     return (

@@ -6,6 +6,7 @@ import { toast } from '@/lib/toast';
 import { useGitStore } from '@/stores/gitStore';
 import { CreateRepoDialog } from './CreateRepoDialog';
 import { EditRepoDialog } from './EditRepoDialog';
+import { RepoBranchesSheet } from './RepoBranchesSheet';
 import { ReposCardGrid } from './ReposCardGrid';
 import { ReposEmptyState } from './ReposEmptyState';
 import { ReposTable } from './ReposTable';
@@ -32,6 +33,7 @@ export const ReposList = () => {
         useState<ReposVisibilityFilter>('all');
     const [createOpen, setCreateOpen] = useState(false);
     const [editingRepo, setEditingRepo] = useState<GitRepo | null>(null);
+    const [branchesRepo, setBranchesRepo] = useState<GitRepo | null>(null);
     const [pendingDelete, setPendingDelete] = useState<GitRepo | null>(null);
 
     useEffect(() => {
@@ -177,6 +179,7 @@ export const ReposList = () => {
                         repos={filtered}
                         onEdit={setEditingRepo}
                         onDelete={setPendingDelete}
+                        onViewBranches={setBranchesRepo}
                     />
                 ) : (
                     <div className="relative px-4 py-6 sm:px-6">
@@ -184,6 +187,7 @@ export const ReposList = () => {
                             repos={filtered}
                             onEdit={setEditingRepo}
                             onDelete={setPendingDelete}
+                            onViewBranches={setBranchesRepo}
                         />
                     </div>
                 )}
@@ -201,6 +205,14 @@ export const ReposList = () => {
                     if (!open) setEditingRepo(null);
                 }}
                 onSubmit={handleEdit}
+            />
+
+            <RepoBranchesSheet
+                open={Boolean(branchesRepo)}
+                repo={branchesRepo}
+                onOpenChange={(open) => {
+                    if (!open) setBranchesRepo(null);
+                }}
             />
 
             <ConfirmModal

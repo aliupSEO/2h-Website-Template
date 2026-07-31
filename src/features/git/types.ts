@@ -30,3 +30,24 @@ export type GitRepoListResult = {
     perPage: number;
     hasNextPage: boolean;
 };
+
+export type GitBranch = {
+    name: string;
+    sha: string;
+    protected: boolean;
+};
+
+export type GitCommit = {
+    sha: string;
+    message: string;
+    authorName: string;
+    authorDate: string;
+    htmlUrl: string;
+};
+
+export type GitCommitListResult = {
+    commits: GitCommit[];
+    page: number;
+    perPage: number;
+    hasNextPage: boolean;
+};

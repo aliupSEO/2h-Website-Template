@@ -1,13 +1,18 @@
 import {
     createRepo,
     deleteRepo,
+    listBranches,
+    listCommits,
     listRepos,
     updateRepo,
 } from './client.js';
 import type {
     CreateRepoInput,
     GitHubApiErrorBody,
+    GitHubBranchDto,
     GitHubRepoDto,
+    ListCommitsQuery,
+    ListCommitsResult,
     ListReposQuery,
     ListReposResult,
     UpdateRepoInput,
@@ -27,6 +32,29 @@ const parseListReposQuery = (query: Record<string, unknown>): ListReposQuery => 
             : undefined;
 
     return {
+        page: Number.isFinite(page) && page > 0 ? page : 1,
+        perPage: Number.isFinite(perPage) && perPage! > 0 ? perPage : undefined,
+    };
+};
+
+const parseListCommitsQuery = (
+    query: Record<string, unknown>,
+): ListCommitsQuery => {
+    const pageRaw = query.page;
+    const perPageRaw = query.per_page ?? query.perPage;
+    const shaRaw = query.sha;
+
+    const page =
+        typeof pageRaw === 'string' && pageRaw.trim()
+            ? Number.parseInt(pageRaw, 10)
+            : 1;
+    const perPage =
+        typeof perPageRaw === 'string' && perPageRaw.trim()
+            ? Number.parseInt(perPageRaw, 10)
+            : undefined;
+
+    return {
+        sha: typeof shaRaw === 'string' && shaRaw.trim() ? shaRaw.trim() : undefined,
         page: Number.isFinite(page) && page > 0 ? page : 1,
         perPage: Number.isFinite(perPage) && perPage! > 0 ? perPage : undefined,
     };
@@ -115,6 +143,55 @@ export const handleListRepos = async (
 ): Promise<HandlerResult<ListReposResult>> => {
     try {
         const result = await listRepos(parseListReposQuery(query));
+        return { ok: true, data: result, status: 200 };
+    }
+    catch (error) {
+        const body = toError(error);
+        return { ok: false, body, status: body.status };
+    }
+};
+
+export const handleListBranches = async (
+    owner: string,
+    repoName: string,
+): Promise<HandlerResult<{ branches: GitHubBranchDto[] }>> => {
+    if (!owner || !repoName) {
+        return {
+            ok: false,
+            body: { error: 'Owner and repository name are required', status: 400 },
+            status: 400,
+        };
+    }
+
+    try {
+        const branches = await listBranches(owner, repoName);
+        return { ok: true, data: { branches }, status: 200 };
+    }
+    catch (error) {
+        const body = toError(error);
+        return { ok: false, body, status: body.status };
+    }
+};
+
+export const handleListCommits = async (
+    owner: string,
+    repoName: string,
+    query: Record<string, unknown> = {},
+): Promise<HandlerResult<ListCommitsResult>> => {
+    if (!owner || !repoName) {
+        return {
+            ok: false,
+            body: { error: 'Owner and repository name are required', status: 400 },
+            status: 400,
+        };
+    }
+
+    try {
+        const result = await listCommits(
+            owner,
+            repoName,
+            parseListCommitsQuery(query),
+        );
         return { ok: true, data: result, status: 200 };
     }
     catch (error) {

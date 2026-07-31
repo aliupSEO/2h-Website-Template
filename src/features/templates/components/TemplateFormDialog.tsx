@@ -218,12 +218,6 @@ export const TemplateFormDialog = ({
                                                 shouldDirty: true,
                                                 shouldValidate: true,
                                             });
-                                            if (!isEdit) {
-                                                setValue('name', repo.name, {
-                                                    shouldDirty: true,
-                                                    shouldValidate: true,
-                                                });
-                                            }
                                         }}
                                     />
                                 )}

@@ -73,7 +73,6 @@ const App = () => {
                             <Route path="/git" element={<GitPage />} />
                             <Route path="/firebase" element={<FirebasePage />} />
                             <Route path="/vercel" element={<VercelPage />} />
-                            <Route path="/env" element={<EnvPage />} />
                             <Route path="/invoices" element={<InvoicesPage />} />
                             <Route path="/profile" element={<ProfilePage />} />
                             <Route path="/settings" element={<SettingsPage />} />
@@ -82,6 +81,7 @@ const App = () => {
                         <Route element={<AdminRoute />}>
                             <Route element={<AppLayout />}>
                                 <Route path="/admin" element={<AdminPage />} />
+                                <Route path="/env" element={<EnvPage />} />
                             </Route>
                         </Route>
                     </Route>

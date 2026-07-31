@@ -1,4 +1,5 @@
-import { PagePlaceholder } from '@/components/common';
+import { EnvVarsView } from '@/features/env';
+
 export const EnvPage = () => {
-    return <PagePlaceholder title="Env"/>;
+    return <EnvVarsView />;
 };

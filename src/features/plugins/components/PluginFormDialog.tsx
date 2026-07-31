@@ -1,7 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FileUp, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
-import { useForm } from 'react-hook-form';
+import {
+    useEffect,
+    useRef,
+    useState,
+    type ChangeEvent,
+    type DragEvent,
+} from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { Loading } from '@/components/common';
 import {
     Button,
@@ -17,11 +23,12 @@ import {
 } from '@/components/ui';
 import { formatFileSize } from '@/features/clients/utils';
 import {
-    PLUGIN_MAX_FILE_BYTES,
     pluginFormSchema,
     type PluginFormSchema,
 } from '@/features/plugins/schemas';
 import type { Plugin } from '@/features/plugins/types';
+import { cn } from '@/lib/utils';
+import { PluginStatusToggle } from './PluginStatusToggle';
 
 export type PluginSubmitValues = PluginFormSchema & {
     file?: File | null;
@@ -46,10 +53,12 @@ export const PluginFormDialog = ({
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [removeExistingFile, setRemoveExistingFile] = useState(false);
     const [fileError, setFileError] = useState<string | null>(null);
+    const [dragging, setDragging] = useState(false);
 
     const {
         register,
         handleSubmit,
+        control,
         reset,
         formState: { errors, isSubmitting },
     } = useForm<PluginFormSchema>({
@@ -57,6 +66,7 @@ export const PluginFormDialog = ({
         defaultValues: {
             name: '',
             description: '',
+            isActive: true,
         },
     });
 
@@ -66,6 +76,7 @@ export const PluginFormDialog = ({
             setSelectedFile(null);
             setRemoveExistingFile(false);
             setFileError(null);
+            setDragging(false);
             return;
         }
 
@@ -73,18 +84,21 @@ export const PluginFormDialog = ({
             reset({
                 name: plugin.name,
                 description: plugin.description ?? '',
+                isActive: plugin.isActive,
             });
         }
         else {
             reset({
                 name: '',
                 description: '',
+                isActive: true,
             });
         }
 
         setSelectedFile(null);
         setRemoveExistingFile(false);
         setFileError(null);
+        setDragging(false);
     }, [open, plugin, reset]);
 
     const hasExistingFile =
@@ -92,20 +106,25 @@ export const PluginFormDialog = ({
     const displayFileName = selectedFile?.name ?? plugin?.fileName ?? null;
     const displayFileSize = selectedFile?.size ?? plugin?.sizeBytes ?? null;
 
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        event.target.value = '';
-
-        if (!file) return;
-
-        if (file.size > PLUGIN_MAX_FILE_BYTES) {
-            setFileError('File must be 50 MB or smaller');
-            return;
-        }
-
+    const applyFile = (file: File) => {
         setSelectedFile(file);
         setRemoveExistingFile(false);
         setFileError(null);
+    };
+
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+        if (!file) return;
+        applyFile(file);
+    };
+
+    const handleDrop = (event: DragEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        setDragging(false);
+        const file = event.dataTransfer.files?.[0];
+        if (!file) return;
+        applyFile(file);
     };
 
     const clearSelectedFile = () => {
@@ -125,11 +144,7 @@ export const PluginFormDialog = ({
             return;
         }
 
-        if (
-            isEdit &&
-            removeExistingFile &&
-            !selectedFile
-        ) {
+        if (isEdit && removeExistingFile && !selectedFile) {
             setFileError('Upload a replacement file or keep the current one');
             return;
         }
@@ -194,39 +209,75 @@ export const PluginFormDialog = ({
                     </FormField>
 
                     <FormField
+                        label="Status"
+                        htmlFor="plugin-status"
+                        required
+                    >
+                        <Controller
+                            control={control}
+                            name="isActive"
+                            render={({ field }) => (
+                                <PluginStatusToggle
+                                    id="plugin-status"
+                                    isActive={field.value}
+                                    onChange={field.onChange}
+                                />
+                            )}
+                        />
+                    </FormField>
+
+                    <FormField
                         label="File"
                         htmlFor="plugin-file"
                         required={!isEdit}
                         error={fileError ?? undefined}
                     >
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between gap-3">
-                                <p className="text-xs text-muted-foreground">
-                                    One file per plugin. Max 50 MB.
-                                </p>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => inputRef.current?.click()}
-                                >
-                                    <FileUp data-icon="inline-start" />
-                                    {displayFileName ? 'Replace file' : 'Upload'}
-                                </Button>
-                                <input
-                                    ref={inputRef}
-                                    id="plugin-file"
-                                    type="file"
-                                    className="hidden"
-                                    onChange={handleFileChange}
-                                />
-                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                One file per plugin. Drag and drop or click to
+                                upload.
+                            </p>
 
-                            {!displayFileName ? (
-                                <p className="rounded-lg bg-muted/60 px-3 py-3 text-xs text-muted-foreground">
-                                    No file uploaded.
-                                </p>
-                            ) : (
+                            <button
+                                type="button"
+                                id="plugin-file"
+                                onClick={() => inputRef.current?.click()}
+                                onDragEnter={(event) => {
+                                    event.preventDefault();
+                                    setDragging(true);
+                                }}
+                                onDragOver={(event) => {
+                                    event.preventDefault();
+                                    setDragging(true);
+                                }}
+                                onDragLeave={(event) => {
+                                    event.preventDefault();
+                                    setDragging(false);
+                                }}
+                                onDrop={handleDrop}
+                                className={cn(
+                                    'flex w-full flex-col items-center justify-center gap-2 rounded-xl bg-muted/50 px-4 py-8 text-center transition-colors',
+                                    dragging
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'text-muted-foreground hover:bg-muted/80',
+                                )}
+                            >
+                                <FileUp className="size-6" />
+                                <span className="text-sm font-medium text-foreground">
+                                    {displayFileName
+                                        ? 'Drop or click to replace file'
+                                        : 'Drop file here or click to upload'}
+                                </span>
+                            </button>
+
+                            <input
+                                ref={inputRef}
+                                type="file"
+                                className="hidden"
+                                onChange={handleFileChange}
+                            />
+
+                            {displayFileName ? (
                                 <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2">
                                     <div className="min-w-0">
                                         <p className="truncate text-sm text-foreground">
@@ -235,7 +286,9 @@ export const PluginFormDialog = ({
                                         {displayFileSize != null ? (
                                             <p className="text-xs text-muted-foreground">
                                                 {formatFileSize(displayFileSize)}
-                                                {hasExistingFile ? ' · current file' : ''}
+                                                {hasExistingFile
+                                                    ? ' · current file'
+                                                    : ''}
                                             </p>
                                         ) : null}
                                     </div>
@@ -249,14 +302,13 @@ export const PluginFormDialog = ({
                                                 clearSelectedFile();
                                                 return;
                                             }
-
                                             removeCurrentFile();
                                         }}
                                     >
                                         <Trash2 />
                                     </Button>
                                 </div>
-                            )}
+                            ) : null}
                         </div>
                     </FormField>
 

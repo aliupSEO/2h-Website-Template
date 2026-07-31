@@ -1,4 +1,4 @@
-import { APP_ROLE_LABELS } from '@/constants/roles';
+import { APP_ROLE_LABELS, canModifyTargetRole, type AppRole } from '@/constants/roles';
 import {
     Button,
     Table,
@@ -14,6 +14,7 @@ import { AccountStatusBadge, AuthStatusBadge } from './UserStatusBadge';
 type UsersTableProps = {
     users: AdminUser[];
     currentUserId: string | undefined;
+    actorRole: AppRole;
     onEdit: (user: AdminUser) => void;
     onSetPassword: (user: AdminUser) => void;
     onSendReset: (user: AdminUser) => void;
@@ -30,6 +31,7 @@ const formatDate = (value: string | null) => {
 export const UsersTable = ({
     users,
     currentUserId,
+    actorRole,
     onEdit,
     onSetPassword,
     onSendReset,
@@ -51,6 +53,8 @@ export const UsersTable = ({
                 <TableBody>
                     {users.map((user) => {
                         const isSelf = user.id === currentUserId;
+                        const canModify =
+                            isSelf || canModifyTargetRole(actorRole, user.role);
 
                         return (
                             <TableRow key={user.id} className="border-white/5">
@@ -58,36 +62,46 @@ export const UsersTable = ({
                                     {user.fullName ?? '—'}
                                 </TableCell>
                                 <TableCell>{user.email}</TableCell>
-                                <TableCell>{APP_ROLE_LABELS[user.role]}</TableCell>
+                                <TableCell>
+                                    {APP_ROLE_LABELS[user.role]}
+                                </TableCell>
                                 <TableCell>
                                     <AccountStatusBadge user={user} />
                                 </TableCell>
                                 <TableCell>
                                     <AuthStatusBadge user={user} />
                                 </TableCell>
-                                <TableCell>{formatDate(user.lastSignInAt)}</TableCell>
+                                <TableCell>
+                                    {formatDate(user.lastSignInAt)}
+                                </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => onEdit(user)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        {!isSelf ? (
+                                        {canModify ? (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => onEdit(user)}
+                                            >
+                                                Edit
+                                            </Button>
+                                        ) : null}
+                                        {!isSelf && canModify ? (
                                             <>
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    onClick={() => onSetPassword(user)}
+                                                    onClick={() =>
+                                                        onSetPassword(user)
+                                                    }
                                                 >
                                                     Set password
                                                 </Button>
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    onClick={() => onSendReset(user)}
+                                                    onClick={() =>
+                                                        onSendReset(user)
+                                                    }
                                                 >
                                                     Send reset
                                                 </Button>

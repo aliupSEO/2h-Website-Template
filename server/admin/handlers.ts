@@ -7,7 +7,11 @@ import {
 } from '../email/client.js';
 import { getAppUrl } from '../email/env.js';
 import { getSupabaseAdminClient } from '../supabase/admin-client.js';
-import { requireAdmin } from './auth.js';
+import {
+    assertCanAssignRole,
+    assertCanModifyTarget,
+    requireAdmin,
+} from './auth.js';
 import type {
     AdminApiErrorBody,
     AdminSetPasswordInput,
@@ -225,6 +229,15 @@ export const handleInviteUser = async (
             };
         }
 
+        const assignError = assertCanAssignRole(auth.admin.role, parsed.role);
+        if (assignError) {
+            return {
+                ok: false,
+                body: { error: assignError, status: 403 },
+                status: 403,
+            };
+        }
+
         const admin = getSupabaseAdminClient();
         const existing = await findAuthUserByEmail(parsed.email);
         const resent = Boolean(existing);
@@ -337,16 +350,58 @@ export const handleUpdateUser = async (
                     status: 400,
                 };
             }
-            if (parsed.role && parsed.role !== 'admin') {
+            if (parsed.role && parsed.role !== auth.admin.role) {
                 return {
                     ok: false,
-                    body: { error: 'You cannot change your own admin role', status: 400 },
+                    body: { error: 'You cannot change your own role', status: 400 },
                     status: 400,
                 };
             }
         }
 
         const admin = getSupabaseAdminClient();
+
+        const { data: existingTarget, error: targetError } = await admin
+            .from('profiles')
+            .select('role')
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (targetError) throw targetError;
+        if (!existingTarget) {
+            return {
+                ok: false,
+                body: { error: 'User not found', status: 404 },
+                status: 404,
+            };
+        }
+
+        const modifyError = assertCanModifyTarget(
+            auth.admin.role,
+            existingTarget.role as AppRole,
+        );
+        if (modifyError && userId !== auth.admin.userId) {
+            return {
+                ok: false,
+                body: { error: modifyError, status: 403 },
+                status: 403,
+            };
+        }
+
+        if (parsed.role !== undefined) {
+            const assignError = assertCanAssignRole(
+                auth.admin.role,
+                parsed.role,
+            );
+            if (assignError) {
+                return {
+                    ok: false,
+                    body: { error: assignError, status: 403 },
+                    status: 403,
+                };
+            }
+        }
+
         const updates: {
             full_name?: string;
             role?: AppRole;
@@ -437,7 +492,7 @@ export const handleAdminSetPassword = async (
         const admin = getSupabaseAdminClient();
         const { data: profile, error: profileError } = await admin
             .from('profiles')
-            .select('email, full_name')
+            .select('email, full_name, role')
             .eq('id', userId)
             .maybeSingle();
 
@@ -447,6 +502,18 @@ export const handleAdminSetPassword = async (
                 ok: false,
                 body: { error: 'User not found', status: 404 },
                 status: 404,
+            };
+        }
+
+        const modifyError = assertCanModifyTarget(
+            auth.admin.role,
+            profile.role as AppRole,
+        );
+        if (modifyError) {
+            return {
+                ok: false,
+                body: { error: modifyError, status: 403 },
+                status: 403,
             };
         }
 
@@ -492,7 +559,7 @@ export const handleAdminSendPasswordReset = async (
         const admin = getSupabaseAdminClient();
         const { data: profile, error: profileError } = await admin
             .from('profiles')
-            .select('email, full_name')
+            .select('email, full_name, role')
             .eq('id', userId)
             .maybeSingle();
 
@@ -502,6 +569,18 @@ export const handleAdminSendPasswordReset = async (
                 ok: false,
                 body: { error: 'User not found', status: 404 },
                 status: 404,
+            };
+        }
+
+        const modifyError = assertCanModifyTarget(
+            auth.admin.role,
+            profile.role as AppRole,
+        );
+        if (modifyError) {
+            return {
+                ok: false,
+                body: { error: modifyError, status: 403 },
+                status: 403,
             };
         }
 

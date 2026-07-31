@@ -10,8 +10,7 @@ export const pluginFormSchema = z.object({
         .max(2000, 'Description is too long')
         .optional()
         .or(z.literal('')),
+    isActive: z.boolean(),
 });
 
 export type PluginFormSchema = z.infer<typeof pluginFormSchema>;
-
-export const PLUGIN_MAX_FILE_BYTES = 52_428_800;

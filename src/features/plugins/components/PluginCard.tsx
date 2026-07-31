@@ -16,12 +16,14 @@ import {
 } from '@/components/ui';
 import type { Plugin } from '@/features/plugins/types';
 import { cn } from '@/lib/utils';
+import { PluginStatusToggle } from './PluginStatusToggle';
 
 type PluginCardProps = {
     plugin: Plugin;
     onEdit: (plugin: Plugin) => void;
     onDelete: (plugin: Plugin) => void;
     onDownload: (plugin: Plugin) => Promise<void>;
+    onToggleActive: (plugin: Plugin, isActive: boolean) => Promise<void>;
 };
 
 export const PluginCard = ({
@@ -29,8 +31,10 @@ export const PluginCard = ({
     onEdit,
     onDelete,
     onDownload,
+    onToggleActive,
 }: PluginCardProps) => {
     const [downloading, setDownloading] = useState(false);
+    const [toggling, setToggling] = useState(false);
 
     const handleDownload = async () => {
         setDownloading(true);
@@ -42,6 +46,17 @@ export const PluginCard = ({
         }
     };
 
+    const handleToggle = async (isActive: boolean) => {
+        if (isActive === plugin.isActive) return;
+        setToggling(true);
+        try {
+            await onToggleActive(plugin, isActive);
+        }
+        finally {
+            setToggling(false);
+        }
+    };
+
     return (
         <article
             className={cn(
@@ -50,6 +65,7 @@ export const PluginCard = ({
                 'transition-[box-shadow,ring-color,background-color] duration-300 ease-out',
                 'hover:bg-[#323232] hover:ring-primary/40',
                 'hover:shadow-[0_0_0_1px_rgba(198,245,50,0.1),0_12px_40px_rgba(0,0,0,0.45)]',
+                !plugin.isActive && 'opacity-70',
             )}
         >
             <span
@@ -58,7 +74,17 @@ export const PluginCard = ({
             />
 
             <div className="relative flex flex-1 flex-col p-5">
-                <div className="mb-4 flex items-start justify-end gap-3">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                    <span
+                        className={cn(
+                            'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium',
+                            plugin.isActive
+                                ? 'bg-primary/10 text-primary'
+                                : 'bg-destructive/10 text-destructive',
+                        )}
+                    >
+                        {plugin.isActive ? 'Active' : 'Inactive'}
+                    </span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
@@ -98,6 +124,14 @@ export const PluginCard = ({
                 <h3 className="font-heading text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 ease-out group-hover/plugin:text-primary">
                     {plugin.name}
                 </h3>
+
+                <div className="mt-4">
+                    <PluginStatusToggle
+                        isActive={plugin.isActive}
+                        disabled={toggling}
+                        onChange={(isActive) => void handleToggle(isActive)}
+                    />
+                </div>
             </div>
 
             <div className="relative flex flex-wrap items-center gap-2 border-t border-white/[0.06] bg-black/35 p-3.5 transition-colors duration-300 ease-out group-hover/plugin:border-primary/15 group-hover/plugin:bg-black/50">
@@ -106,7 +140,7 @@ export const PluginCard = ({
                     size="sm"
                     variant="brand"
                     className="h-10 min-w-0 flex-1 rounded-md"
-                    disabled={!plugin.storagePath || downloading}
+                    disabled={!plugin.storagePath || downloading || !plugin.isActive}
                     onClick={() => void handleDownload()}
                 >
                     {downloading ? (

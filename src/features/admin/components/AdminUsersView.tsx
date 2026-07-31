@@ -192,6 +192,7 @@ export const AdminUsersView = () => {
                     <UsersTable
                         users={filteredUsers}
                         currentUserId={currentUser?.id}
+                        actorRole={currentUser?.role ?? 'user'}
                         onEdit={setEditingUser}
                         onSetPassword={setPasswordUser}
                         onSendReset={setResetUser}
@@ -201,6 +202,7 @@ export const AdminUsersView = () => {
 
             <InviteUserDialog
                 open={inviteOpen}
+                actorRole={currentUser?.role ?? 'user'}
                 onOpenChange={setInviteOpen}
                 onSubmit={handleInvite}
             />
@@ -209,6 +211,7 @@ export const AdminUsersView = () => {
                 open={Boolean(editingUser)}
                 user={editingUser}
                 currentUserId={currentUser?.id}
+                actorRole={currentUser?.role ?? 'user'}
                 onOpenChange={(open) => {
                     if (!open) setEditingUser(null);
                 }}

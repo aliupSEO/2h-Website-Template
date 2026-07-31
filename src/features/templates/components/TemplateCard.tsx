@@ -32,7 +32,6 @@ export const TemplateCard = ({
     onDelete,
 }: TemplateCardProps) => {
     const [copied, setCopied] = useState(false);
-    const [owner, repo] = template.gitRepository.split('/');
 
     const copyUrl = async () => {
         try {
@@ -100,16 +99,18 @@ export const TemplateCard = ({
                     </DropdownMenu>
                 </div>
 
-                <p className="text-[11px] font-semibold tracking-[0.16em] text-primary uppercase">
-                    {owner}
-                </p>
-                <h3 className="mt-1 font-heading text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 ease-out group-hover/template:text-primary">
+                <h3 className="font-heading text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 ease-out group-hover/template:text-primary">
                     {template.name}
                 </h3>
 
-                <p className="mt-3 truncate text-sm text-foreground/70">
-                    {repo ?? template.gitRepository}
-                </p>
+                <div className="mt-3 space-y-1">
+                    <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                        Repo
+                    </p>
+                    <p className="truncate text-sm text-foreground/70">
+                        {template.gitRepository}
+                    </p>
+                </div>
 
                 <p className="mt-2 line-clamp-2 min-h-10 break-all text-xs text-muted-foreground">
                     {template.url}

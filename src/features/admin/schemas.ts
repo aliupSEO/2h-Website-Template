@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { APP_ROLES } from '@/constants/roles';
+import {
+    APP_ROLE_LABELS,
+    APP_ROLES,
+    assignableRolesFor,
+    type AppRole,
+} from '@/constants/roles';
 
 export const inviteUserSchema = z.object({
     fullName: z
@@ -38,12 +43,15 @@ export const adminSetPasswordSchema = z
     });
 export type AdminSetPasswordSchema = z.infer<typeof adminSetPasswordSchema>;
 
+export const roleOptionsForActor = (actor: AppRole) => {
+    return assignableRolesFor(actor).map((role) => ({
+        value: role,
+        label: APP_ROLE_LABELS[role],
+    }));
+};
+
+/** @deprecated Prefer roleOptionsForActor(actorRole) */
 export const ADMIN_ROLE_OPTIONS = APP_ROLES.map((role) => ({
     value: role,
-    label:
-        role === 'admin'
-            ? 'Admin'
-            : role === 'manager'
-              ? 'Manager'
-              : 'User',
+    label: APP_ROLE_LABELS[role],
 }));

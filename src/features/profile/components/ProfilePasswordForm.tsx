@@ -1,8 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Loading } from '@/components/common';
-import { Button, FormField, Input } from '@/components/ui';
+import { Button, FormField, PasswordInput } from '@/components/ui';
 import { toast } from '@/lib/toast';
+import { profileService } from '@/services/profileService';
+import { useAuthStore } from '@/stores/authStore';
 import {
     profilePasswordSchema,
     type ProfilePasswordSchema,
@@ -12,6 +14,8 @@ const FIELD_CLASS =
     'h-12 rounded-md bg-field px-4 text-base text-foreground ring-1 ring-white/15 placeholder:text-foreground/40 transition-[box-shadow,ring-color,background-color] duration-200 hover:ring-primary/35 hover:bg-[#303030] aria-invalid:bg-field';
 
 export const ProfilePasswordForm = () => {
+    const email = useAuthStore((state) => state.user?.email);
+
     const {
         register,
         handleSubmit,
@@ -26,10 +30,29 @@ export const ProfilePasswordForm = () => {
         },
     });
 
-    const onSubmit = async (_values: ProfilePasswordSchema) => {
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        reset();
-        toast.success('Password updated');
+    const onSubmit = async (values: ProfilePasswordSchema) => {
+        if (!email) {
+            toast.error('Not signed in');
+            return;
+        }
+
+        try {
+            await profileService.updatePassword({
+                email,
+                currentPassword: values.currentPassword,
+                newPassword: values.newPassword,
+            });
+            reset();
+            toast.success('Password updated');
+        }
+        catch (error) {
+            toast.error(
+                error instanceof Error
+                    ? error.message
+                    : 'Could not update password',
+            );
+            throw error;
+        }
     };
 
     return (
@@ -53,9 +76,8 @@ export const ProfilePasswordForm = () => {
                 required
                 error={errors.currentPassword?.message}
             >
-                <Input
+                <PasswordInput
                     id="profile-current-password"
-                    type="password"
                     autoComplete="current-password"
                     placeholder="••••••••"
                     className={FIELD_CLASS}
@@ -71,9 +93,8 @@ export const ProfilePasswordForm = () => {
                     required
                     error={errors.newPassword?.message}
                 >
-                    <Input
+                    <PasswordInput
                         id="profile-new-password"
-                        type="password"
                         autoComplete="new-password"
                         placeholder="••••••••"
                         className={FIELD_CLASS}
@@ -88,9 +109,8 @@ export const ProfilePasswordForm = () => {
                     required
                     error={errors.confirmPassword?.message}
                 >
-                    <Input
+                    <PasswordInput
                         id="profile-confirm-password"
-                        type="password"
                         autoComplete="new-password"
                         placeholder="••••••••"
                         className={FIELD_CLASS}

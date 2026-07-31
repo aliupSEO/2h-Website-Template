@@ -1,13 +1,18 @@
 import { getGitHubEnv } from './env.js';
 import type {
     CreateRepoInput,
+    GitHubBranchDto,
+    GitHubCommitDto,
     GitHubRepoDto,
+    ListCommitsQuery,
+    ListCommitsResult,
     ListReposQuery,
     ListReposResult,
     UpdateRepoInput,
 } from './types.js';
 
 export const DEFAULT_REPOS_PER_PAGE = 50;
+export const DEFAULT_COMMITS_PER_PAGE = 30;
 
 const GITHUB_API = 'https://api.github.com';
 const API_VERSION = '2022-11-28';
@@ -25,6 +30,29 @@ type GitHubRepoRaw = {
     owner: { login: string };
 };
 
+type GitHubBranchRaw = {
+    name: string;
+    commit: { sha: string };
+    protected: boolean;
+};
+
+type GitHubCommitRaw = {
+    sha: string;
+    html_url: string;
+    commit: {
+        message: string;
+        author: {
+            name: string | null;
+            date: string;
+        } | null;
+        committer: {
+            name: string | null;
+            date: string;
+        } | null;
+    };
+    author: { login: string } | null;
+};
+
 const mapRepo = (repo: GitHubRepoRaw): GitHubRepoDto => ({
     id: repo.id,
     name: repo.name,
@@ -37,6 +65,33 @@ const mapRepo = (repo: GitHubRepoRaw): GitHubRepoDto => ({
     defaultBranch: repo.default_branch,
     updatedAt: repo.updated_at,
 });
+
+const mapBranch = (branch: GitHubBranchRaw): GitHubBranchDto => ({
+    name: branch.name,
+    sha: branch.commit.sha,
+    protected: branch.protected,
+});
+
+const mapCommit = (commit: GitHubCommitRaw): GitHubCommitDto => {
+    const message = commit.commit.message.split('\n')[0]?.trim() || 'Commit';
+    const authorName =
+        commit.commit.author?.name?.trim() ||
+        commit.author?.login ||
+        commit.commit.committer?.name?.trim() ||
+        'Unknown';
+    const authorDate =
+        commit.commit.author?.date ||
+        commit.commit.committer?.date ||
+        new Date().toISOString();
+
+    return {
+        sha: commit.sha,
+        message,
+        authorName,
+        authorDate,
+        htmlUrl: commit.html_url,
+    };
+};
 
 const githubFetch = async <T>(
     path: string,
@@ -80,7 +135,10 @@ export const listRepos = async (
 ): Promise<ListReposResult> => {
     const { org } = getGitHubEnv();
     const page = Math.max(1, query.page ?? 1);
-    const perPage = Math.min(100, Math.max(1, query.perPage ?? DEFAULT_REPOS_PER_PAGE));
+    const perPage = Math.min(
+        100,
+        Math.max(1, query.perPage ?? DEFAULT_REPOS_PER_PAGE),
+    );
     const params = new URLSearchParams({
         page: String(page),
         per_page: String(perPage),
@@ -97,6 +155,46 @@ export const listRepos = async (
         page,
         perPage,
         hasNextPage: repos.length === perPage,
+    };
+};
+
+export const listBranches = async (
+    owner: string,
+    repoName: string,
+): Promise<GitHubBranchDto[]> => {
+    const branches = await githubFetch<GitHubBranchRaw[]>(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/branches?per_page=100`,
+    );
+    return branches.map(mapBranch);
+};
+
+export const listCommits = async (
+    owner: string,
+    repoName: string,
+    query: ListCommitsQuery = {},
+): Promise<ListCommitsResult> => {
+    const page = Math.max(1, query.page ?? 1);
+    const perPage = Math.min(
+        100,
+        Math.max(1, query.perPage ?? DEFAULT_COMMITS_PER_PAGE),
+    );
+    const params = new URLSearchParams({
+        page: String(page),
+        per_page: String(perPage),
+    });
+    if (query.sha?.trim()) {
+        params.set('sha', query.sha.trim());
+    }
+
+    const commits = await githubFetch<GitHubCommitRaw[]>(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?${params}`,
+    );
+
+    return {
+        commits: commits.map(mapCommit),
+        page,
+        perPage,
+        hasNextPage: commits.length === perPage,
     };
 };
 

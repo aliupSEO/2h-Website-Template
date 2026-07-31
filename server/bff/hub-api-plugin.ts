@@ -2,12 +2,15 @@ import type { Plugin } from 'vite';
 import {
     isAdminApiPath,
     isAuthApiPath,
+    isEnvApiPath,
     isFirebaseApiPath,
     isGitHubApiPath,
     isVercelApiPath,
     isVercelWebhookPath,
     parseAdminUserPasswordPath,
     parseAdminUserPath,
+    parseEnvRevealPath,
+    parseEnvVarPath,
     parseFirebaseAppConfigPath,
     parseFirebaseAppPath,
     parseFirebaseAppsPath,
@@ -19,6 +22,8 @@ import {
     parseFirebaseStorageEnablePath,
     parseFirebaseWebAppsPath,
     parseGitHubRepoPath,
+    parseGitHubRepoBranchesPath,
+    parseGitHubRepoCommitsPath,
     parseVercelEnvPath,
     parseVercelProjectDeploymentsPath,
     parseVercelRedeployPath,
@@ -45,6 +50,8 @@ import {
 import {
     handleCreateRepo,
     handleDeleteRepo,
+    handleListBranches,
+    handleListCommits,
     handleListRepos,
     handleUpdateRepo,
 } from '../github/handlers.js';
@@ -72,6 +79,14 @@ import {
     handleListUsers,
     handleUpdateUser,
 } from '../admin/handlers.js';
+import {
+    handleDeleteEnvVar as handleDeleteHubEnvVar,
+    handleImportEnvFile,
+    handleListEnvVars as handleListHubEnvVars,
+    handleRevealEnvVar,
+    handleUpdateEnvVar as handleUpdateHubEnvVar,
+    handleUpsertEnvVar as handleUpsertHubEnvVar,
+} from '../env/handlers.js';
 
 const readRawBody = async (req: import('node:http').IncomingMessage) => {
     const chunks: Buffer[] = [];
@@ -108,7 +123,8 @@ export const hubApiPlugin = (): Plugin => {
                     !isVercelWebhookPath(pathname) &&
                     !isFirebaseApiPath(pathname) &&
                     !isAdminApiPath(pathname) &&
-                    !isAuthApiPath(pathname)
+                    !isAuthApiPath(pathname) &&
+                    !isEnvApiPath(pathname)
                 ) {
                     next();
                     return;
@@ -138,6 +154,8 @@ export const hubApiPlugin = (): Plugin => {
                     }
 
                     if (isGitHubApiPath(pathname)) {
+                        const branchesPath = parseGitHubRepoBranchesPath(pathname);
+                        const commitsPath = parseGitHubRepoCommitsPath(pathname);
                         const repoPath = parseGitHubRepoPath(pathname);
 
                         if (
@@ -167,6 +185,36 @@ export const hubApiPlugin = (): Plugin => {
                                 );
                                 return;
                             }
+                        }
+
+                        if (branchesPath && req.method === 'GET') {
+                            const result = await handleListBranches(
+                                branchesPath.owner,
+                                branchesPath.repo,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        if (commitsPath && req.method === 'GET') {
+                            const query = Object.fromEntries(
+                                requestUrl.searchParams.entries(),
+                            );
+                            const result = await handleListCommits(
+                                commitsPath.owner,
+                                commitsPath.repo,
+                                query,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
                         }
 
                         if (repoPath) {
@@ -602,6 +650,104 @@ export const hubApiPlugin = (): Plugin => {
                                 result.ok ? result.data : result.body,
                             );
                             return;
+                        }
+                    }
+
+                    if (isEnvApiPath(pathname)) {
+                        const authorization = req.headers.authorization;
+                        const envVarPath = parseEnvVarPath(pathname);
+                        const envRevealPath = parseEnvRevealPath(pathname);
+
+                        if (
+                            pathname === '/api/env/vars' ||
+                            pathname === '/api/env/vars/'
+                        ) {
+                            if (req.method === 'GET') {
+                                const result =
+                                    await handleListHubEnvVars(authorization);
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+
+                            if (req.method === 'POST') {
+                                const body = await readBody(req);
+                                const result = await handleUpsertHubEnvVar(
+                                    authorization,
+                                    body,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        if (
+                            pathname === '/api/env/import' ||
+                            pathname === '/api/env/import/'
+                        ) {
+                            if (req.method === 'POST') {
+                                const body = await readBody(req);
+                                const result = await handleImportEnvFile(
+                                    authorization,
+                                    body,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+                        }
+
+                        if (envRevealPath && req.method === 'POST') {
+                            const result = await handleRevealEnvVar(
+                                authorization,
+                                envRevealPath.id,
+                            );
+                            sendJson(
+                                res,
+                                result.status,
+                                result.ok ? result.data : result.body,
+                            );
+                            return;
+                        }
+
+                        if (envVarPath) {
+                            if (req.method === 'PATCH') {
+                                const body = await readBody(req);
+                                const result = await handleUpdateHubEnvVar(
+                                    authorization,
+                                    envVarPath.id,
+                                    body,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
+
+                            if (req.method === 'DELETE') {
+                                const result = await handleDeleteHubEnvVar(
+                                    authorization,
+                                    envVarPath.id,
+                                );
+                                sendJson(
+                                    res,
+                                    result.status,
+                                    result.ok ? result.data : result.body,
+                                );
+                                return;
+                            }
                         }
                     }
 

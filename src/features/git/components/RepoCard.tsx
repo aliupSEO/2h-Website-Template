@@ -21,12 +21,14 @@ type RepoCardProps = {
     repo: GitRepo;
     onEdit: (repo: GitRepo) => void;
     onDelete: (repo: GitRepo) => void;
+    onViewBranches: (repo: GitRepo) => void;
 };
 
 export const RepoCard = ({
     repo,
     onEdit,
     onDelete,
+    onViewBranches,
 }: RepoCardProps) => {
     const description = repo.description?.trim();
     const [copied, setCopied] = useState(false);
@@ -65,6 +67,7 @@ export const RepoCard = ({
                         repo={repo}
                         onEdit={onEdit}
                         onDelete={onDelete}
+                        onViewBranches={onViewBranches}
                     />
                 </div>
 
@@ -122,6 +125,16 @@ export const RepoCard = ({
                         <ExternalLink data-icon="inline-start" />
                         Open on GitHub
                     </a>
+                </Button>
+                <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-10 rounded-md border-0 border-transparent ring-1 ring-inset ring-white/12 transition-[background-color,color,box-shadow,ring-color] duration-200 ease-out hover:bg-primary hover:text-black hover:shadow-[0_0_18px_rgba(198,245,50,0.25)] hover:ring-primary active:scale-[0.98]"
+                    aria-label={`View branches for ${repo.fullName}`}
+                    onClick={() => onViewBranches(repo)}
+                >
+                    <GitBranch className="size-4" />
                 </Button>
                 <Button
                     type="button"

@@ -16,6 +16,7 @@ export const PluginsView = () => {
     const fetchPlugins = usePluginsStore((state) => state.fetchPlugins);
     const createPlugin = usePluginsStore((state) => state.createPlugin);
     const updatePlugin = usePluginsStore((state) => state.updatePlugin);
+    const setPluginActive = usePluginsStore((state) => state.setPluginActive);
     const deletePlugin = usePluginsStore((state) => state.deletePlugin);
     const getDownloadUrl = usePluginsStore((state) => state.getDownloadUrl);
 
@@ -75,6 +76,21 @@ export const PluginsView = () => {
                     : 'Could not delete plugin',
             );
             throw deleteError;
+        }
+    };
+
+    const handleToggleActive = async (plugin: Plugin, isActive: boolean) => {
+        try {
+            await setPluginActive(plugin.id, isActive);
+            toast.success(isActive ? 'Plugin activated' : 'Plugin deactivated');
+        }
+        catch (toggleError) {
+            toast.error(
+                toggleError instanceof Error
+                    ? toggleError.message
+                    : 'Could not update plugin status',
+            );
+            throw toggleError;
         }
     };
 
@@ -148,6 +164,7 @@ export const PluginsView = () => {
                         }}
                         onDelete={setPendingDelete}
                         onDownload={handleDownload}
+                        onToggleActive={handleToggleActive}
                     />
                 )}
             </div>

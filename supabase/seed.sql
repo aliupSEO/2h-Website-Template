@@ -37,7 +37,7 @@ begin
       now(),
       now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
-      '{"full_name":"Ali Haider","role":"admin"}'::jsonb,
+      '{"full_name":"Ali Haider","role":"super_admin"}'::jsonb,
       now(),
       now(),
       '',
@@ -71,7 +71,7 @@ begin
   update public.profiles
   set
     full_name = 'Ali Haider',
-    role = 'admin',
+    role = 'super_admin',
     is_active = true
   where email = admin_email;
 end $$;

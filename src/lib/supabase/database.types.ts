@@ -5,7 +5,7 @@
 export type Json = string | number | boolean | null | {
     [key: string]: Json | undefined;
 } | Json[];
-export type AppRole = 'admin' | 'manager' | 'user';
+export type AppRole = 'super_admin' | 'admin' | 'manager' | 'user';
 export type ClientStatus = 'active' | 'inactive' | 'draft';
 export type ClientFileKind = 'logo' | 'asset' | 'document';
 export type TemplateCategory = 'websites' | 'apps';
@@ -190,6 +190,7 @@ export type Database = {
                     id: string;
                     name: string;
                     description: string | null;
+                    is_active: boolean;
                     file_name: string | null;
                     mime_type: string | null;
                     size_bytes: number | null;
@@ -203,6 +204,7 @@ export type Database = {
                     id?: string;
                     name: string;
                     description?: string | null;
+                    is_active?: boolean;
                     file_name?: string | null;
                     mime_type?: string | null;
                     size_bytes?: number | null;
@@ -216,10 +218,48 @@ export type Database = {
                     id?: string;
                     name?: string;
                     description?: string | null;
+                    is_active?: boolean;
                     file_name?: string | null;
                     mime_type?: string | null;
                     size_bytes?: number | null;
                     storage_path?: string | null;
+                    created_by?: string | null;
+                    updated_by?: string | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                ];
+            };
+            hub_env_vars: {
+                Row: {
+                    id: string;
+                    key: string;
+                    value_ciphertext: string;
+                    value_iv: string;
+                    value_tag: string;
+                    created_by: string | null;
+                    updated_by: string | null;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    key: string;
+                    value_ciphertext: string;
+                    value_iv: string;
+                    value_tag: string;
+                    created_by?: string | null;
+                    updated_by?: string | null;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    key?: string;
+                    value_ciphertext?: string;
+                    value_iv?: string;
+                    value_tag?: string;
                     created_by?: string | null;
                     updated_by?: string | null;
                     created_at?: string;

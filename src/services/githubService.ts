@@ -1,5 +1,7 @@
 import type {
     CreateRepoInput,
+    GitBranch,
+    GitCommitListResult,
     GitRepo,
     GitRepoListResult,
     UpdateRepoInput,
@@ -71,5 +73,25 @@ export const githubService = {
         await request<{ deleted: true }>(apiEndpoints.github.repo(owner, name), {
             method: 'DELETE',
         });
+    },
+
+    listBranches: async (
+        owner: string,
+        name: string,
+    ): Promise<GitBranch[]> => {
+        const data = await request<{ branches: GitBranch[] }>(
+            apiEndpoints.github.repoBranches(owner, name),
+        );
+        return data.branches;
+    },
+
+    listCommits: async (
+        owner: string,
+        name: string,
+        params?: { sha?: string; page?: number; perPage?: number },
+    ): Promise<GitCommitListResult> => {
+        return request<GitCommitListResult>(
+            apiEndpoints.github.repoCommits(owner, name, params),
+        );
     },
 };

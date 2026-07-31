@@ -18,7 +18,7 @@ export const AppSidebar = () => {
     const navGroups = APP_NAV_GROUPS.map((group) => ({
         ...group,
         items: group.items.filter((item) => {
-            if (item.to !== '/admin') return true;
+            if (item.to !== '/admin' && item.to !== '/env') return true;
             return user ? canManageProfiles(user.role) : false;
         }),
     })).filter((group) => group.items.length > 0);

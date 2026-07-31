@@ -4,7 +4,6 @@ import {
     buildPluginStoragePath,
     HUB_PLUGINS_BUCKET,
 } from '@/lib/supabase/storage';
-import { PLUGIN_MAX_FILE_BYTES } from '@/features/plugins/schemas';
 import type { Plugin, PluginInput } from '@/features/plugins/types';
 
 type PluginRow = Database['public']['Tables']['plugins']['Row'];
@@ -13,6 +12,7 @@ const mapPlugin = (row: PluginRow): Plugin => ({
     id: row.id,
     name: row.name,
     description: row.description,
+    isActive: row.is_active,
     fileName: row.file_name,
     mimeType: row.mime_type,
     sizeBytes: row.size_bytes,
@@ -38,10 +38,6 @@ const removeStorageObject = async (path: string | null | undefined) => {
 };
 
 const uploadPluginFile = async (pluginId: string, file: File) => {
-    if (file.size > PLUGIN_MAX_FILE_BYTES) {
-        throw new Error('File must be 50 MB or smaller');
-    }
-
     const storagePath = buildPluginStoragePath(pluginId, file.name);
     const { error } = await getSupabaseClient()
         .storage
@@ -90,6 +86,7 @@ export const pluginsService = {
                 id,
                 name: input.name.trim(),
                 description: normalizeDescription(input.description),
+                is_active: input.isActive ?? true,
                 file_name: fileMeta.fileName,
                 mime_type: fileMeta.mimeType,
                 size_bytes: fileMeta.sizeBytes,
@@ -162,7 +159,29 @@ export const pluginsService = {
             .update({
                 name: input.name.trim(),
                 description: normalizeDescription(input.description),
+                ...(input.isActive !== undefined
+                    ? { is_active: input.isActive }
+                    : {}),
                 ...filePatch,
+                updated_by: user?.id ?? null,
+            })
+            .eq('id', id)
+            .select('*')
+            .single();
+
+        if (error) throw error;
+        return mapPlugin(data);
+    },
+
+    setActive: async (id: string, isActive: boolean): Promise<Plugin> => {
+        const {
+            data: { user },
+        } = await getSupabaseClient().auth.getUser();
+
+        const { data, error } = await getSupabaseClient()
+            .from('plugins')
+            .update({
+                is_active: isActive,
                 updated_by: user?.id ?? null,
             })
             .eq('id', id)

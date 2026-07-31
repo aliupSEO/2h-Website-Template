@@ -1,6 +1,7 @@
 import {
     Copy,
     ExternalLink,
+    GitBranch,
     MoreHorizontal,
     Pencil,
     Trash2,
@@ -21,6 +22,7 @@ type RepoRowActionsProps = {
     repo: GitRepo;
     onEdit: (repo: GitRepo) => void;
     onDelete: (repo: GitRepo) => void;
+    onViewBranches: (repo: GitRepo) => void;
     /** Show open + copy as quick icon buttons (table view). */
     dense?: boolean;
 };
@@ -29,6 +31,7 @@ export const RepoRowActions = ({
     repo,
     onEdit,
     onDelete,
+    onViewBranches,
     dense = false,
 }: RepoRowActionsProps) => {
     const copyCloneUrl = async () => {
@@ -95,6 +98,13 @@ export const RepoRowActions = ({
                     align="end"
                     className="w-48 border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.55)]"
                 >
+                    <DropdownMenuItem
+                        className="cursor-pointer gap-2"
+                        onClick={() => onViewBranches(repo)}
+                    >
+                        <GitBranch className="size-4" />
+                        Branches
+                    </DropdownMenuItem>
                     {!dense ? (
                         <DropdownMenuItem
                             className="cursor-pointer gap-2"

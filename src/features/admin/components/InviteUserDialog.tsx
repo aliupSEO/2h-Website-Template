@@ -19,22 +19,28 @@ import {
     SelectValue,
 } from '@/components/ui';
 import {
-    ADMIN_ROLE_OPTIONS,
+    roleOptionsForActor,
     inviteUserSchema,
     type InviteUserSchema,
 } from '@/features/admin/schemas';
+import type { AppRole } from '@/constants/roles';
 
 type InviteUserDialogProps = {
     open: boolean;
+    actorRole: AppRole;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: InviteUserSchema) => Promise<void>;
 };
 
 export const InviteUserDialog = ({
     open,
+    actorRole,
     onOpenChange,
     onSubmit,
 }: InviteUserDialogProps) => {
+    const roleOptions = roleOptionsForActor(actorRole);
+    const defaultRole = roleOptions[0]?.value ?? 'user';
+
     const {
         register,
         handleSubmit,
@@ -46,13 +52,19 @@ export const InviteUserDialog = ({
         defaultValues: {
             fullName: '',
             email: '',
-            role: 'user',
+            role: defaultRole,
         },
     });
 
     useEffect(() => {
-        if (!open) reset();
-    }, [open, reset]);
+        if (!open) {
+            reset({
+                fullName: '',
+                email: '',
+                role: defaultRole,
+            });
+        }
+    }, [open, reset, defaultRole]);
 
     const submit = handleSubmit(async (values) => {
         await onSubmit(values);
@@ -126,7 +138,7 @@ export const InviteUserDialog = ({
                                         <SelectValue placeholder="Select role" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {ADMIN_ROLE_OPTIONS.map((option) => (
+                                        {roleOptions.map((option) => (
                                             <SelectItem
                                                 key={option.value}
                                                 value={option.value}
