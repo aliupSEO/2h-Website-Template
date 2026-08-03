@@ -1,6 +1,7 @@
 import { LayoutGrid, List, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui';
+import { SegmentedControl } from '@/features/git/components/SegmentedControl';
 import type { ClientStatus, ClientsViewMode } from '@/features/clients/types';
 import { CLIENT_STATUSES } from '@/features/clients/schemas';
 import { cn } from '@/lib/utils';
@@ -13,12 +14,18 @@ type ClientsToolbarProps = {
 export const ClientsToolbar = ({ viewMode, onViewModeChange, statusFilter, onStatusFilterChange, }: ClientsToolbarProps) => {
     return (<div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" size="sm" variant={statusFilter === 'all' ? 'brand' : 'outline'} onClick={() => onStatusFilterChange('all')}>
-          All
-        </Button>
-        {CLIENT_STATUSES.map((status) => (<Button key={status.value} type="button" size="sm" variant={statusFilter === status.value ? 'brand' : 'outline'} onClick={() => onStatusFilterChange(status.value)}>
-            {status.label}
-          </Button>))}
+        <SegmentedControl
+            aria-label="Client status filter"
+            value={statusFilter}
+            onChange={(val) => onStatusFilterChange(val as 'all' | ClientStatus)}
+            options={[
+                { value: 'all', label: 'All' },
+                ...CLIENT_STATUSES.map((status) => ({
+                    value: status.value,
+                    label: status.label,
+                })),
+            ]}
+        />
       </div>
 
       <div className="flex items-center gap-2">

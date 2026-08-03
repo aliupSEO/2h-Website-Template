@@ -38,25 +38,35 @@ export const ClientFilesField = ({ name, title, description, accept, multiple = 
           <p className="text-sm font-medium text-foreground">{title}</p>
           <p className="text-xs text-muted-foreground">{description}</p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
-          <FileUp data-icon="inline-start"/>
-          Upload
-        </Button>
+        {files.length > 0 && (
+          <Button type="button" variant="outline" size="sm" className="h-9 border-white/10 bg-transparent hover:bg-white/5" onClick={() => inputRef.current?.click()}>
+            <FileUp data-icon="inline-start"/>
+            Upload
+          </Button>
+        )}
         <input ref={inputRef} type="file" className="hidden" accept={accept} multiple={multiple} onChange={(event) => void handleChange(event)}/>
       </div>
 
-      {files.length === 0 ? (<p className="rounded-lg bg-muted/60 px-3 py-3 text-xs text-muted-foreground">
-          No files uploaded.
-        </p>) : (<ul className="space-y-2">
-          {files.map((file: ClientFile) => (<li key={file.id} className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2">
-              <div className="min-w-0">
-                <p className="truncate text-sm text-foreground">{file.name}</p>
-                <p className="text-xs text-muted-foreground">
+      {files.length === 0 ? (
+        <button type="button" onClick={() => inputRef.current?.click()} className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/10 bg-transparent py-8 transition-colors hover:bg-white/[0.02]">
+          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <FileUp className="size-5" />
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-medium text-foreground">No files uploaded</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Click here to add files.</p>
+          </div>
+        </button>
+      ) : (<ul className="space-y-2">
+          {files.map((file: ClientFile) => (<li key={file.id} className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-transparent p-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {formatFileSize(file.size)}
                 </p>
               </div>
-              <Button type="button" variant="ghost" size="icon" onClick={() => removeFile(file.id)} aria-label={`Remove ${file.name}`}>
-                <Trash2 />
+              <Button type="button" variant="ghost" className="size-9 shrink-0 rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive" onClick={() => removeFile(file.id)} aria-label={`Remove ${file.name}`}>
+                <Trash2 className="size-4" />
               </Button>
             </li>))}
         </ul>)}

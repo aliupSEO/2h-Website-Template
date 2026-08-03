@@ -14,10 +14,10 @@ export const TemplateCategoryBadge = ({
     return (
         <span
             className={cn(
-                'inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide uppercase',
+                'inline-flex h-6 items-center rounded px-2.5 text-[11px] font-bold tracking-wide uppercase',
                 category === 'websites'
-                    ? 'bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/20'
-                    : 'bg-violet-500/10 text-violet-300 ring-1 ring-violet-500/20',
+                    ? 'bg-sky-500 text-white'
+                    : 'bg-violet-500 text-white',
                 className,
             )}
         >

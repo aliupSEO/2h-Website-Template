@@ -149,18 +149,9 @@ export const AdminUsersView = () => {
     }
 
     return (
-        <>
+        <div className="space-y-4">
             <DocumentTitle title="Admin" />
-            <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">
-                        Admin
-                    </h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Invite users, manage roles, and control account access.
-                    </p>
-                </div>
-
+            <div className="-m-4 space-y-0 bg-muted sm:-m-6">
                 <UsersToolbar
                     query={query}
                     onQueryChange={setQuery}
@@ -241,6 +232,6 @@ export const AdminUsersView = () => {
                 confirmLabel="Send reset email"
                 onConfirm={handleSendReset}
             />
-        </>
+        </div>
     );
 };

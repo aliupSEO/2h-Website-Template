@@ -17,25 +17,25 @@ export const ClientLinksField = () => {
             Add titled URLs for this client.
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => append({ id: createId('link'), title: '', url: '' })}>
+        <Button type="button" variant="outline" size="sm" className="h-9 border-white/10 bg-transparent hover:bg-white/5" onClick={() => append({ id: createId('link'), title: '', url: '' })}>
           <Plus data-icon="inline-start"/>
           Add link
         </Button>
       </div>
 
-      {fields.length === 0 ? (<p className="rounded-lg bg-muted/60 px-3 py-3 text-xs text-muted-foreground">
+      {fields.length === 0 ? (<p className="rounded-lg bg-[#2a2a2a] px-3 py-3 text-xs text-muted-foreground">
           No links yet.
         </p>) : (<div className="space-y-3">
-          {fields.map((field, index) => (<div key={field.id} className="grid gap-3 rounded-xl bg-muted/40 p-3 sm:grid-cols-[1fr_1.4fr_auto]">
+          {fields.map((field, index) => (<div key={field.id} className="grid gap-4 rounded-xl border border-white/5 bg-transparent p-4 sm:grid-cols-[1fr_1.4fr_auto]">
               <FormField label="Title" htmlFor={`link-title-${field.id}`} required error={errors.links?.[index]?.title?.message}>
-                <Input id={`link-title-${field.id}`} placeholder="Website" {...register(`links.${index}.title`)}/>
+                <Input id={`link-title-${field.id}`} placeholder="Website" className="h-11 rounded-md border-transparent bg-[#2a2a2a]" {...register(`links.${index}.title`)}/>
               </FormField>
               <FormField label="URL" htmlFor={`link-url-${field.id}`} required error={errors.links?.[index]?.url?.message}>
-                <Input id={`link-url-${field.id}`} placeholder="https://example.com" {...register(`links.${index}.url`)}/>
+                <Input id={`link-url-${field.id}`} placeholder="https://example.com" className="h-11 rounded-md border-transparent bg-[#2a2a2a]" {...register(`links.${index}.url`)}/>
               </FormField>
               <div className="flex items-end">
-                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} aria-label="Remove link">
-                  <Trash2 />
+                <Button type="button" variant="ghost" className="h-11 w-11 rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive" onClick={() => remove(index)} aria-label="Remove link">
+                  <Trash2 className="size-5" />
                 </Button>
               </div>
             </div>))}

@@ -25,6 +25,8 @@ import {
 } from '@/features/admin/schemas';
 import type { AdminUser } from '@/features/admin/types';
 import { APP_ROLE_LABELS, type AppRole } from '@/constants/roles';
+import { UserRoleBadge } from './UserRoleBadge';
+import { AccountStatusBadge } from './UserStatusBadge';
 
 type EditUserDialogProps = {
     open: boolean;
@@ -34,6 +36,8 @@ type EditUserDialogProps = {
     onOpenChange: (open: boolean) => void;
     onSubmit: (user: AdminUser, values: EditUserSchema) => Promise<void>;
 };
+
+const FIELD_CLASS = 'w-full h-11 rounded-md bg-[#2a2a2a] text-foreground border-transparent';
 
 export const EditUserDialog = ({
     open,
@@ -78,16 +82,16 @@ export const EditUserDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Edit user</DialogTitle>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-0 sm:max-w-md">
+                <DialogHeader className="space-y-1 border-b border-white/5 px-5 py-4 pr-12">
+                    <DialogTitle className="text-lg">Edit user</DialogTitle>
                     <DialogDescription>
                         Update role and account status for {user?.email}.
                     </DialogDescription>
                 </DialogHeader>
 
                 <form
-                    className="space-y-4"
+                    className="space-y-4 px-5 py-4"
                     onSubmit={(event) => void submit(event)}
                     noValidate
                 >
@@ -99,7 +103,7 @@ export const EditUserDialog = ({
                     >
                         <Input
                             id="edit-full-name"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.fullName)}
                             {...register('fullName')}
                         />
@@ -120,16 +124,17 @@ export const EditUserDialog = ({
                                     onValueChange={field.onChange}
                                     disabled={isSelf}
                                 >
-                                    <SelectTrigger id="edit-role" className="w-full">
+                                    <SelectTrigger id="edit-role" className={FIELD_CLASS}>
                                         <SelectValue placeholder="Select role" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="border-white/10 bg-[#1a1a1a]">
                                         {roleOptions.map((option) => (
                                             <SelectItem
                                                 key={option.value}
                                                 value={option.value}
+                                                className="focus:bg-[#2a2a2a] focus:text-foreground"
                                             >
-                                                {option.label}
+                                                <UserRoleBadge role={option.value as AppRole} variant="ghost" />
                                             </SelectItem>
                                         ))}
                                         {user &&
@@ -137,12 +142,11 @@ export const EditUserDialog = ({
                                             (option) =>
                                                 option.value === user.role,
                                         ) ? (
-                                            <SelectItem value={user.role}>
-                                                {
-                                                    APP_ROLE_LABELS[
-                                                        user.role as AppRole
-                                                    ]
-                                                }
+                                            <SelectItem 
+                                                value={user.role}
+                                                className="focus:bg-[#2a2a2a] focus:text-foreground"
+                                            >
+                                                <UserRoleBadge role={user.role as AppRole} variant="ghost" />
                                             </SelectItem>
                                         ) : null}
                                     </SelectContent>
@@ -167,13 +171,21 @@ export const EditUserDialog = ({
                                     }
                                     disabled={isSelf}
                                 >
-                                    <SelectTrigger id="edit-active" className="w-full">
+                                    <SelectTrigger id="edit-active" className={FIELD_CLASS}>
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="inactive">
-                                            Inactive
+                                    <SelectContent className="border-white/10 bg-[#1a1a1a]">
+                                        <SelectItem 
+                                            value="active"
+                                            className="focus:bg-[#2a2a2a] focus:text-foreground"
+                                        >
+                                            <AccountStatusBadge isActive={true} variant="ghost" />
+                                        </SelectItem>
+                                        <SelectItem 
+                                            value="inactive"
+                                            className="focus:bg-[#2a2a2a] focus:text-foreground"
+                                        >
+                                            <AccountStatusBadge isActive={false} variant="ghost" />
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -181,16 +193,22 @@ export const EditUserDialog = ({
                         />
                     </FormField>
 
-                    <DialogFooter className="gap-2 pt-2">
+                    <DialogFooter className="gap-2 border-t border-white/5 pt-4 sm:justify-end">
                         <Button
                             type="button"
                             variant="outline"
+                            className="h-11 rounded-md"
                             disabled={isSubmitting}
                             onClick={() => onOpenChange(false)}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" variant="brand" disabled={isSubmitting}>
+                        <Button 
+                            type="submit" 
+                            variant="brand" 
+                            className="h-11 min-w-24 rounded-md"
+                            disabled={isSubmitting}
+                        >
                             {isSubmitting ? <Loading size="sm" /> : 'Save changes'}
                         </Button>
                     </DialogFooter>

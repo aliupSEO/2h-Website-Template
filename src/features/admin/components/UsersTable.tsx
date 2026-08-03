@@ -1,6 +1,6 @@
-import { APP_ROLE_LABELS, canModifyTargetRole, type AppRole } from '@/constants/roles';
+import { canModifyTargetRole, type AppRole } from '@/constants/roles';
+import { cn } from '@/lib/utils';
 import {
-    Button,
     Table,
     TableBody,
     TableCell,
@@ -10,6 +10,8 @@ import {
 } from '@/components/ui';
 import type { AdminUser } from '@/features/admin/types';
 import { AccountStatusBadge, AuthStatusBadge } from './UserStatusBadge';
+import { UserRoleBadge } from './UserRoleBadge';
+import { UserRowActions } from './UserRowActions';
 
 type UsersTableProps = {
     users: AdminUser[];
@@ -28,6 +30,9 @@ const formatDate = (value: string | null) => {
     }).format(new Date(value));
 };
 
+const headClass =
+    'h-14 px-4 text-sm font-extrabold tracking-wide text-black uppercase sm:px-6';
+
 export const UsersTable = ({
     users,
     currentUserId,
@@ -37,17 +42,17 @@ export const UsersTable = ({
     onSendReset,
 }: UsersTableProps) => {
     return (
-        <div className="rounded-xl border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 bg-muted shadow-none">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-white/5 hover:bg-transparent">
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Account</TableHead>
-                        <TableHead>Auth</TableHead>
-                        <TableHead>Last sign-in</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="border-b-0 bg-primary hover:bg-primary">
+                        <TableHead className={headClass}>Name</TableHead>
+                        <TableHead className={headClass}>Email</TableHead>
+                        <TableHead className={headClass}>Role</TableHead>
+                        <TableHead className={headClass}>Account</TableHead>
+                        <TableHead className={headClass}>Auth</TableHead>
+                        <TableHead className={headClass}>Last sign-in</TableHead>
+                        <TableHead className={cn(headClass, 'w-[7.5rem] text-right')}>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -57,57 +62,32 @@ export const UsersTable = ({
                             isSelf || canModifyTargetRole(actorRole, user.role);
 
                         return (
-                            <TableRow key={user.id} className="border-white/5">
-                                <TableCell className="font-medium">
+                            <TableRow key={user.id} className="group/row border-white/5 hover:bg-white/[0.035]">
+                                <TableCell className="px-4 py-3.5 font-medium sm:px-6">
                                     {user.fullName ?? '—'}
                                 </TableCell>
-                                <TableCell>{user.email}</TableCell>
-                                <TableCell>
-                                    {APP_ROLE_LABELS[user.role]}
+                                <TableCell className="px-4 py-3.5 sm:px-6">{user.email}</TableCell>
+                                <TableCell className="px-4 py-3.5 sm:px-6">
+                                    <UserRoleBadge role={user.role} />
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="px-4 py-3.5 sm:px-6">
                                     <AccountStatusBadge user={user} />
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="px-4 py-3.5 sm:px-6">
                                     <AuthStatusBadge user={user} />
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="px-4 py-3.5 sm:px-6">
                                     {formatDate(user.lastSignInAt)}
                                 </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                        {canModify ? (
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => onEdit(user)}
-                                            >
-                                                Edit
-                                            </Button>
-                                        ) : null}
-                                        {!isSelf && canModify ? (
-                                            <>
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    onClick={() =>
-                                                        onSetPassword(user)
-                                                    }
-                                                >
-                                                    Set password
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    onClick={() =>
-                                                        onSendReset(user)
-                                                    }
-                                                >
-                                                    Send reset
-                                                </Button>
-                                            </>
-                                        ) : null}
-                                    </div>
+                                <TableCell className="px-4 py-3.5 text-right sm:px-6">
+                                    <UserRowActions
+                                        user={user}
+                                        isSelf={isSelf}
+                                        canModify={canModify}
+                                        onEdit={onEdit}
+                                        onSetPassword={onSetPassword}
+                                        onSendReset={onSendReset}
+                                    />
                                 </TableCell>
                             </TableRow>
                         );

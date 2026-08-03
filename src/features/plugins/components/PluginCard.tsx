@@ -2,6 +2,7 @@ import {
     Download,
     MoreHorizontal,
     Pencil,
+    Power,
     Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -16,7 +17,6 @@ import {
 } from '@/components/ui';
 import type { Plugin } from '@/features/plugins/types';
 import { cn } from '@/lib/utils';
-import { PluginStatusToggle } from './PluginStatusToggle';
 
 type PluginCardProps = {
     plugin: Plugin;
@@ -77,10 +77,10 @@ export const PluginCard = ({
                 <div className="mb-4 flex items-start justify-between gap-3">
                     <span
                         className={cn(
-                            'inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium',
+                            'inline-flex h-6 items-center rounded px-2.5 text-xs font-bold',
                             plugin.isActive
-                                ? 'bg-primary/10 text-primary'
-                                : 'bg-destructive/10 text-destructive',
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-destructive text-white',
                         )}
                     >
                         {plugin.isActive ? 'Active' : 'Inactive'}
@@ -101,6 +101,15 @@ export const PluginCard = ({
                             align="end"
                             className="w-48 border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.55)]"
                         >
+                            <DropdownMenuItem
+                                className="cursor-pointer gap-2"
+                                onClick={() => void handleToggle(!plugin.isActive)}
+                                disabled={toggling}
+                            >
+                                <Power className="size-4" />
+                                {plugin.isActive ? 'Deactivate' : 'Activate'}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-white/10" />
                             <DropdownMenuItem
                                 className="cursor-pointer gap-2"
                                 onClick={() => onEdit(plugin)}
@@ -124,14 +133,19 @@ export const PluginCard = ({
                 <h3 className="font-heading text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 ease-out group-hover/plugin:text-primary">
                     {plugin.name}
                 </h3>
-
-                <div className="mt-4">
-                    <PluginStatusToggle
-                        isActive={plugin.isActive}
-                        disabled={toggling}
-                        onChange={(isActive) => void handleToggle(isActive)}
-                    />
+                
+                <div className="mt-3 space-y-1">
+                    <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                        File
+                    </p>
+                    <p className="truncate text-sm text-foreground/70">
+                        {plugin.fileName ?? 'No file attached'}
+                    </p>
                 </div>
+
+                <p className="mt-2 min-h-10 line-clamp-2 break-all text-xs text-muted-foreground">
+                    {plugin.description ?? 'No description provided.'}
+                </p>
             </div>
 
             <div className="relative flex flex-wrap items-center gap-2 border-t border-white/[0.06] bg-black/35 p-3.5 transition-colors duration-300 ease-out group-hover/plugin:border-primary/15 group-hover/plugin:bg-black/50">

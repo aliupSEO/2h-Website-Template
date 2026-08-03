@@ -13,10 +13,10 @@
 
 .phone-field .form-control {
   width: 100% !important;
-  height: 2.5rem !important;
+  height: 2.75rem !important;
   border: 0 !important;
   border-radius: 0.5rem !important;
-  background: var(--muted) !important;
+  background: #2a2a2a !important;
   color: var(--foreground) !important;
   font-size: 0.875rem !important;
   box-shadow: none !important;
@@ -67,7 +67,7 @@
   margin-top: 0.25rem !important;
   padding: 0.35rem !important;
   overflow-y: auto !important;
-  background: var(--background) !important;
+  background: #1a1a1a !important;
   color: var(--foreground) !important;
   border: 1px solid color-mix(in srgb, var(--brand-white) 14%, transparent) !important;
   border-radius: 0.75rem !important;
@@ -87,7 +87,7 @@
 
 .phone-field .country-list .country:hover,
 .phone-field .country-list .country.highlight {
-  background: var(--muted) !important;
+  background: #2a2a2a !important;
 }
 
 .phone-field .country-list .search {
@@ -96,18 +96,18 @@
   z-index: 1 !important;
   padding: 0.35rem 0.35rem 0.5rem !important;
   margin: 0 0 0.25rem !important;
-  background: var(--background) !important;
+  background: #1a1a1a !important;
   border: 0 !important;
 }
 
 .phone-field .country-list .search-box {
   width: 100% !important;
-  height: 2.25rem !important;
+  height: 2.75rem !important;
   margin-left: 0 !important;
   padding: 0 0.75rem !important;
   border: 0 !important;
   border-radius: 0.5rem !important;
-  background: var(--muted) !important;
+  background: #2a2a2a !important;
   color: var(--foreground) !important;
   font-size: 0.875rem !important;
   outline: none !important;

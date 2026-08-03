@@ -30,6 +30,8 @@ import type { Plugin } from '@/features/plugins/types';
 import { cn } from '@/lib/utils';
 import { PluginStatusToggle } from './PluginStatusToggle';
 
+const FIELD_CLASS = 'w-full h-11 rounded-md bg-[#2a2a2a] text-foreground border-transparent';
+
 export type PluginSubmitValues = PluginFormSchema & {
     file?: File | null;
     removeFile?: boolean;
@@ -163,9 +165,9 @@ export const PluginFormDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-0 sm:max-w-lg">
+                <DialogHeader className="space-y-1 border-b border-white/5 px-5 py-4 pr-12">
+                    <DialogTitle className="text-lg">
                         {isEdit ? 'Edit plugin' : 'Create plugin'}
                     </DialogTitle>
                     <DialogDescription>
@@ -175,7 +177,7 @@ export const PluginFormDialog = ({
                 </DialogHeader>
 
                 <form
-                    className="space-y-4"
+                    className="space-y-4 px-5 py-4"
                     onSubmit={(event) => void submit(event)}
                     noValidate
                 >
@@ -188,7 +190,7 @@ export const PluginFormDialog = ({
                         <Input
                             id="plugin-name"
                             placeholder="Analytics connector"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.name)}
                             {...register('name')}
                         />
@@ -203,6 +205,7 @@ export const PluginFormDialog = ({
                             id="plugin-description"
                             placeholder="What this plugin does…"
                             rows={3}
+                            className={cn("min-h-[5.5rem] py-3 resize-none", FIELD_CLASS)}
                             aria-invalid={Boolean(errors.description)}
                             {...register('description')}
                         />
@@ -256,10 +259,10 @@ export const PluginFormDialog = ({
                                 }}
                                 onDrop={handleDrop}
                                 className={cn(
-                                    'flex w-full flex-col items-center justify-center gap-2 rounded-xl bg-muted/50 px-4 py-8 text-center transition-colors',
+                                    'flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-transparent bg-[#2a2a2a] px-4 py-8 text-center transition-colors',
                                     dragging
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'text-muted-foreground hover:bg-muted/80',
+                                        ? 'border-primary/50 bg-primary/10 text-primary'
+                                        : 'text-muted-foreground hover:bg-[#323232]',
                                 )}
                             >
                                 <FileUp className="size-6" />
@@ -278,7 +281,7 @@ export const PluginFormDialog = ({
                             />
 
                             {displayFileName ? (
-                                <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2">
+                                <div className="flex items-center justify-between gap-3 rounded-lg bg-[#2a2a2a] px-3 py-2">
                                     <div className="min-w-0">
                                         <p className="truncate text-sm text-foreground">
                                             {displayFileName}
@@ -312,10 +315,11 @@ export const PluginFormDialog = ({
                         </div>
                     </FormField>
 
-                    <DialogFooter className="gap-2 pt-2">
+                    <DialogFooter className="gap-2 border-t border-white/5 pt-4 sm:justify-end">
                         <Button
                             type="button"
                             variant="outline"
+                            className="h-11 rounded-md"
                             disabled={isSubmitting}
                             onClick={() => onOpenChange(false)}
                         >
@@ -324,6 +328,7 @@ export const PluginFormDialog = ({
                         <Button
                             type="submit"
                             variant="brand"
+                            className="h-11 min-w-24 rounded-md"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? (

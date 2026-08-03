@@ -14,3 +14,4 @@ export { DropdownMenu, DropdownMenuPortal, DropdownMenuTrigger, DropdownMenuCont
 export { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger, } from './dialog';
 export { Sheet, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription, } from './sheet';
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants } from './tabs';
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';

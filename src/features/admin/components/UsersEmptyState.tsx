@@ -21,14 +21,14 @@ export const UsersEmptyState = ({
     const showAction = (showInvite && onInvite) || (actionLabel && onAction);
 
     return (
-        <div className="flex flex-col items-center rounded-xl bg-card px-6 py-16 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-            <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
-                <Shield className="size-6" />
+        <div className="flex flex-col items-center justify-center px-6 py-24 text-center sm:py-32">
+            <div className="mb-6 flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/25">
+                <Shield className="size-8" />
             </div>
-            <h2 className="font-heading text-lg font-semibold tracking-tight">
+            <h2 className="font-heading text-xl font-semibold tracking-tight text-foreground">
                 {title}
             </h2>
-            <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+            <p className="mt-2.5 max-w-sm text-sm text-muted-foreground">
                 {description}
             </p>
             {showAction ? (

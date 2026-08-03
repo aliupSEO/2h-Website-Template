@@ -29,6 +29,8 @@ type SetPasswordDialogProps = {
     ) => Promise<void>;
 };
 
+const FIELD_CLASS = 'w-full h-11 rounded-md bg-[#2a2a2a] text-foreground border-transparent';
+
 export const SetPasswordDialog = ({
     open,
     user,
@@ -61,9 +63,9 @@ export const SetPasswordDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Set password</DialogTitle>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-0 sm:max-w-md">
+                <DialogHeader className="space-y-1 border-b border-white/5 px-5 py-4 pr-12">
+                    <DialogTitle className="text-lg">Set password</DialogTitle>
                     <DialogDescription>
                         Set a new password for {user?.email}. The user can sign
                         in immediately with this password.
@@ -71,7 +73,7 @@ export const SetPasswordDialog = ({
                 </DialogHeader>
 
                 <form
-                    className="space-y-4"
+                    className="space-y-4 px-5 py-4"
                     onSubmit={(event) => void submit(event)}
                     noValidate
                 >
@@ -85,7 +87,7 @@ export const SetPasswordDialog = ({
                             id="admin-new-password"
                             type="password"
                             autoComplete="new-password"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.password)}
                             {...register('password')}
                         />
@@ -101,22 +103,28 @@ export const SetPasswordDialog = ({
                             id="admin-confirm-password"
                             type="password"
                             autoComplete="new-password"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.confirmPassword)}
                             {...register('confirmPassword')}
                         />
                     </FormField>
 
-                    <DialogFooter className="gap-2 pt-2">
+                    <DialogFooter className="gap-2 border-t border-white/5 pt-4 sm:justify-end">
                         <Button
                             type="button"
                             variant="outline"
+                            className="h-11 rounded-md"
                             disabled={isSubmitting}
                             onClick={() => onOpenChange(false)}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" variant="brand" disabled={isSubmitting}>
+                        <Button 
+                            type="submit" 
+                            variant="brand" 
+                            className="h-11 min-w-24 rounded-md"
+                            disabled={isSubmitting}
+                        >
                             {isSubmitting ? <Loading size="sm" /> : 'Update password'}
                         </Button>
                     </DialogFooter>

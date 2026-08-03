@@ -24,6 +24,7 @@ import {
     type InviteUserSchema,
 } from '@/features/admin/schemas';
 import type { AppRole } from '@/constants/roles';
+import { UserRoleBadge } from './UserRoleBadge';
 
 type InviteUserDialogProps = {
     open: boolean;
@@ -31,6 +32,8 @@ type InviteUserDialogProps = {
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: InviteUserSchema) => Promise<void>;
 };
+
+const FIELD_CLASS = 'w-full h-11 rounded-md bg-[#2a2a2a] text-foreground border-transparent';
 
 export const InviteUserDialog = ({
     open,
@@ -74,9 +77,9 @@ export const InviteUserDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Invite user</DialogTitle>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-0 sm:max-w-md">
+                <DialogHeader className="space-y-1 border-b border-white/5 px-5 py-4 pr-12">
+                    <DialogTitle className="text-lg">Invite user</DialogTitle>
                     <DialogDescription>
                         Send an invitation email so the user can accept and set
                         their password.
@@ -84,7 +87,7 @@ export const InviteUserDialog = ({
                 </DialogHeader>
 
                 <form
-                    className="space-y-4"
+                    className="space-y-4 px-5 py-4"
                     onSubmit={(event) => void submit(event)}
                     noValidate
                 >
@@ -97,7 +100,7 @@ export const InviteUserDialog = ({
                         <Input
                             id="invite-full-name"
                             placeholder="Jane Doe"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.fullName)}
                             {...register('fullName')}
                         />
@@ -114,7 +117,7 @@ export const InviteUserDialog = ({
                             type="email"
                             autoComplete="email"
                             placeholder="jane@example.com"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.email)}
                             {...register('email')}
                         />
@@ -134,16 +137,17 @@ export const InviteUserDialog = ({
                                     value={field.value}
                                     onValueChange={field.onChange}
                                 >
-                                    <SelectTrigger id="invite-role" className="w-full">
+                                    <SelectTrigger id="invite-role" className={FIELD_CLASS}>
                                         <SelectValue placeholder="Select role" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="border-white/10 bg-[#1a1a1a]">
                                         {roleOptions.map((option) => (
                                             <SelectItem
                                                 key={option.value}
                                                 value={option.value}
+                                                className="focus:bg-[#2a2a2a] focus:text-foreground"
                                             >
-                                                {option.label}
+                                                <UserRoleBadge role={option.value as AppRole} variant="ghost" />
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -152,16 +156,22 @@ export const InviteUserDialog = ({
                         />
                     </FormField>
 
-                    <DialogFooter className="gap-2 pt-2">
+                    <DialogFooter className="gap-2 border-t border-white/5 pt-4 sm:justify-end">
                         <Button
                             type="button"
                             variant="outline"
+                            className="h-11 rounded-md"
                             disabled={isSubmitting}
                             onClick={() => onOpenChange(false)}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" variant="brand" disabled={isSubmitting}>
+                        <Button 
+                            type="submit" 
+                            variant="brand" 
+                            className="h-11 min-w-24 rounded-md"
+                            disabled={isSubmitting}
+                        >
                             {isSubmitting ? <Loading size="sm" /> : 'Send invitation'}
                         </Button>
                     </DialogFooter>

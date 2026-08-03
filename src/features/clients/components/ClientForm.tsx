@@ -24,6 +24,8 @@ const EMPTY_VALUES: ClientFormValues = {
     assets: [],
     documents: [],
 };
+
+const FIELD_CLASS = 'w-full h-11 rounded-md bg-[#2a2a2a] text-foreground border-transparent';
 export const ClientForm = ({ mode, client }: ClientFormProps) => {
     const navigate = useNavigate();
     const createClient = useClientsStore((state) => state.createClient);
@@ -62,20 +64,20 @@ export const ClientForm = ({ mode, client }: ClientFormProps) => {
     };
     return (<FormProvider {...form}>
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Card className="relative z-20 overflow-visible">
-          <CardHeader>
+        <Card className="relative z-20 overflow-visible rounded-xl border border-white/5 bg-[#1a1a1a]">
+          <CardHeader className="border-b border-white/5 px-6 py-5">
             <CardTitle>Details</CardTitle>
             <CardDescription>
               Core contact info and client status.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 overflow-visible sm:grid-cols-2">
+          <CardContent className="grid gap-4 overflow-visible px-6 py-6 sm:grid-cols-2">
             <FormField label="Name" htmlFor="client-name" required error={errors.name?.message}>
-              <Input id="client-name" placeholder="Acme Corp" className="h-10" aria-invalid={Boolean(errors.name)} {...register('name')}/>
+              <Input id="client-name" placeholder="Acme Corp" className={FIELD_CLASS} aria-invalid={Boolean(errors.name)} {...register('name')}/>
             </FormField>
 
             <FormField label="Email" htmlFor="client-email" required error={errors.email?.message}>
-              <Input id="client-email" type="email" placeholder="contact@acme.com" className="h-10" aria-invalid={Boolean(errors.email)} {...register('email')}/>
+              <Input id="client-email" type="email" placeholder="contact@acme.com" className={FIELD_CLASS} aria-invalid={Boolean(errors.email)} {...register('email')}/>
             </FormField>
 
             <PhoneField id="client-phone" required value={watch('phone')} onChange={(value) => setValue('phone', value, {
@@ -88,11 +90,11 @@ export const ClientForm = ({ mode, client }: ClientFormProps) => {
             shouldDirty: true,
             shouldValidate: true,
         })}>
-                <SelectTrigger id="client-status" className="w-full">
+                <SelectTrigger id="client-status" className={FIELD_CLASS}>
                   <SelectValue placeholder="Select status"/>
                 </SelectTrigger>
-                <SelectContent className="border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.55)]">
-                  {CLIENT_STATUSES.map((status) => (<SelectItem key={status.value} value={status.value}>
+                <SelectContent className="border-white/10 bg-[#1a1a1a]">
+                  {CLIENT_STATUSES.map((status) => (<SelectItem key={status.value} value={status.value} className="focus:bg-[#2a2a2a] focus:text-foreground">
                       {status.label}
                     </SelectItem>))}
                 </SelectContent>
@@ -101,37 +103,37 @@ export const ClientForm = ({ mode, client }: ClientFormProps) => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="rounded-xl border border-white/5 bg-[#1a1a1a]">
+          <CardHeader className="border-b border-white/5 px-6 py-5">
             <CardTitle>Links</CardTitle>
             <CardDescription>
               Multiple titled links for portals, docs, or sites.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-6 py-6">
             <ClientLinksField />
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="rounded-xl border border-white/5 bg-[#1a1a1a]">
+          <CardHeader className="border-b border-white/5 px-6 py-5">
             <CardTitle>Files</CardTitle>
             <CardDescription>
               Logos, assets, and PDF/document uploads (one or many).
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 px-6 py-6">
             <ClientFilesField name="logos" title="Logos" description="Brand marks and logo variants." accept="image/*" multiple/>
             <ClientFilesField name="assets" title="Assets" description="Images or other media files." accept="image/*,video/*,.zip,.svg" multiple/>
             <ClientFilesField name="documents" title="Documents" description="PDFs and other documents." accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv" multiple/>
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap justify-end gap-2">
-          <Button type="button" variant="outline" onClick={() => navigate('/clients')}>
+        <div className="flex flex-wrap justify-end gap-2 pt-2">
+          <Button type="button" variant="outline" className="h-11 rounded-md" onClick={() => navigate('/clients')}>
             Cancel
           </Button>
-          <Button type="submit" variant="brand" disabled={isSubmitting}>
+          <Button type="submit" variant="brand" className="h-11 min-w-24 rounded-md" disabled={isSubmitting}>
             {isSubmitting ? (<Loading size="sm"/>) : mode === 'create' ? ('Create client') : ('Save changes')}
           </Button>
         </div>

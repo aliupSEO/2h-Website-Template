@@ -28,6 +28,8 @@ import {
 import type { Template } from '@/features/templates/types';
 import { githubService } from '@/services/githubService';
 
+const FIELD_CLASS = 'w-full h-11 rounded-md bg-[#2a2a2a] text-foreground border-transparent';
+
 type TemplateFormDialogProps = {
     open: boolean;
     template: Template | null;
@@ -122,9 +124,9 @@ export const TemplateFormDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-0 sm:max-w-lg">
+                <DialogHeader className="space-y-1 border-b border-white/5 px-5 py-4 pr-12">
+                    <DialogTitle className="text-lg">
                         {isEdit ? 'Edit template' : 'Create template'}
                     </DialogTitle>
                     <DialogDescription>
@@ -134,7 +136,7 @@ export const TemplateFormDialog = ({
                 </DialogHeader>
 
                 <form
-                    className="space-y-4"
+                    className="min-w-0 space-y-4 px-5 py-4"
                     onSubmit={(event) => void submit(event)}
                     noValidate
                 >
@@ -147,7 +149,7 @@ export const TemplateFormDialog = ({
                         <Input
                             id="template-name"
                             placeholder="Marketing landing starter"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.name)}
                             {...register('name')}
                         />
@@ -169,16 +171,17 @@ export const TemplateFormDialog = ({
                                 >
                                     <SelectTrigger
                                         id="template-category"
-                                        className="w-full"
+                                        className={FIELD_CLASS}
                                     >
                                         <SelectValue placeholder="Select category" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="border-white/10 bg-[#1a1a1a]">
                                         {TEMPLATE_CATEGORY_OPTIONS.map(
                                             (option) => (
                                                 <SelectItem
                                                     key={option.value}
                                                     value={option.value}
+                                                    className="focus:bg-[#2a2a2a] focus:text-foreground"
                                                 >
                                                     {option.label}
                                                 </SelectItem>
@@ -200,29 +203,23 @@ export const TemplateFormDialog = ({
                             undefined
                         }
                     >
-                        {loadingRepos ? (
-                            <div className="flex h-10 items-center">
-                                <Loading size="sm" label="Loading repos…" />
-                            </div>
-                        ) : (
-                            <Controller
-                                control={control}
-                                name="gitRepository"
-                                render={({ field }) => (
-                                    <GitRepoPicker
-                                        repos={repos}
-                                        value={field.value}
-                                        onChange={(fullName, repo) => {
-                                            field.onChange(fullName);
-                                            setValue('url', repo.cloneUrl, {
-                                                shouldDirty: true,
-                                                shouldValidate: true,
-                                            });
-                                        }}
-                                    />
-                                )}
-                            />
-                        )}
+                        <Controller
+                            control={control}
+                            name="gitRepository"
+                            render={({ field }) => (
+                                <GitRepoPicker
+                                    repos={repos}
+                                    value={field.value}
+                                    onChange={(fullName, repo) => {
+                                        field.onChange(fullName);
+                                        setValue('url', repo.cloneUrl, {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                        });
+                                    }}
+                                />
+                            )}
+                        />
                     </FormField>
 
                     <FormField
@@ -234,22 +231,28 @@ export const TemplateFormDialog = ({
                         <Input
                             id="template-url"
                             placeholder="https://github.com/owner/repo.git"
-                            className="h-10"
+                            className={FIELD_CLASS}
                             aria-invalid={Boolean(errors.url)}
                             {...register('url')}
                         />
                     </FormField>
 
-                    <DialogFooter className="gap-2 pt-2">
+                    <DialogFooter className="gap-2 border-t border-white/5 pt-4 sm:justify-end">
                         <Button
                             type="button"
                             variant="outline"
+                            className="h-11 rounded-md"
                             disabled={isSubmitting}
                             onClick={() => onOpenChange(false)}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" variant="brand" disabled={isSubmitting}>
+                        <Button 
+                            type="submit" 
+                            variant="brand" 
+                            className="h-11 min-w-24 rounded-md"
+                            disabled={isSubmitting}
+                        >
                             {isSubmitting ? (
                                 <Loading size="sm" />
                             ) : isEdit ? (

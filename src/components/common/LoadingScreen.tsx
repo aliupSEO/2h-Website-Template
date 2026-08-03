@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Loading, type LoadingSize } from './Loading';
 
@@ -11,7 +12,18 @@ export const LoadingScreen = ({
     label,
     size = 'xl',
     className,
+    delayMs = 250,
 }: LoadingScreenProps) => {
+    const [show, setShow] = useState(delayMs === 0);
+
+    useEffect(() => {
+        if (delayMs === 0) return;
+        const timer = setTimeout(() => setShow(true), delayMs);
+        return () => clearTimeout(timer);
+    }, [delayMs]);
+
+    if (!show) return null;
+
     return (
         <div
             className={cn(

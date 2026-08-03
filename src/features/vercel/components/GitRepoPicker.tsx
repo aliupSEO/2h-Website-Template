@@ -34,7 +34,7 @@ export const GitRepoPicker = ({
     }, [repos, query]);
 
     return (
-        <div className="overflow-hidden rounded-xl bg-[#111111] ring-1 ring-white/10">
+        <div className="overflow-hidden rounded-md bg-[#2a2a2a]">
             <div className="relative border-b border-white/5">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-foreground/45" />
                 <Input
@@ -42,7 +42,7 @@ export const GitRepoPicker = ({
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search repositories…"
                     disabled={disabled}
-                    className="h-10 rounded-none border-0 bg-transparent pl-9 text-sm ring-0"
+                    className="h-11 rounded-none border-0 bg-transparent pl-9 text-sm ring-0 text-foreground"
                     aria-label="Search repositories"
                 />
             </div>
@@ -67,7 +67,7 @@ export const GitRepoPicker = ({
                                     aria-selected={selected}
                                     disabled={disabled}
                                     className={cn(
-                                        'flex w-full items-start gap-2.5 rounded-lg px-3 py-2.5 text-left transition-colors',
+                                        'flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition-colors',
                                         selected
                                             ? 'bg-primary/20 text-foreground ring-1 ring-primary/35'
                                             : 'text-foreground/85 hover:bg-white/[0.05]',

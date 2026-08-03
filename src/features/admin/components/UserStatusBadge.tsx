@@ -1,15 +1,33 @@
 import type { AdminUser } from '@/features/admin/types';
 
-export const AccountStatusBadge = ({ user }: { user: AdminUser }) => {
+export const AccountStatusBadge = ({ 
+    user, 
+    isActive, 
+    variant = 'solid' 
+}: { 
+    user?: AdminUser; 
+    isActive?: boolean;
+    variant?: 'solid' | 'ghost';
+}) => {
+    const active = isActive ?? user?.isActive ?? false;
+
+    if (variant === 'ghost') {
+        return (
+            <span className={active ? 'text-sm font-medium text-primary' : 'text-sm font-medium text-destructive'}>
+                {active ? 'Active' : 'Inactive'}
+            </span>
+        );
+    }
+
     return (
         <span
             className={
-                user.isActive
-                    ? 'inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'
-                    : 'inline-flex rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive'
+                active
+                    ? 'inline-flex h-6 items-center rounded bg-primary px-2.5 text-xs font-bold text-black'
+                    : 'inline-flex h-6 items-center rounded bg-destructive px-2.5 text-xs font-bold text-white'
             }
         >
-            {user.isActive ? 'Active' : 'Inactive'}
+            {active ? 'Active' : 'Inactive'}
         </span>
     );
 };
@@ -19,8 +37,8 @@ export const AuthStatusBadge = ({ user }: { user: AdminUser }) => {
         <span
             className={
                 user.emailConfirmed
-                    ? 'inline-flex rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300'
-                    : 'inline-flex rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-300'
+                    ? 'inline-flex h-6 items-center rounded bg-emerald-500 px-2.5 text-xs font-bold text-white'
+                    : 'inline-flex h-6 items-center rounded bg-amber-400 px-2.5 text-xs font-bold text-black'
             }
         >
             {user.emailConfirmed ? 'Confirmed' : 'Pending'}
@@ -32,7 +50,7 @@ export const AuthStatusBadge = ({ user }: { user: AdminUser }) => {
 export const UserStatusBadge = ({ user }: { user: AdminUser }) => {
     if (!user.isActive) {
         return (
-            <span className="inline-flex rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive">
+            <span className="inline-flex h-6 items-center rounded bg-destructive px-2.5 text-xs font-bold text-white">
                 Inactive
             </span>
         );
@@ -40,14 +58,14 @@ export const UserStatusBadge = ({ user }: { user: AdminUser }) => {
 
     if (!user.emailConfirmed) {
         return (
-            <span className="inline-flex rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-300">
+            <span className="inline-flex h-6 items-center rounded bg-amber-400 px-2.5 text-xs font-bold text-black">
                 Pending
             </span>
         );
     }
 
     return (
-        <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+        <span className="inline-flex h-6 items-center rounded bg-primary px-2.5 text-xs font-bold text-black">
             Active
         </span>
     );

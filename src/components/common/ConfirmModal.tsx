@@ -48,19 +48,19 @@ export const ConfirmModal = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 showCloseButton={false}
-                className="gap-5 border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.75)] ring-0"
+                className="gap-5 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.75)] ring-0 sm:max-w-md"
             >
-                <DialogHeader>
-                    <DialogTitle className="text-foreground">{title}</DialogTitle>
+                <DialogHeader className="space-y-1">
+                    <DialogTitle className="text-lg text-foreground">{title}</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
                         {description}
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="gap-2">
+                <DialogFooter className="gap-2 sm:justify-end">
                     <Button
                         type="button"
                         variant="outline"
-                        size="default"
+                        className="h-11 rounded-md"
                         disabled={pending}
                         onClick={() => onOpenChange(false)}
                     >
@@ -71,9 +71,8 @@ export const ConfirmModal = ({
                         variant={
                             variant === 'destructive' ? 'destructive' : 'brand'
                         }
-                        size="default"
+                        className="h-11 min-w-24 rounded-md gap-2"
                         disabled={pending}
-                        className="gap-2"
                         onClick={() => void handleConfirm()}
                     >
                         {pending ? (
