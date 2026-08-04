@@ -3,6 +3,7 @@ import { ConfirmModal, DocumentTitle, LoadingScreen } from '@/components/common'
 import type { PluginSubmitValues } from '@/features/plugins/components/PluginFormDialog';
 import { PluginFormDialog } from '@/features/plugins/components/PluginFormDialog';
 import { PluginsCardGrid } from '@/features/plugins/components/PluginsCardGrid';
+import { PluginsTable } from '@/features/plugins/components/PluginsTable';
 import { PluginsEmptyState } from '@/features/plugins/components/PluginsEmptyState';
 import { PluginsToolbar } from '@/features/plugins/components/PluginsToolbar';
 import type { Plugin } from '@/features/plugins/types';
@@ -21,6 +22,8 @@ export const PluginsView = () => {
     const getDownloadUrl = usePluginsStore((state) => state.getDownloadUrl);
 
     const [query, setQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+    const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
     const [formOpen, setFormOpen] = useState(false);
     const [editingPlugin, setEditingPlugin] = useState<Plugin | null>(null);
     const [pendingDelete, setPendingDelete] = useState<Plugin | null>(null);
@@ -33,6 +36,8 @@ export const PluginsView = () => {
         const needle = query.trim().toLowerCase();
 
         return plugins.filter((plugin) => {
+            if (statusFilter === 'active' && !plugin.isActive) return false;
+            if (statusFilter === 'inactive' && plugin.isActive) return false;
             if (!needle) return true;
 
             const haystack = [plugin.name, plugin.description ?? '']
@@ -40,7 +45,17 @@ export const PluginsView = () => {
                 .toLowerCase();
             return haystack.includes(needle);
         });
-    }, [plugins, query]);
+    }, [plugins, query, statusFilter]);
+
+    const activeCount = useMemo(
+        () => plugins.filter((p) => p.isActive).length,
+        [plugins]
+    );
+
+    const inactiveCount = useMemo(
+        () => plugins.filter((p) => !p.isActive).length,
+        [plugins]
+    );
 
     const handleSubmit = async (values: PluginSubmitValues) => {
         try {
@@ -122,20 +137,26 @@ export const PluginsView = () => {
     }
 
     return (
-        <>
+        <div className="space-y-4">
             <DocumentTitle title="Plugins" />
 
-            <PluginsToolbar
-                query={query}
-                onQueryChange={setQuery}
-                pluginCount={plugins.length}
-                onCreate={() => {
-                    setEditingPlugin(null);
-                    setFormOpen(true);
-                }}
-            />
+            <div className="-m-4 space-y-0 bg-muted sm:-m-6">
+                <PluginsToolbar
+                    query={query}
+                    onQueryChange={setQuery}
+                    pluginCount={plugins.length}
+                    activeCount={activeCount}
+                    inactiveCount={inactiveCount}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter as (val: string) => void}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    onCreate={() => {
+                        setEditingPlugin(null);
+                        setFormOpen(true);
+                    }}
+                />
 
-            <div className="px-4 pb-8 sm:px-6">
                 {error && plugins.length === 0 ? (
                     <PluginsEmptyState
                         title="Could not load plugins"
@@ -145,18 +166,18 @@ export const PluginsView = () => {
                     <PluginsEmptyState
                         title="No plugins found"
                         description={
-                            query
-                                ? 'Try a different search term.'
+                            query || statusFilter !== 'all'
+                                ? 'Try a different search term or status filter.'
                                 : 'Create your first plugin with a name, description, and file.'
                         }
-                        showCreate={!query}
+                        showCreate={!query && statusFilter === 'all'}
                         onCreate={() => {
                             setEditingPlugin(null);
                             setFormOpen(true);
                         }}
                     />
-                ) : (
-                    <PluginsCardGrid
+                ) : viewMode === 'table' ? (
+                    <PluginsTable
                         plugins={filtered}
                         onEdit={(plugin) => {
                             setEditingPlugin(plugin);
@@ -166,6 +187,19 @@ export const PluginsView = () => {
                         onDownload={handleDownload}
                         onToggleActive={handleToggleActive}
                     />
+                ) : (
+                    <div className="relative px-4 py-6 sm:px-6">
+                        <PluginsCardGrid
+                            plugins={filtered}
+                            onEdit={(plugin) => {
+                                setEditingPlugin(plugin);
+                                setFormOpen(true);
+                            }}
+                            onDelete={setPendingDelete}
+                            onDownload={handleDownload}
+                            onToggleActive={handleToggleActive}
+                        />
+                    </div>
                 )}
             </div>
 
@@ -194,6 +228,6 @@ export const PluginsView = () => {
                 variant="destructive"
                 onConfirm={handleDelete}
             />
-        </>
+        </div>
     );
 };

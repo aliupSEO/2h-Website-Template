@@ -30,9 +30,6 @@ export const ProjectCard = ({ project, onManage }: ProjectCardProps) => {
             <div className="relative flex flex-1 flex-col p-5">
                 <div className="mb-4 flex items-start justify-between gap-3">
                     <ProjectStateBadge state={project.state} />
-                    <span className="inline-flex size-8 items-center justify-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/25">
-                        <Flame className="size-4" aria-hidden />
-                    </span>
                 </div>
 
                 <p className="truncate font-heading text-xl font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover/project:text-primary">
@@ -43,7 +40,7 @@ export const ProjectCard = ({ project, onManage }: ProjectCardProps) => {
                 </p>
 
                 {project.projectNumber ? (
-                    <p className="mt-auto pt-5 text-xs text-muted-foreground">
+                    <p className="mt-auto pt-5 text-xs text-primary">
                         Project number{' '}
                         <span className="font-semibold text-primary tabular-nums">
                             {project.projectNumber}

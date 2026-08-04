@@ -58,7 +58,7 @@ export const RepoRowActions = ({
                         size="icon-sm"
                         variant="ghost"
                         asChild
-                        className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                        className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                     >
                         <a
                             href={repo.htmlUrl}
@@ -74,7 +74,7 @@ export const RepoRowActions = ({
                         size="icon-sm"
                         variant="ghost"
                         aria-label={`Copy clone URL for ${repo.fullName}`}
-                        className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                        className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                         onClick={() => void copyCloneUrl()}
                     >
                         <Copy className="size-4" />
@@ -89,7 +89,7 @@ export const RepoRowActions = ({
                         size="icon-sm"
                         variant="ghost"
                         aria-label={`Actions for ${repo.fullName}`}
-                        className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                        className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                     >
                         <MoreHorizontal className="size-4" />
                     </Button>
@@ -124,7 +124,7 @@ export const RepoRowActions = ({
                     <DropdownMenuSeparator className="bg-white/10" />
                     <DropdownMenuItem
                         variant="destructive"
-                        className="cursor-pointer gap-2"
+                        className="cursor-pointer gap-2 text-destructive"
                         onClick={() => onDelete(repo)}
                     >
                         <Trash2 className="size-4" />

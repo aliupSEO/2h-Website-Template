@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import authBg from '@/assets/authbg-hub-7.jpg';
+import authBg from '@/assets/authbg-hub-3.jpg';
 import logo2h from '@/assets/logo-2h.png';
 import { DocumentTitle } from '@/components/common/DocumentTitle';
 import {

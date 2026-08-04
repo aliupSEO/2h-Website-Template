@@ -1,4 +1,4 @@
-import { Plus, Search, X } from 'lucide-react';
+import { LayoutGrid, List, Plus, Search, X } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { SegmentedControl } from '@/features/git/components/SegmentedControl';
 import type { TemplateCategoryFilter } from '@/features/templates/types';
@@ -12,6 +12,8 @@ type TemplatesToolbarProps = {
     onCreate: () => void;
     websitesCount: number;
     appsCount: number;
+    viewMode: 'table' | 'cards';
+    onViewModeChange: (mode: 'table' | 'cards') => void;
 };
 
 export const TemplatesToolbar = ({
@@ -22,6 +24,8 @@ export const TemplatesToolbar = ({
     onCreate,
     websitesCount,
     appsCount,
+    viewMode,
+    onViewModeChange,
 }: TemplatesToolbarProps) => {
     const hasQuery = query.trim().length > 0;
 
@@ -65,46 +69,71 @@ export const TemplatesToolbar = ({
                     ) : null}
                 </div>
 
-                <SegmentedControl
-                    aria-label="Category filter"
-                    value={categoryFilter}
-                    onChange={onCategoryFilterChange}
-                    options={[
-                        {
-                            value: 'all',
-                            label: (
-                                <>
-                                    All{' '}
-                                    <span className="tabular-nums opacity-80">
-                                        {websitesCount + appsCount}
-                                    </span>
-                                </>
-                            ),
-                        },
-                        {
-                            value: 'websites',
-                            label: (
-                                <>
-                                    {TEMPLATE_CATEGORY_LABELS.websites}{' '}
-                                    <span className="tabular-nums opacity-80">
-                                        {websitesCount}
-                                    </span>
-                                </>
-                            ),
-                        },
-                        {
-                            value: 'apps',
-                            label: (
-                                <>
-                                    {TEMPLATE_CATEGORY_LABELS.apps}{' '}
-                                    <span className="tabular-nums opacity-80">
-                                        {appsCount}
-                                    </span>
-                                </>
-                            ),
-                        },
-                    ]}
-                />
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 sm:ml-auto">
+                    <SegmentedControl
+                        aria-label="Category filter"
+                        value={categoryFilter}
+                        onChange={onCategoryFilterChange}
+                        options={[
+                            {
+                                value: 'all',
+                                label: (
+                                    <>
+                                        All{' '}
+                                        <span className="tabular-nums opacity-80">
+                                            {websitesCount + appsCount}
+                                        </span>
+                                    </>
+                                ),
+                            },
+                            {
+                                value: 'websites',
+                                label: (
+                                    <>
+                                        {TEMPLATE_CATEGORY_LABELS.websites}{' '}
+                                        <span className="tabular-nums opacity-80">
+                                            {websitesCount}
+                                        </span>
+                                    </>
+                                ),
+                            },
+                            {
+                                value: 'apps',
+                                label: (
+                                    <>
+                                        {TEMPLATE_CATEGORY_LABELS.apps}{' '}
+                                        <span className="tabular-nums opacity-80">
+                                            {appsCount}
+                                        </span>
+                                    </>
+                                ),
+                            },
+                        ]}
+                    />
+
+                    <SegmentedControl
+                        aria-label="View mode"
+                        value={viewMode}
+                        onChange={onViewModeChange}
+                        className="w-[5rem]"
+                        buttonClassName="px-0"
+                        options={[
+                            {
+                                value: 'table',
+                                label: <List className="size-4" aria-hidden />,
+                            },
+                            {
+                                value: 'cards',
+                                label: (
+                                    <LayoutGrid
+                                        className="size-4"
+                                        aria-hidden
+                                    />
+                                ),
+                            },
+                        ]}
+                    />
+                </div>
             </div>
         </section>
     );

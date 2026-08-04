@@ -92,7 +92,7 @@ export const PluginCard = ({
                                 size="icon-sm"
                                 variant="ghost"
                                 aria-label={`Actions for ${plugin.name}`}
-                                className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                                className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                             >
                                 <MoreHorizontal className="size-4" />
                             </Button>
@@ -135,7 +135,7 @@ export const PluginCard = ({
                 </h3>
                 
                 <div className="mt-3 space-y-1">
-                    <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                    <p className="text-[11px] font-medium tracking-wide text-primary uppercase">
                         File
                     </p>
                     <p className="truncate text-sm text-foreground/70">
@@ -143,7 +143,7 @@ export const PluginCard = ({
                     </p>
                 </div>
 
-                <p className="mt-2 min-h-10 line-clamp-2 break-all text-xs text-muted-foreground">
+                <p className="mt-2 min-h-10 line-clamp-2 break-all text-xs text-primary">
                     {plugin.description ?? 'No description provided.'}
                 </p>
             </div>

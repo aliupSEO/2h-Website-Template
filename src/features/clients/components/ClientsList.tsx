@@ -29,22 +29,15 @@ export const ClientsList = () => {
         deleteClient(pendingDelete.id);
         toast.success('Client deleted');
     };
-    return (<div className="space-y-6">
+    return (<div className="space-y-4">
       <DocumentTitle title="Clients"/>
-      <div className="space-y-1">
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">
-          Clients
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Manage clients with contact details, links, logos, assets, and docs.
-        </p>
-      </div>
 
-      <ClientsToolbar viewMode={viewMode} onViewModeChange={setViewMode} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter}/>
+      <div className="-m-4 space-y-0 bg-muted sm:-m-6">
+        <ClientsToolbar viewMode={viewMode} onViewModeChange={setViewMode} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter}/>
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-6 py-24 text-center sm:py-32">
-            <div className="mb-6 flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="mb-6 flex size-16 items-center justify-center rounded-2xl bg-primary text-black shadow-[0_0_20px_rgba(198,245,50,0.2)]">
                 <Briefcase className="size-8" />
             </div>
             <h3 className="mb-2 text-xl font-semibold tracking-tight text-foreground">
@@ -54,7 +47,14 @@ export const ClientsList = () => {
                 Create your first client to get started.
             </p>
         </div>
-      ) : viewMode === 'table' ? (<ClientsTable clients={filtered} onDelete={(client) => setPendingDelete(client)}/>) : (<ClientsCardGrid clients={filtered} onDelete={(client) => setPendingDelete(client)}/>)}
+      ) : viewMode === 'table' ? (
+        <ClientsTable clients={filtered} onDelete={(client) => setPendingDelete(client)}/>
+      ) : (
+        <div className="relative px-4 py-6 sm:px-6">
+          <ClientsCardGrid clients={filtered} onDelete={(client) => setPendingDelete(client)}/>
+        </div>
+      )}
+      </div>
 
       <ConfirmModal open={Boolean(pendingDelete)} onOpenChange={(open) => {
             if (!open)

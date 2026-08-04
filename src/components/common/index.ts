@@ -11,3 +11,5 @@ export { Loading } from './Loading';
 export { LoadingScreen } from './LoadingScreen';
 export { LoadingOverlay } from './LoadingOverlay';
 export { ButtonSpinner } from './ButtonSpinner';
+
+export * from './ScrollReveal';

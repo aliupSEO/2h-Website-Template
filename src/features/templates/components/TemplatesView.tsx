@@ -4,6 +4,7 @@ import type { TemplateSchema } from '@/features/templates/schemas';
 import type { Template, TemplateCategoryFilter } from '@/features/templates/types';
 import { TemplateFormDialog } from './TemplateFormDialog';
 import { TemplatesCardGrid } from './TemplatesCardGrid';
+import { TemplatesTable } from './TemplatesTable';
 import { TemplatesEmptyState } from './TemplatesEmptyState';
 import { TemplatesToolbar } from './TemplatesToolbar';
 import { toast } from '@/lib/toast';
@@ -19,6 +20,7 @@ export const TemplatesView = () => {
     const deleteTemplate = useTemplatesStore((state) => state.deleteTemplate);
 
     const [query, setQuery] = useState('');
+    const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
     const [categoryFilter, setCategoryFilter] =
         useState<TemplateCategoryFilter>('all');
     const [formOpen, setFormOpen] = useState(false);
@@ -106,10 +108,11 @@ export const TemplatesView = () => {
     }
 
     return (
-        <>
+        <div className="space-y-4">
             <DocumentTitle title="Templates" />
 
-            <TemplatesToolbar
+            <div className="-m-4 space-y-0 bg-muted sm:-m-6">
+                <TemplatesToolbar
                 query={query}
                 onQueryChange={setQuery}
                 categoryFilter={categoryFilter}
@@ -120,10 +123,11 @@ export const TemplatesView = () => {
                 }}
                 websitesCount={websitesCount}
                 appsCount={appsCount}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
             />
 
-            <div className="px-4 pb-8 sm:px-6">
-                {error && templates.length === 0 ? (
+            {error && templates.length === 0 ? (
                     <TemplatesEmptyState
                         title="Could not load templates"
                         description={error}
@@ -142,8 +146,8 @@ export const TemplatesView = () => {
                             setFormOpen(true);
                         }}
                     />
-                ) : (
-                    <TemplatesCardGrid
+                ) : viewMode === 'table' ? (
+                    <TemplatesTable
                         templates={filtered}
                         onEdit={(template) => {
                             setEditingTemplate(template);
@@ -151,6 +155,17 @@ export const TemplatesView = () => {
                         }}
                         onDelete={setPendingDelete}
                     />
+                ) : (
+                    <div className="relative px-4 py-6 sm:px-6">
+                        <TemplatesCardGrid
+                            templates={filtered}
+                            onEdit={(template) => {
+                                setEditingTemplate(template);
+                                setFormOpen(true);
+                            }}
+                            onDelete={setPendingDelete}
+                        />
+                    </div>
                 )}
             </div>
 
@@ -179,6 +194,6 @@ export const TemplatesView = () => {
                 variant="destructive"
                 onConfirm={handleDelete}
             />
-        </>
+        </div>
     );
 };

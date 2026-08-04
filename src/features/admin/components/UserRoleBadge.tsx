@@ -45,7 +45,7 @@ export const UserRoleBadge = ({ role, variant = 'solid' }: UserRoleBadgeProps) =
     }
 
     return (
-        <span className={`inline-flex h-6 w-28 items-center gap-1.5 rounded px-2.5 text-xs font-bold ${colorClass}`}>
+        <span className={`inline-flex h-6 w-fit whitespace-nowrap items-center gap-1.5 rounded px-2.5 text-xs font-bold ${colorClass}`}>
             <Icon className="size-3.5 shrink-0" />
             <span>{label}</span>
         </span>

@@ -23,7 +23,7 @@ export const ProfilePage = () => {
                 <Button
                     type="button"
                     variant="outline"
-                    className="group h-11 shrink-0 gap-2 rounded-md px-4 text-sm ring-1 ring-white/12 transition-[background-color,box-shadow,color] duration-200 hover:bg-primary/15 hover:text-primary hover:ring-primary/35"
+                    className="group h-11 shrink-0 gap-2 rounded-md px-4 text-sm ring-1 ring-white/12 transition-[background-color,box-shadow,color] duration-200 hover:bg-primary hover:text-primary-foreground hover:ring-primary/35"
                     onClick={() => navigate(-1)}
                 >
                     <ArrowLeft className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5" />

@@ -118,7 +118,7 @@ export const DeploymentsTable = ({
                                                 asChild
                                                 size="icon-sm"
                                                 variant="ghost"
-                                                className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                                                className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                                                 aria-label="Open deployment"
                                             >
                                                 <a
@@ -135,7 +135,7 @@ export const DeploymentsTable = ({
                                                 asChild
                                                 size="sm"
                                                 variant="ghost"
-                                                className="h-8 px-2 text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                                                className="h-8 px-2 text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                                             >
                                                 <a
                                                     href={deployment.inspectorUrl}
@@ -150,7 +150,7 @@ export const DeploymentsTable = ({
                                             type="button"
                                             size="sm"
                                             variant="outline"
-                                            className="h-8 gap-1.5 rounded-md ring-1 ring-white/10 hover:bg-primary/15 hover:text-primary hover:ring-primary/30"
+                                            className="h-8 gap-1.5 rounded-md ring-1 ring-white/10 hover:bg-primary hover:text-primary-foreground hover:ring-primary/30"
                                             disabled={Boolean(redeployingId)}
                                             onClick={() =>
                                                 onRedeploy(deployment)

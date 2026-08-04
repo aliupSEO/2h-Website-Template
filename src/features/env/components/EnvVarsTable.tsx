@@ -9,6 +9,7 @@ import {
     TableRow,
 } from '@/components/ui';
 import type { HubEnvVar } from '@/features/env/types';
+import { cn } from '@/lib/utils';
 
 type EnvVarsTableProps = {
     vars: HubEnvVar[];
@@ -24,6 +25,9 @@ const formatDate = (value: string) => {
     }).format(new Date(value));
 };
 
+const headClass =
+    'h-14 px-4 text-sm font-extrabold tracking-wide text-black uppercase sm:px-6';
+
 export const EnvVarsTable = ({
     vars,
     onReveal,
@@ -31,57 +35,57 @@ export const EnvVarsTable = ({
     onDelete,
 }: EnvVarsTableProps) => {
     return (
-        <div className="rounded-xl border-0 bg-card shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+        <div className="overflow-x-auto overflow-y-clip rounded-none border-0 bg-muted shadow-none">
             <Table>
                 <TableHeader>
-                    <TableRow className="border-white/5 hover:bg-transparent">
-                        <TableHead>Key</TableHead>
-                        <TableHead>Value</TableHead>
-                        <TableHead>Updated</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="border-b-0 bg-primary hover:bg-primary">
+                        <TableHead className={headClass}>Key</TableHead>
+                        <TableHead className={headClass}>Value</TableHead>
+                        <TableHead className={headClass}>Updated</TableHead>
+                        <TableHead className={cn(headClass, "text-right")}>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {vars.map((item) => (
-                        <TableRow key={item.id} className="border-white/5">
-                            <TableCell className="font-mono text-sm font-medium">
+                        <TableRow key={item.id} className="group/row border-white/5 hover:bg-white/[0.035]">
+                            <TableCell className="px-4 py-3.5 font-mono text-sm font-medium sm:px-6">
                                 {item.key}
                             </TableCell>
-                            <TableCell className="font-mono text-sm text-muted-foreground">
+                            <TableCell className="px-4 py-3.5 font-mono text-sm text-muted-foreground sm:px-6">
                                 ••••••••
                             </TableCell>
-                            <TableCell>{formatDate(item.updatedAt)}</TableCell>
-                            <TableCell className="text-right">
-                                <div className="flex justify-end gap-2">
+                            <TableCell className="px-4 py-3.5 sm:px-6">{formatDate(item.updatedAt)}</TableCell>
+                            <TableCell className="px-4 py-3.5 sm:px-6 text-right">
+                                <div className="flex items-center justify-end gap-1 text-muted-foreground transition-colors group-hover/row:text-foreground">
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        size="sm"
-                                        className="gap-1.5"
+                                        size="icon-sm"
+                                        className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                                         onClick={() => onReveal(item)}
+                                        title="Reveal"
                                     >
-                                        <Eye className="size-3.5" />
-                                        Reveal
+                                        <Eye className="size-4" />
                                     </Button>
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        size="sm"
-                                        className="gap-1.5"
+                                        size="icon-sm"
+                                        className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                                         onClick={() => onEdit(item)}
+                                        title="Edit"
                                     >
-                                        <Pencil className="size-3.5" />
-                                        Edit
+                                        <Pencil className="size-4" />
                                     </Button>
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        size="sm"
-                                        className="gap-1.5 text-destructive hover:text-destructive"
+                                        size="icon-sm"
+                                        className="text-destructive hover:bg-destructive hover:text-white"
                                         onClick={() => onDelete(item)}
+                                        title="Delete"
                                     >
-                                        <Trash2 className="size-3.5" />
-                                        Delete
+                                        <Trash2 className="size-4" />
                                     </Button>
                                 </div>
                             </TableCell>

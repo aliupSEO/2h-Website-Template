@@ -138,7 +138,7 @@ export const ProfileIdentity = ({
                 <Button
                     type="button"
                     variant="outline"
-                    className="h-11 gap-2 rounded-md bg-transparent px-4 text-sm ring-1 ring-white/12 transition-[background-color,box-shadow,color,transform] duration-200 hover:bg-primary/15 hover:text-primary hover:ring-primary/35 hover:shadow-[0_0_20px_rgba(198,245,50,0.12)] active:scale-[0.98]"
+                    className="h-11 gap-2 rounded-md bg-transparent px-4 text-sm ring-1 ring-white/12 transition-[background-color,box-shadow,color,transform] duration-200 hover:bg-primary hover:text-primary-foreground hover:ring-primary/35 hover:shadow-[0_0_20px_rgba(198,245,50,0.12)] active:scale-[0.98]"
                     disabled={busy}
                     onClick={() => inputRef.current?.click()}
                 >

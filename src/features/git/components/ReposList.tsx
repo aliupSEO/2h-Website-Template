@@ -126,7 +126,7 @@ export const ReposList = () => {
     };
 
     if (loading && repos.length === 0) {
-        return <LoadingScreen label="Loading repositories…" />;
+        return <LoadingScreen label="Loading repositories…" variant="robot" />;
     }
 
     const isSearchOrFilter =

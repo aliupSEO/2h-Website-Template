@@ -3,6 +3,7 @@ import type {
     VercelProjectSummary,
 } from '@/features/vercel/types';
 import { ProjectCard } from './ProjectCard';
+import { ScrollReveal } from '@/components/common';
 
 type ProjectsCardGridProps = {
     projects: VercelProject[];
@@ -20,7 +21,8 @@ export const ProjectsCardGrid = ({
     return (
         <div className="relative px-4 py-6 sm:px-6">
             <div className="relative grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {projects.map((project) => (
+                {projects.map((project, index) => (
+                    <ScrollReveal key={project.id} delay={Math.min(index * 50, 500)}>
                     <ProjectCard
                         key={project.id}
                         project={project}
@@ -38,6 +40,7 @@ export const ProjectsCardGrid = ({
                         onOpenDeployments={onOpenDeployments}
                         onOpenEnv={onOpenEnv}
                     />
+                    </ScrollReveal>
                 ))}
             </div>
         </div>

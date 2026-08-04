@@ -1,11 +1,18 @@
-import { Plus, Search, X } from 'lucide-react';
+import { LayoutGrid, List, Plus, Search, X } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
+import { SegmentedControl } from '@/features/git/components/SegmentedControl';
 
 type PluginsToolbarProps = {
     query: string;
     onQueryChange: (value: string) => void;
     onCreate: () => void;
     pluginCount: number;
+    activeCount: number;
+    inactiveCount: number;
+    statusFilter: 'all' | 'active' | 'inactive';
+    onStatusFilterChange: (filter: 'all' | 'active' | 'inactive') => void;
+    viewMode: 'table' | 'cards';
+    onViewModeChange: (mode: 'table' | 'cards') => void;
 };
 
 export const PluginsToolbar = ({
@@ -13,21 +20,21 @@ export const PluginsToolbar = ({
     onQueryChange,
     onCreate,
     pluginCount,
+    activeCount,
+    inactiveCount,
+    statusFilter,
+    onStatusFilterChange,
+    viewMode,
+    onViewModeChange,
 }: PluginsToolbarProps) => {
     const hasQuery = query.trim().length > 0;
 
     return (
         <section className="overflow-hidden rounded-none">
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
-                <div>
                     <h1 className="font-heading text-3xl font-semibold tracking-tight">
                         Plugins
                     </h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        {pluginCount} plugin{pluginCount === 1 ? '' : 's'} in
-                        catalog
-                    </p>
-                </div>
 
                 <Button
                     type="button"
@@ -40,7 +47,7 @@ export const PluginsToolbar = ({
                 </Button>
             </div>
 
-            <div className="px-4 pb-3 sm:px-6">
+            <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
                 <div className="relative min-w-0 w-full sm:max-w-md">
                     <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-foreground/50" />
                     <Input
@@ -60,6 +67,72 @@ export const PluginsToolbar = ({
                             <X className="size-3.5" />
                         </button>
                     ) : null}
+                </div>
+
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 sm:ml-auto">
+                    <SegmentedControl
+                        aria-label="Status filter"
+                        value={statusFilter}
+                        onChange={onStatusFilterChange}
+                        options={[
+                            {
+                                value: 'all',
+                                label: (
+                                    <>
+                                        All{' '}
+                                        <span className="tabular-nums opacity-80">
+                                            {pluginCount}
+                                        </span>
+                                    </>
+                                ),
+                            },
+                            {
+                                value: 'active',
+                                label: (
+                                    <>
+                                        Active{' '}
+                                        <span className="tabular-nums opacity-80">
+                                            {activeCount}
+                                        </span>
+                                    </>
+                                ),
+                            },
+                            {
+                                value: 'inactive',
+                                label: (
+                                    <>
+                                        Inactive{' '}
+                                        <span className="tabular-nums opacity-80">
+                                            {inactiveCount}
+                                        </span>
+                                    </>
+                                ),
+                            },
+                        ]}
+                    />
+
+                    <SegmentedControl
+                        aria-label="View mode"
+                        value={viewMode}
+                        onChange={onViewModeChange}
+                        className="w-[5rem]"
+                        buttonClassName="px-0"
+                        options={[
+                            {
+                                value: 'table',
+                                label: <List className="size-4" aria-hidden />,
+                            },
+                            {
+                                value: 'cards',
+                                label: (
+                                    <LayoutGrid
+                                        className="size-4"
+                                        aria-hidden
+                                    />
+                                ),
+                            },
+                        ]}
+                    />
                 </div>
             </div>
         </section>

@@ -327,7 +327,7 @@ export const FirebaseProjectsView = () => {
     };
 
     if (loadingStatus && !status) {
-        return <LoadingScreen label="Checking Firebase credentials…" />;
+        return <LoadingScreen label="Checking Firebase credentials…" variant="robot" />;
     }
 
     if (status && !status.configured) {
@@ -348,7 +348,7 @@ export const FirebaseProjectsView = () => {
     }
 
     if (loadingProjects && projects.length === 0) {
-        return <LoadingScreen label="Loading Firebase projects…" />;
+        return <LoadingScreen label="Loading Firebase projects…" variant="robot" />;
     }
 
     return (

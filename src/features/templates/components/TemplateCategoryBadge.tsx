@@ -15,9 +15,7 @@ export const TemplateCategoryBadge = ({
         <span
             className={cn(
                 'inline-flex h-6 items-center rounded px-2.5 text-[11px] font-bold tracking-wide uppercase',
-                category === 'websites'
-                    ? 'bg-sky-500 text-white'
-                    : 'bg-violet-500 text-white',
+                'bg-primary text-black',
                 className,
             )}
         >

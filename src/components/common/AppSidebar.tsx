@@ -42,14 +42,11 @@ export const AppSidebar = () => {
             </div>
 
             <nav
-                className="flex min-h-0 w-full flex-1 flex-col gap-6 overflow-y-auto overscroll-contain py-4"
+                className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-contain py-4"
                 aria-label="Main"
             >
                 {navGroups.map((group) => (
                     <div key={group.label} className="w-full">
-                        <p className="px-4 pb-2 text-[11px] font-semibold tracking-[0.16em] text-primary uppercase">
-                            {group.label}
-                        </p>
                         <ul className="w-full">
                             {group.items.map((item) => {
                                 const Icon = item.icon;

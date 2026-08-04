@@ -30,7 +30,7 @@ export const PluginStatusToggle = ({
                     aria-hidden
                     className={cn(
                         'pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-sm transition-transform duration-300 ease-out',
-                        isActive ? 'bg-primary' : 'bg-destructive/80',
+                        isActive ? 'bg-primary' : 'bg-amber-400',
                     )}
                     style={{
                         transform: `translateX(${activeIndex * 100}%)`,
@@ -55,7 +55,7 @@ export const PluginStatusToggle = ({
                     className={cn(
                         'relative z-10 h-9 rounded-sm text-sm font-medium',
                         !isActive
-                            ? 'text-white'
+                            ? 'text-black'
                             : 'text-foreground/75 hover:text-foreground',
                     )}
                     onClick={() => onChange(false)}

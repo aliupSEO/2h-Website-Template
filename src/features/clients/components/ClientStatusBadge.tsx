@@ -2,9 +2,9 @@ import { Badge } from '@/components/ui';
 import type { ClientStatus } from '@/features/clients/types';
 import { cn } from '@/lib/utils';
 const STATUS_STYLES: Record<ClientStatus, string> = {
-    active: 'bg-primary/15 text-primary',
-    inactive: 'bg-muted text-muted-foreground',
-    draft: 'bg-white/10 text-foreground',
+    active: 'bg-primary text-black',
+    inactive: 'bg-white/10 text-white',
+    draft: 'bg-amber-400 text-black',
 };
 const STATUS_LABELS: Record<ClientStatus, string> = {
     active: 'Active',
@@ -15,7 +15,14 @@ type ClientStatusBadgeProps = {
     status: ClientStatus;
 };
 export const ClientStatusBadge = ({ status }: ClientStatusBadgeProps) => {
-    return (<Badge variant="secondary" className={cn('rounded-md border-0', STATUS_STYLES[status])}>
-      {STATUS_LABELS[status]}
-    </Badge>);
+    return (
+        <span
+            className={cn(
+                'inline-flex h-6 items-center rounded px-2.5 text-[11px] font-bold tracking-wide uppercase',
+                STATUS_STYLES[status]
+            )}
+        >
+            {STATUS_LABELS[status]}
+        </span>
+    );
 };

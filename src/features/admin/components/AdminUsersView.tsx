@@ -15,6 +15,7 @@ import { InviteUserDialog } from './InviteUserDialog';
 import { SetPasswordDialog } from './SetPasswordDialog';
 import { UsersEmptyState } from './UsersEmptyState';
 import { UsersTable } from './UsersTable';
+import { UsersCardGrid } from './UsersCardGrid';
 import { UsersToolbar } from './UsersToolbar';
 import { toast } from '@/lib/toast';
 import { useAdminStore } from '@/stores/adminStore';
@@ -23,6 +24,8 @@ import { useAuthStore } from '@/stores/authStore';
 export const AdminUsersView = () => {
     const currentUser = useAuthStore((state) => state.user);
     const users = useAdminStore((state) => state.users);
+    const viewMode = useAdminStore((state) => state.viewMode);
+    const setViewMode = useAdminStore((state) => state.setViewMode);
     const loading = useAdminStore((state) => state.loading);
     const error = useAdminStore((state) => state.error);
     const fetchUsers = useAdminStore((state) => state.fetchUsers);
@@ -159,6 +162,8 @@ export const AdminUsersView = () => {
                     onStatusFilterChange={setStatusFilter}
                     counts={counts}
                     onInvite={() => setInviteOpen(true)}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
                 />
 
                 {error && users.length === 0 ? (
@@ -179,7 +184,7 @@ export const AdminUsersView = () => {
                         showInvite={!query && statusFilter === 'all'}
                         onInvite={() => setInviteOpen(true)}
                     />
-                ) : (
+                ) : viewMode === 'table' ? (
                     <UsersTable
                         users={filteredUsers}
                         currentUserId={currentUser?.id}
@@ -188,6 +193,17 @@ export const AdminUsersView = () => {
                         onSetPassword={setPasswordUser}
                         onSendReset={setResetUser}
                     />
+                ) : (
+                    <div className="relative px-4 py-6 sm:px-6">
+                        <UsersCardGrid
+                            users={filteredUsers}
+                            currentUserId={currentUser?.id}
+                            actorRole={currentUser?.role ?? 'user'}
+                            onEdit={setEditingUser}
+                            onSetPassword={setPasswordUser}
+                            onSendReset={setResetUser}
+                        />
+                    </div>
                 )}
             </div>
 

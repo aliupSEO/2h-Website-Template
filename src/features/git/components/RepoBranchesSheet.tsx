@@ -288,7 +288,7 @@ export const RepoBranchesSheet = ({
                                                 asChild
                                                 size="icon-sm"
                                                 variant="ghost"
-                                                className="shrink-0 text-foreground/70 hover:bg-primary/15 hover:text-primary"
+                                                className="shrink-0 text-foreground/70 hover:bg-primary hover:text-primary-foreground"
                                             >
                                                 <a
                                                     href={commit.htmlUrl}

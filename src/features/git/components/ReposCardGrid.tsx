@@ -1,5 +1,6 @@
 import type { GitRepo } from '@/features/git/types';
 import { RepoCard } from './RepoCard';
+import { ScrollReveal } from '@/components/common';
 
 type ReposCardGridProps = {
     repos: GitRepo[];
@@ -16,7 +17,8 @@ export const ReposCardGrid = ({
 }: ReposCardGridProps) => {
     return (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {repos.map((repo) => (
+            {repos.map((repo, index) => (
+                <ScrollReveal key={repo.id} delay={Math.min(index * 50, 500)}>
                 <RepoCard
                     key={repo.id}
                     repo={repo}
@@ -24,6 +26,7 @@ export const ReposCardGrid = ({
                     onDelete={onDelete}
                     onViewBranches={onViewBranches}
                 />
+                </ScrollReveal>
             ))}
         </div>
     );

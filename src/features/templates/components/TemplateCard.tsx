@@ -70,7 +70,7 @@ export const TemplateCard = ({
                                 size="icon-sm"
                                 variant="ghost"
                                 aria-label={`Actions for ${template.name}`}
-                                className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                                className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                             >
                                 <MoreHorizontal className="size-4" />
                             </Button>
@@ -104,7 +104,7 @@ export const TemplateCard = ({
                 </h3>
 
                 <div className="mt-3 space-y-1">
-                    <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                    <p className="text-[11px] font-medium tracking-wide text-primary uppercase">
                         Repo
                     </p>
                     <p className="truncate text-sm text-foreground/70">
@@ -112,7 +112,7 @@ export const TemplateCard = ({
                     </p>
                 </div>
 
-                <p className="mt-2 line-clamp-2 min-h-10 break-all text-xs text-muted-foreground">
+                <p className="mt-2 line-clamp-2 min-h-10 break-all text-xs text-primary">
                     {template.url}
                 </p>
             </div>

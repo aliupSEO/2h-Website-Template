@@ -12,7 +12,7 @@ type ClientsState = {
 };
 export const useClientsStore = create<ClientsState>((set) => ({
     clients: [],
-    viewMode: 'table',
+    viewMode: 'cards',
     hydrate: () => set({ clients: clientsService.list() }),
     setViewMode: (viewMode) => set({ viewMode }),
     createClient: (input) => {

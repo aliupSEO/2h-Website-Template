@@ -21,12 +21,17 @@ type AdminStore = {
         input: AdminSetPasswordInput,
     ) => Promise<void>;
     sendPasswordReset: (userId: string) => Promise<void>;
+    viewMode: 'table' | 'grid';
+    setViewMode: (mode: 'table' | 'grid') => void;
 };
 
 export const useAdminStore = create<AdminStore>((set, get) => ({
     users: [],
     loading: false,
     error: null,
+    viewMode: 'grid',
+
+    setViewMode: (mode) => set({ viewMode: mode }),
 
     fetchUsers: async () => {
         set({ loading: true, error: null });

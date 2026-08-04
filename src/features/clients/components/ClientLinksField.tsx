@@ -34,7 +34,7 @@ export const ClientLinksField = () => {
                 <Input id={`link-url-${field.id}`} placeholder="https://example.com" className="h-11 rounded-md border-transparent bg-[#2a2a2a]" {...register(`links.${index}.url`)}/>
               </FormField>
               <div className="flex items-end">
-                <Button type="button" variant="ghost" className="h-11 w-11 rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive" onClick={() => remove(index)} aria-label="Remove link">
+                <Button type="button" variant="ghost" className="h-11 w-11 rounded-md text-muted-foreground hover:bg-destructive hover:text-white" onClick={() => remove(index)} aria-label="Remove link">
                   <Trash2 className="size-5" />
                 </Button>
               </div>

@@ -95,7 +95,7 @@ export const RepoCard = ({
                         'No description yet — open on GitHub or edit from the hub.'}
                 </p>
 
-                <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5 text-xs text-muted-foreground">
+                <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5 text-xs text-primary">
                     <span className="inline-flex items-center gap-1.5 rounded bg-primary px-2.5 py-1 text-xs font-bold text-black">
                         <GitBranch className="size-3.5 text-black" />
                         <span className="font-bold text-black">

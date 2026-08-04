@@ -72,7 +72,7 @@ export const ProjectCard = ({
                         'mt-2 line-clamp-1 text-sm',
                         productionHost
                             ? 'text-foreground/70'
-                            : 'text-muted-foreground/50',
+                            : 'text-primary/50',
                     )}
                 >
                     {productionHost || 'No production URL yet'}
@@ -89,7 +89,7 @@ export const ProjectCard = ({
                             ) : latest ? (
                                 <DeploymentStatusBadge state={latest.state} />
                             ) : (
-                                <p className="text-[11px] text-muted-foreground">
+                                <p className="text-[11px] text-primary">
                                     None
                                 </p>
                             )}
@@ -138,7 +138,7 @@ export const ProjectCard = ({
                     </div>
                 </div>
 
-                <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-4 text-xs text-muted-foreground">
+                <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-4 text-xs text-primary">
                     <span
                         className="tabular-nums"
                         title={formatVercelDate(project.updatedAt)}

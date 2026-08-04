@@ -1,19 +1,10 @@
-import { cn } from '@/lib/utils';
+import { Loading } from './Loading';
 
 type ButtonSpinnerProps = {
     className?: string;
 };
 
-/** Compact circular spinner for auth buttons (sign in / sign out). */
+/** Compact circular spinner for auth buttons (sign in / sign out) and other small elements. */
 export const ButtonSpinner = ({ className }: ButtonSpinnerProps) => {
-    return (
-        <span
-            role="status"
-            aria-label="Loading"
-            className={cn(
-                'inline-block size-4 shrink-0 animate-spin rounded-full border-2 border-current border-r-transparent',
-                className,
-            )}
-        />
-    );
+    return <Loading size="sm" className={className} />;
 };

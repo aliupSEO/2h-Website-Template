@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Loading } from '@/components/common';
+import { Loader2 } from 'lucide-react';
 import {
     Button,
     Dialog,
@@ -83,9 +83,9 @@ export const RevealEnvDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Reveal value</DialogTitle>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-0 sm:max-w-md">
+                <DialogHeader className="space-y-1 border-b border-white/5 px-5 py-4 pr-12">
+                    <DialogTitle className="text-lg">Reveal value</DialogTitle>
                     <DialogDescription>
                         {item
                             ? `Decrypted value for ${item.key}. Close this dialog when finished.`
@@ -93,10 +93,11 @@ export const RevealEnvDialog = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="min-h-24 rounded-lg bg-muted px-3 py-3">
+                <div className="space-y-4 px-5 py-4">
+                    <div className="min-h-24 w-full rounded-md bg-[#2a2a2a] px-4 py-3">
                     {loading ? (
-                        <div className="flex items-center justify-center py-6">
-                            <Loading size="sm" />
+                        <div className="flex h-full items-center justify-center py-6">
+                            <Loader2 className="size-6 animate-spin text-primary" />
                         </div>
                     ) : (
                         <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all font-mono text-sm">
@@ -105,23 +106,26 @@ export const RevealEnvDialog = ({
                     )}
                 </div>
 
-                <DialogFooter>
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => onOpenChange(false)}
-                    >
-                        Close
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="brand"
-                        disabled={!value || loading}
-                        onClick={() => void handleCopy()}
-                    >
-                        Copy
-                    </Button>
-                </DialogFooter>
+                    <DialogFooter className="gap-2 border-t border-white/5 pt-4 sm:justify-end">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="h-11 rounded-md"
+                            onClick={() => onOpenChange(false)}
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="brand"
+                            className="h-11 min-w-24 rounded-md"
+                            disabled={!value || loading}
+                            onClick={() => void handleCopy()}
+                        >
+                            Copy
+                        </Button>
+                    </DialogFooter>
+                </div>
             </DialogContent>
         </Dialog>
     );

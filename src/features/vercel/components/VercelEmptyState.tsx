@@ -17,23 +17,23 @@ export const VercelEmptyState = ({
     icon,
 }: VercelEmptyStateProps) => {
     return (
-        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+        <div className="flex flex-col items-center justify-center px-6 py-24 text-center sm:py-32">
             {icon ? (
-                <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
+                <div className="mb-6 flex size-16 items-center justify-center rounded-2xl bg-primary text-black shadow-[0_0_20px_rgba(198,245,50,0.2)]">
                     {icon}
                 </div>
             ) : null}
-            <h3 className="font-heading text-lg font-semibold tracking-tight text-foreground">
+            <h3 className="font-heading text-xl font-semibold tracking-tight text-foreground">
                 {title}
             </h3>
-            <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+            <p className="mt-2.5 max-w-sm text-sm text-muted-foreground">
                 {description}
             </p>
             {actionLabel && onAction ? (
                 <Button
                     type="button"
                     variant="brand"
-                    className="mt-5 h-10 rounded-md px-4"
+                    className="mt-6 h-10 rounded-md px-4"
                     onClick={onAction}
                 >
                     {actionLabel}

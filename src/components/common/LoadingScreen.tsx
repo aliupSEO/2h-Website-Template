@@ -6,13 +6,16 @@ type LoadingScreenProps = {
     label?: string;
     size?: LoadingSize;
     className?: string;
+    delayMs?: number;
+    variant?: 'default' | 'robot';
 };
 
 export const LoadingScreen = ({
     label,
     size = 'xl',
     className,
-    delayMs = 250,
+    delayMs = 0,
+    variant = 'robot',
 }: LoadingScreenProps) => {
     const [show, setShow] = useState(delayMs === 0);
 
@@ -31,7 +34,7 @@ export const LoadingScreen = ({
                 className,
             )}
         >
-            <Loading size={size} label={label} />
+            <Loading size={size} label={label} variant={variant} />
         </div>
     );
 };

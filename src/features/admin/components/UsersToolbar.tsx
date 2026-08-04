@@ -1,4 +1,4 @@
-import { Plus, Search, X } from 'lucide-react';
+import { LayoutGrid, List, Plus, Search, X } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { SegmentedControl } from '@/features/git/components/SegmentedControl';
 import type { UserStatusFilter } from '@/features/admin/types';
@@ -16,6 +16,8 @@ type UsersToolbarProps = {
         confirmed: number;
     };
     onInvite: () => void;
+    viewMode: 'table' | 'grid';
+    onViewModeChange: (mode: 'table' | 'grid') => void;
 };
 
 export const UsersToolbar = ({
@@ -25,6 +27,8 @@ export const UsersToolbar = ({
     onStatusFilterChange,
     counts,
     onInvite,
+    viewMode,
+    onViewModeChange,
 }: UsersToolbarProps) => {
     const hasQuery = query.trim().length > 0;
 
@@ -133,6 +137,28 @@ export const UsersToolbar = ({
                                             {counts.confirmed}
                                         </span>
                                     </>
+                                ),
+                            },
+                        ]}
+                    />
+                    <SegmentedControl
+                        aria-label="View mode"
+                        value={viewMode}
+                        onChange={onViewModeChange}
+                        className="w-[5rem]"
+                        buttonClassName="px-0"
+                        options={[
+                            {
+                                value: 'table',
+                                label: <List className="size-4" aria-hidden />,
+                            },
+                            {
+                                value: 'grid',
+                                label: (
+                                    <LayoutGrid
+                                        className="size-4"
+                                        aria-hidden
+                                    />
                                 ),
                             },
                         ]}

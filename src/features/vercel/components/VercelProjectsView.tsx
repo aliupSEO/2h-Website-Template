@@ -253,7 +253,7 @@ export const VercelProjectsView = () => {
     };
 
     if (loadingProjects && projects.length === 0) {
-        return <LoadingScreen label="Loading Vercel projects…" />;
+        return <LoadingScreen label="Loading Vercel projects…" variant="robot" />;
     }
 
     const detailTitle =

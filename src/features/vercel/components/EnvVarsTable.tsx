@@ -128,7 +128,7 @@ export const EnvVarsTable = ({
                                                 type="button"
                                                 size="icon-sm"
                                                 variant="ghost"
-                                                className="text-foreground/80 hover:bg-primary/15 hover:text-primary"
+                                                className="text-foreground/80 hover:bg-primary hover:text-primary-foreground"
                                                 aria-label={`Edit ${envVar.key}`}
                                                 onClick={() => onEdit(envVar)}
                                             >
@@ -138,7 +138,7 @@ export const EnvVarsTable = ({
                                                 type="button"
                                                 size="icon-sm"
                                                 variant="ghost"
-                                                className="text-foreground/80 hover:bg-destructive/15 hover:text-destructive"
+                                                className="text-foreground/80 hover:bg-destructive hover:text-white"
                                                 aria-label={`Delete ${envVar.key}`}
                                                 onClick={() => onDelete(envVar)}
                                             >

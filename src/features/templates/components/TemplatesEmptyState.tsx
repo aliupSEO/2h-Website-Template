@@ -16,7 +16,7 @@ export const TemplatesEmptyState = ({
 }: TemplatesEmptyStateProps) => {
     return (
         <div className="flex flex-col items-center justify-center px-6 py-24 text-center sm:py-32">
-            <div className="mb-6 flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/25">
+            <div className="mb-6 flex size-16 items-center justify-center rounded-2xl bg-primary text-black shadow-[0_0_20px_rgba(198,245,50,0.2)]">
                 <LayoutTemplate className="size-8" />
             </div>
             <h2 className="font-heading text-xl font-semibold tracking-tight text-foreground">

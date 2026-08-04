@@ -1,5 +1,6 @@
 import type { Plugin } from '@/features/plugins/types';
 import { PluginCard } from './PluginCard';
+import { ScrollReveal } from '@/components/common';
 
 type PluginsCardGridProps = {
     plugins: Plugin[];
@@ -18,7 +19,8 @@ export const PluginsCardGrid = ({
 }: PluginsCardGridProps) => {
     return (
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {plugins.map((plugin) => (
+            {plugins.map((plugin, index) => (
+                <ScrollReveal key={plugin.id} delay={Math.min(index * 50, 500)}>
                 <PluginCard
                     key={plugin.id}
                     plugin={plugin}
@@ -27,6 +29,7 @@ export const PluginsCardGrid = ({
                     onDownload={onDownload}
                     onToggleActive={onToggleActive}
                 />
+                </ScrollReveal>
             ))}
         </div>
     );

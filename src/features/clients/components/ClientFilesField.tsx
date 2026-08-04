@@ -48,8 +48,8 @@ export const ClientFilesField = ({ name, title, description, accept, multiple = 
       </div>
 
       {files.length === 0 ? (
-        <button type="button" onClick={() => inputRef.current?.click()} className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/10 bg-transparent py-8 transition-colors hover:bg-white/[0.02]">
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <button type="button" onClick={() => inputRef.current?.click()} className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/10 bg-transparent py-8 transition-colors hover:bg-white/[0.02]">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-primary text-black">
             <FileUp className="size-5" />
           </div>
           <div className="text-center">
@@ -58,14 +58,14 @@ export const ClientFilesField = ({ name, title, description, accept, multiple = 
           </div>
         </button>
       ) : (<ul className="space-y-2">
-          {files.map((file: ClientFile) => (<li key={file.id} className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-transparent p-3">
+          {files.map((file: ClientFile) => (<li key={file.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-transparent p-3">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {formatFileSize(file.size)}
                 </p>
               </div>
-              <Button type="button" variant="ghost" className="size-9 shrink-0 rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive" onClick={() => removeFile(file.id)} aria-label={`Remove ${file.name}`}>
+              <Button type="button" variant="ghost" className="size-9 shrink-0 rounded-md text-muted-foreground hover:bg-destructive hover:text-white" onClick={() => removeFile(file.id)} aria-label={`Remove ${file.name}`}>
                 <Trash2 className="size-4" />
               </Button>
             </li>))}

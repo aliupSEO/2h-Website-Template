@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { Loading } from '@/components/common';
+import { Loader2 } from 'lucide-react';
 import {
     Button,
     Dialog,
@@ -17,6 +17,9 @@ import {
     importEnvSchema,
     type ImportEnvSchema,
 } from '@/features/env/schemas';
+import { cn } from '@/lib/utils';
+
+const FIELD_CLASS = 'w-full h-11 rounded-md bg-[#2a2a2a] text-foreground border-transparent';
 
 type ImportEnvDialogProps = {
     open: boolean;
@@ -62,9 +65,9 @@ export const ImportEnvDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>Import .env</DialogTitle>
+            <DialogContent className="gap-0 overflow-hidden rounded-xl border-0 bg-[#1a1a1a] p-0 sm:max-w-lg">
+                <DialogHeader className="space-y-1 border-b border-white/5 px-5 py-4 pr-12">
+                    <DialogTitle className="text-lg">Import .env</DialogTitle>
                     <DialogDescription>
                         Paste KEY=value lines or upload a .env file. Existing
                         keys are updated; invalid lines are skipped.
@@ -72,7 +75,7 @@ export const ImportEnvDialog = ({
                 </DialogHeader>
 
                 <form
-                    className="space-y-4"
+                    className="space-y-4 px-5 py-4"
                     onSubmit={(event) => void submit(event)}
                     noValidate
                 >
@@ -88,12 +91,13 @@ export const ImportEnvDialog = ({
                         />
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="outline"
+                            className="h-10 rounded-md bg-[#2a2a2a] border-transparent"
                             onClick={() => fileInputRef.current?.click()}
                         >
                             Choose file
                         </Button>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
                             Or paste below
                         </span>
                     </div>
@@ -108,15 +112,17 @@ export const ImportEnvDialog = ({
                             id="env-import-content"
                             rows={10}
                             placeholder={'API_KEY=...\nDATABASE_URL=...'}
-                            className="min-h-48 resize-y font-mono text-sm"
+                            className={cn("min-h-48 resize-y py-3 font-mono text-sm", FIELD_CLASS)}
+                            aria-invalid={Boolean(errors.content)}
                             {...register('content')}
                         />
                     </FormField>
 
-                    <DialogFooter>
+                    <DialogFooter className="gap-2 border-t border-white/5 pt-4 sm:justify-end">
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="outline"
+                            className="h-11 rounded-md"
                             onClick={() => onOpenChange(false)}
                         >
                             Cancel
@@ -124,9 +130,10 @@ export const ImportEnvDialog = ({
                         <Button
                             type="submit"
                             variant="brand"
+                            className="h-11 min-w-24 rounded-md"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? <Loading size="sm" /> : 'Import'}
+                            {isSubmitting ? <Loader2 className="size-5 animate-spin" /> : 'Import'}
                         </Button>
                     </DialogFooter>
                 </form>

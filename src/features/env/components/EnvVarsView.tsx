@@ -4,6 +4,7 @@ import { EnvEmptyState } from './EnvEmptyState';
 import { EnvToolbar } from './EnvToolbar';
 import { EnvVarFormDialog } from './EnvVarFormDialog';
 import { EnvVarsTable } from './EnvVarsTable';
+import { EnvVarsCardGrid } from './EnvVarsCardGrid';
 import { ImportEnvDialog } from './ImportEnvDialog';
 import { RevealEnvDialog } from './RevealEnvDialog';
 import type {
@@ -26,6 +27,7 @@ export const EnvVarsView = () => {
     const importFile = useEnvStore((state) => state.importFile);
 
     const [query, setQuery] = useState('');
+    const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
     const [formOpen, setFormOpen] = useState(false);
     const [importOpen, setImportOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<HubEnvVar | null>(null);
@@ -115,21 +117,23 @@ export const EnvVarsView = () => {
     }
 
     return (
-        <>
+        <div className="space-y-4">
             <DocumentTitle title="Env" />
 
-            <EnvToolbar
-                query={query}
-                onQueryChange={setQuery}
-                varCount={vars.length}
-                onAdd={() => {
-                    setEditingItem(null);
-                    setFormOpen(true);
-                }}
-                onImport={() => setImportOpen(true)}
-            />
+            <div className="-m-4 space-y-0 bg-muted sm:-m-6">
+                <EnvToolbar
+                    query={query}
+                    onQueryChange={setQuery}
+                    varCount={vars.length}
+                    onAdd={() => {
+                        setEditingItem(null);
+                        setFormOpen(true);
+                    }}
+                    onImport={() => setImportOpen(true)}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                />
 
-            <div className="px-4 pb-8 sm:px-6">
                 {error && vars.length === 0 ? (
                     <EnvEmptyState
                         title="Could not load env"
@@ -149,7 +153,7 @@ export const EnvVarsView = () => {
                             setFormOpen(true);
                         }}
                     />
-                ) : (
+                ) : viewMode === 'table' ? (
                     <EnvVarsTable
                         vars={filtered}
                         onReveal={setRevealItem}
@@ -159,6 +163,18 @@ export const EnvVarsView = () => {
                         }}
                         onDelete={setPendingDelete}
                     />
+                ) : (
+                    <div className="relative px-4 py-6 sm:px-6">
+                        <EnvVarsCardGrid
+                            vars={filtered}
+                            onReveal={setRevealItem}
+                            onEdit={(item) => {
+                                setEditingItem(item);
+                                setFormOpen(true);
+                            }}
+                            onDelete={setPendingDelete}
+                        />
+                    </div>
                 )}
             </div>
 
@@ -203,6 +219,6 @@ export const EnvVarsView = () => {
                 variant="destructive"
                 onConfirm={handleDelete}
             />
-        </>
+        </div>
     );
 };
