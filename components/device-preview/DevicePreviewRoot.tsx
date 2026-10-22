@@ -130,6 +130,13 @@ const Seg = ({ active, disabled, label, onClick, children }: SegProps) => (
 );
 
 export const DevicePreviewRoot = ({ children }: { children: ReactNode }) => {
+    if (process.env.NODE_ENV !== "development") {
+        return <>{children}</>;
+    }
+    return <DevicePreviewDev>{children}</DevicePreviewDev>;
+};
+
+const DevicePreviewDev = ({ children }: { children: ReactNode }) => {
     const [ready, setReady] = useState(false);
     const [inFrame, setInFrame] = useState(false);
     const [mode, setMode] = useState<Mode>("desktop");
