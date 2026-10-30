@@ -249,8 +249,14 @@ lib/
 ## 11. WordPress Plugin Requirements
 
 For this template to work, the WordPress site needs:
+- **2H Hub connector** (Settings → 2H Hub)
+- **Hub plugins** installed through that connector
 - **WPGraphQL** plugin (provides the `/graphql` endpoint)
 - **RankMath** + **WPGraphQL for Rank Math SEO** bridge plugin (do NOT use the generic Yoast WPGraphQL SEO plugin)
 - **firebase-form** custom plugin (provides `/wp-json/firebase-form/v1/submit` and `/wp-json/firebase-form/v1/settings`)
 
-If those plugins aren't installed, the GraphQL queries will still work but SEO fields will be null, and the contact form will fall back to Firestore directly.
+Do not install, upload, activate, or download the 2H Hub connector or any WordPress plugin. A person installs those in WordPress.
+
+If the 2H Hub connector or a required plugin is missing, **stop**. Do not design, do not create pages, and do not work around it. Show this error and nothing else:
+
+**Error:** Install the 2H Hub connector and plugins.

@@ -1,0 +1,14 @@
+---
+description: Stop when the 2H Hub connector or WordPress plugins are missing. Never install them.
+alwaysApply: true
+---
+
+# 2H Hub connector and plugins
+
+Do not install, upload, activate, or download the **2H Hub connector** or any WordPress plugin.
+A person installs those in WordPress. You do not.
+
+If the 2H Hub connector or a required plugin is missing, **stop**. Do not design, do not create pages, and do not work around it.
+Show this error and nothing else:
+
+**Error:** Install the 2H Hub connector and plugins.
